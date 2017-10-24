@@ -54,3 +54,5 @@ p <- ggplot(data = df, aes(x = X, y = Y)) +
   theme(plot.title = element_text(size=16)) +
   theme(plot.subtitle = element_text(size=10, color = "#7F7F7F"))
 p
+
+ggsave("Examples/GridMap.png", plot = last_plot(), width = 6, units = "in")
