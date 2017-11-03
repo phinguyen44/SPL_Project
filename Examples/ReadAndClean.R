@@ -13,8 +13,8 @@ library("data.table")
 load("easySHARE_rel6_0_0.rda")
 dat = copy(easySHARE_rel6_0_0)
 
-a = c(-3, -7, -9, -12, -13, -14, -15, -16)
-b = c("implausible", "uncoded", "notApplicable", "dontKnow", "notAskedWave", "notAskedCountry", "noInformation", "noDropOff")
+a = c(-2, -3, -4, -7, -9, -12, -13, -14, -15, -16)
+b = c("tocheck","implausible", "tocheck","uncoded", "notApplicable", "dontKnow", "notAskedWave", "notAskedCountry", "noInformation", "noDropOff")
 missing.value.codes = data.frame(a,b)
 
 # Wave 6 ONLY
