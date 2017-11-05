@@ -1,10 +1,11 @@
 #################################################################################################
-# GridMap-CASPbyCountry.R
+# EDA-CASPbyCountry.R
 #
 #################################################################################################
 # Description:
 # Grid map: displays average CASP score of countries in Wave 5 of SHARE.
 # Grid map #2: plot histograms
+# Maps of distributions
 # Na's are removed
 #
 #################################################################################################
@@ -16,34 +17,38 @@
 wd = file.path(Sys.getenv("HOME"),"/Documents/Projects/SPL_Project")
 setwd(wd)
 
-# Source cleaned data set
+# Source necessary packages and data
 source("Scripts/EDA.R")
-rm(list = ls()[which(!(ls() %in% c("casp_country", "df.loc")))])
-
-# Get necessary packages for analysis
-# run install.packages("needs") and library(needs) if not installed yet
+rm(list = ls()[which(!(ls() %in% "df.loc"))])
 needs(ggplot2, countrycode, viridis, geofacet, ggridges)
-
-# Country code data
-coordinates = readxl::read_excel("Examples/Coordinates.xlsx", sheet = 1)
-codes       = countrycode_data
 
 ##################################################################################################
 # Data Preparation
 
+casp_country = df.loc %>% 
+  group_by(loc_country) %>% 
+  summarize(avg_casp = round(mean(casp, na.rm = TRUE),2))
+
+coordinates = readxl::read_excel("Examples/Coordinates.xlsx", sheet = 1)
+codes       = countrycode_data
+
 df = left_join(coordinates, codes, by = c("Country" = "country.name.en")) %>%
-  select(Country, iso3c, X, Y, InSet) %>%
+  select(Country, iso3c, X, Y) %>%
   left_join(casp_country, by = c("iso3c" = "loc_country")) %>%
   rename(loc_country = iso3c)
-
-df$InSet = !is.na(df$avg_casp)
 
 # remove Israel
 df.loc = df.loc %>% filter(loc_country != "ISR")
 
-# remove NA's
-df.loc.noNA = df.loc %>% filter(!is.na(casp))
+# remove NA's and reorder
 df.noNA     = df %>% filter(!is.na(avg_casp))
+df.loc.noNA = df.loc %>% 
+  filter(!is.na(casp)) %>% 
+  group_by(loc_country) %>%
+  mutate(m = mean(casp)) %>%
+  arrange(m) %>%
+  ungroup() %>%
+  mutate(loc_country=factor(loc_country, unique(loc_country)))
 
 ##################################################################################################
 # Draw graph
@@ -96,14 +101,8 @@ p2
 
 ggsave("Output/Histogram-CASPbyCountry.png", plot = last_plot(), width = 6, height = 6, units = "in")
 
-### ggjoy
-# reorder by mean
-df.loc.noNA = df.loc.noNA %>%
-  group_by(loc_country) %>%
-  mutate(m = mean(casp)) %>%
-  arrange(m) %>%
-  ungroup() %>%
-  mutate(loc_country=factor(loc_country, unique(loc_country)))
+##################################################################################################
+# Draw graph3
 
 p3 = ggplot(data = df.loc.noNA, aes(x = casp, y = loc_country)) +
   geom_density_ridges(fill = "lightblue", na.rm = TRUE, scale = 2, rel_min_height = 0.01) +

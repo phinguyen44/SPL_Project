@@ -83,15 +83,8 @@ df.health  = select(df.slim, starts_with("health"), casp)
 df.job     = select(df.slim, starts_with("job"), casp)
 
 ##################################################################################################
-# Data Exploration
-
-# explore happiness by country
-casp_country = df.loc %>% 
-  group_by(loc_country) %>% 
-  summarize(avg_casp = round(mean(casp, na.rm = TRUE),2))
+# Data Exploration (in separate scripts!)
 
 # corrplots for each group
 # summary statistics
 # creat basic univariate stuff (x[i] vs y)
-
-# mean / histogram of happiness by country (geofacet)
