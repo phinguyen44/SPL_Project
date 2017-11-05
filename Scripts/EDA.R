@@ -35,7 +35,7 @@ job       = c("ep005_", "ep013_mod", "ep026_mod", "co007_", "thinc_m")
 yvar      = "casp"
 
 df.slim = df.out %>% 
-  select(base, location, education, family, health, job) %>% 
+  select(base, location, education, family, health, job, yvar) %>% 
   rename(base_gender        = female,
          base_age           = age,
          loc_country        = country_mod,
@@ -65,3 +65,6 @@ df.slim = df.out %>%
 # discretize some variables?
 # regularize?
 
+# corrplots for each group
+# summary statistics
+# creat basic univariate stuff (x[i] vs y)
