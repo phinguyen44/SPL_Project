@@ -90,10 +90,8 @@ casp_country = df.loc %>%
   group_by(loc_country) %>% 
   summarize(avg_casp = round(mean(casp, na.rm = TRUE),2))
 
-
-
 # corrplots for each group
 # summary statistics
 # creat basic univariate stuff (x[i] vs y)
 
-# mean / histogram of happiness by country (geofacet) + my grid
+# mean / histogram of happiness by country (geofacet)
