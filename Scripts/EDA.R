@@ -24,7 +24,7 @@ needs(ggplot2, tidyr, dplyr, zoo, corrplot, countrycode)
 ##################################################################################################
 # Organize Data Set
 
-# first pass: select only those that have theoretical value
+# first pass: select only those that have theoretical value (note that NA columns were removed)
 base      = c("female", "age")
 location  = c("country_mod", "birth_country", "iv009_mod")
 education = c("isced1997_r", "eduyears_mod")
@@ -60,11 +60,25 @@ df.slim = df.out %>%
          job_afford         = co007_,
          job_income         = thinc_m)
 
-# gonna have to do some imputation or remove some variables because only 1031 complete cases
+rm(df.out)
 
-# discretize some variables?
-# regularize?
+# TODO: IMPUTATION. Only 1031 complete cases otherwise.
+# TODO: DISCRETIZATION. Simplify some numeric inputs.
+# TODO: REGULARIZATION. Consider model shrinking methods.
+
+# split data sets into groupings
+df.base    = select(df.slim, starts_with("base"), casp)
+df.loc     = select(df.slim, starts_with("loc"), casp)
+df.edu     = select(df.slim, starts_with("edu"), casp)
+df.fam     = select(df.slim, starts_with("fam"), casp)
+df.health  = select(df.slim, starts_with("health"), casp)
+df.job     = select(df.slim, starts_with("job"), casp)
+
+##################################################################################################
+# Organize Data Set
 
 # corrplots for each group
 # summary statistics
 # creat basic univariate stuff (x[i] vs y)
+
+# mean / histogram of happiness by country (facet)
