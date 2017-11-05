@@ -24,9 +24,14 @@ needs(ggplot2, tidyr, dplyr, zoo, corrplot, countrycode)
 ##################################################################################################
 # Organize Data Set
 
+# convert country to iso code (alphabetic)
+country_data = with(countrycode_data, data.frame(iso3c, iso3n))
+df.out       = left_join(df.out, country_data, by = c("country_mod" = "iso3n")) %>% 
+  left_join(country_data, by = c("birth_country" = "iso3n"))
+
 # first pass: select only those that have theoretical value (note that NA columns were removed)
 base      = c("female", "age")
-location  = c("country_mod", "birth_country", "iv009_mod")
+location  = c("iso3c.x", "iso3c.y", "iv009_mod")
 education = c("isced1997_r", "eduyears_mod")
 family    = c("mar_stat", "hhsize", "ch001_", "ch021_mod", "ch007_km") 
 health    = c("chronic_mod", "eurod", "bmi", "smoking", "br010_mod", "br015_")
@@ -38,8 +43,8 @@ df.slim = df.out %>%
   select(base, location, education, family, health, job, yvar) %>% 
   rename(base_gender        = female,
          base_age           = age,
-         loc_country        = country_mod,
-         loc_birth          = birth_country,
+         loc_country        = iso3c.x,
+         loc_birth          = iso3c.y,
          loc_area           = iv009_mod,
          edu                = isced1997_r,
          edu_years          = eduyears_mod,
@@ -60,10 +65,13 @@ df.slim = df.out %>%
          job_afford         = co007_,
          job_income         = thinc_m)
 
+df.slim$loc_country = as.character(df.slim$loc_country)
+df.slim$loc_birth   = as.character(df.slim$loc_birth)
+
 rm(df.out)
 
 # TODO: IMPUTATION. Only 1031 complete cases otherwise.
-# TODO: DISCRETIZATION. Simplify some numeric inputs.
+# TODO: DISCRETIZATION. Simplify some numeric inputs. Age is a good example.
 # TODO: REGULARIZATION. Consider model shrinking methods.
 
 # split data sets into groupings
@@ -75,10 +83,17 @@ df.health  = select(df.slim, starts_with("health"), casp)
 df.job     = select(df.slim, starts_with("job"), casp)
 
 ##################################################################################################
-# Organize Data Set
+# Data Exploration
+
+# explore happiness by country
+casp_country = df.loc %>% 
+  group_by(loc_country) %>% 
+  summarize(avg_casp = round(mean(casp, na.rm = TRUE),2))
+
+
 
 # corrplots for each group
 # summary statistics
 # creat basic univariate stuff (x[i] vs y)
 
-# mean / histogram of happiness by country (facet)
+# mean / histogram of happiness by country (geofacet) + my grid
