@@ -17,7 +17,7 @@ a = c(-2, -3, -4, -7, -9, -12, -13, -14, -15, -16)
 b = c("tocheck","implausible", "tocheck","uncoded", "notApplicable", "dontKnow", "notAskedWave", "notAskedCountry", "noInformation", "noDropOff")
 missing.value.codes = data.frame(a,b)
 
-# Wave 6 ONLY
+# Wave 5 ONLY
 df = subset(dat, dat$wave == "5")
 
 # Numeric:

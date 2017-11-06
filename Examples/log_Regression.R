@@ -139,3 +139,8 @@ sensitivity(df.reg$unhappy, predicted, threshold = 0.5)
 specificity(df.reg$unhappy, predicted, threshold = 0.5)
 
 confusionMatrix(df.reg$unhappy, predicted, threshold = 0.5)
+
+#install.packages("Information")
+library(Information)
+
+IV <- create_infotables(data=df.reg, y=unhappy, bins=4)
