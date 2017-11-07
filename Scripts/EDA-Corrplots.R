@@ -10,9 +10,15 @@
 #################################################################################################
 # LOAD DATA
 
+rm(list = ls())
+
 # Adjust your working directory
 wd = file.path(Sys.getenv("HOME"),"/Documents/Projects/SPL_Project")
 setwd(wd)
 
 source("Scripts/EDA.R")
 needs(PerformanceAnalytics)
+
+#################################################################################################
+# Do corrplots
+
