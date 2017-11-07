@@ -36,7 +36,7 @@ base      = c("female", "age", "eduyears_mod")
 location  = c("iso3c.x", "iso3c.y", "iv009_mod")
 family    = c("mar_stat", "hhsize", "ch001_", "ch021_mod", "ch007_km") 
 health    = c("sphus", "chronic_mod", "eurod", "bmi", "ever_smoked", "br010_mod", "br015_")
-job       = c("ep005_", "ep013_mod", "ep026_mod", "co007_", "thinc_m")
+job       = c("ep005_", "ep026_mod", "co007_", "thinc_m") # dropped job satisf. and salary due to high NA count
 
 yvar      = "casp"
 
@@ -61,8 +61,6 @@ df.slim = df.out %>%
          health_drinking    = br010_mod,      # drinking scale. 1 not at all, 7 daily
          health_activities  = br015_,         # health scale. 1 if often, 4 hardly ever
          job_status         = ep005_,         # 1ret, 2job, 3unemp, 4sick, 5homemaker, 97other
-         job_hours          = ep013_mod,      # hours per week worked
-         job_satisfaction   = ep026_mod,      # 1 strongly agree - 4 strongly disagree
          job_afford         = co007_,         # can make ends meet. 1 hard - 4 easy
          job_income         = thinc_m)        # household income
 
