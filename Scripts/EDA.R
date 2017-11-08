@@ -86,6 +86,7 @@ df.slim$fam_child_prox[df.slim$fam_child_prox == 5] = 0
 df.slim$health_smoking[df.slim$health_smoking == 5] = 0
 
 # TODO: Fix outliers: fam_num_grandchild, health_bmi, job_income
+# TODO: Convert all categorical variables from numeric to factors
 
 # split data sets into groupings
 df.base    = select(df.slim, starts_with("base"), casp)
