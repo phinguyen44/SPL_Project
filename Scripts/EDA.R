@@ -36,7 +36,7 @@ base      = c("female", "age", "eduyears_mod")
 location  = c("iso3c.x", "iso3c.y", "iv009_mod")
 family    = c("mar_stat", "hhsize", "ch001_", "ch021_mod", "ch007_km") 
 health    = c("sphus", "chronic_mod", "eurod", "bmi", "ever_smoked", "br010_mod", "br015_")
-job       = c("ep005_", "ep026_mod", "co007_", "thinc_m") # dropped job satisf. and salary due to high NA count
+job       = c("ep005_", "co007_", "thinc_m") # dropped job satisf. and salary due to high NA count
 
 yvar      = "casp"
 
