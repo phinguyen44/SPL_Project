@@ -56,3 +56,39 @@ corrplot(cor(df.job.cc),
          addCoef.col = "black", 
          tl.col      = "black", 
          tl.srt      = 45)
+
+#################################################################################################
+# Scatterplots, covariates vs. CASP score
+
+# Reorganize data frames in a tidy set for plotting
+base.tidy   = df.base.cc %>% 
+  gather("xvar", "x", 1:(ncol(df.base.cc)-1))
+fam.tidy    = df.fam.cc %>% 
+  gather("xvar", "x", 1:(ncol(df.fam.cc)-1))
+health.tidy = df.health.cc %>% 
+  gather("xvar", "x", 1:(ncol(df.health.cc)-1))
+job.tidy    = df.job.cc %>% 
+  gather("xvar", "x", 1:(ncol(df.job.cc)-1))
+
+# Draw basic scatterplots
+p1 <- ggplot(data = base.tidy, aes(x = x, y = casp)) +
+  geom_point(alpha = 0.10) +
+  facet_grid(. ~ xvar, scales = "free")
+p1
+
+p2 <- ggplot(data = fam.tidy, aes(x = x, y = casp)) +
+  geom_point(alpha = 0.10) +
+  facet_grid(. ~ xvar, scales = "free")
+p2
+
+p3 <- ggplot(data = health.tidy, aes(x = x, y = casp)) +
+  geom_point(alpha = 0.10) +
+  facet_grid(. ~ xvar, scales = "free")
+p3
+
+p4 <- ggplot(data = job.tidy, aes(x = x, y = casp)) +
+  geom_point(alpha = 0.10) +
+  facet_grid(. ~ xvar, scales = "free")
+p4
+
+# TODO: Consider better plots for binary variables

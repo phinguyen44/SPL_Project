@@ -48,7 +48,7 @@ df.slim = df.out %>%
          loc_country        = iso3c.x,        # location of participant (factor)
          loc_birth          = iso3c.y,        # birth location of participant (factor)
          loc_area           = iv009_mod,      # 1city, 2burbs of city, 3town, 4small town, 5rural
-         fam_married        = mar_stat,       # categorical var describing marital status
+         fam_married        = mar_stat,       # 1mar+liv, 2partner, 3mar+sep, 4never, 5div, 6widowed
          fam_hhsize         = hhsize,         # num people in household
          fam_num_child      = ch001_,         # num children
          fam_num_grandchild = ch021_mod,      # num grandchild
@@ -66,9 +66,10 @@ df.slim = df.out %>%
 
 rm(df.out)
 
-# TODO: IMPUTATION. Only 1031 complete cases otherwise.
+# TODO: IMPUTATION. Only 46558 complete cases otherwise.
 # TODO: DISCRETIZATION. Simplify some numeric inputs. Age is a good example.
 # TODO: DROP 97 values from job_status since we don't know what it is
+# TODO: DROP 0 from fam_married because it's no information (essentially NAs)
 
 ##################################################################################################
 # Data Cleaning & Description: describe variables, make necessary changes, summaries.
@@ -84,7 +85,7 @@ df.slim$base_age = round(df.slim$base_age)
 df.slim$fam_child_prox[df.slim$fam_child_prox == 5] = 0
 df.slim$health_smoking[df.slim$health_smoking == 5] = 0
 
-# TODO: Fix outliers: fam_num_grandchild, health_bmi
+# TODO: Fix outliers: fam_num_grandchild, health_bmi, job_income
 
 # split data sets into groupings
 df.base    = select(df.slim, starts_with("base"), casp)
