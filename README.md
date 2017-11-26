@@ -2,6 +2,8 @@
 
 Statistical Programming Languages Group Project
 
+![image](https://imgs.xkcd.com/comics/machine_learning.png)
+
 ## Project Details
 
 **RESEARCH QUESTION**: How is the labor force participation behavior of individuals aged 50-64 in 11 European countries influenced by different health indicators (both self-reported and tested)?
@@ -37,6 +39,8 @@ Statistical Programming Languages Group Project
     - Measure [health-related indicators](https://ourworldindata.org/wp-content/uploads/2017/04/Happiness-Inequality-Clark-et-al-2015.png) over time (using new waves of data). Consider using deciles to show inequalities.
     - [For each country](https://ourworldindata.org/wp-content/uploads/2017/04/Happiness-by-Income-Quintiles-Small-Multiples.png) (use small multiples) show how labor-force participation may change based on the distribution of health.
     - [Show correlation](https://ourworldindata.org/grapher/gdp-vs-happiness) of each indicator and labor-force participation on a scatterplot. Size the dots by country size.
+
+Add notes on data quality and measurement. Do we believe the variables selected are meaningful?
 
 ## Team Members
 
