@@ -19,6 +19,23 @@ Statistical Programming Languages Group Project
 ### Section 1: Data and Descriptive Statistics
 
 1. Data import, cleaning, imputation, prep variables for model input (dummy variables, standardization)
+    - 11 countries: Austria, Belgium, Denmark, France, Germany, Greece, Italy, the Netherlands, Spain, Sweden, Switzerland (**country_mod**)
+    - Filter: Only men and women between 50 and 64, only wave 1
+    - Select: (8 health indicators):
+        1. Serious Health Condition (**chronic_mod**)
+        2. Mild Health Condition (**chronic_mod**)
+        3. Activities of Daily Living (**adla**)
+        4. Max. Grip Strength (**maxgrip**)
+        5. Overweight (**bmi2**)
+        6. Obese (**bmi2**)
+        7. Bad Mental Health (**eurod**)
+        8. Good Self-Perceived Health (**sphus**)
+    - Select: (demographic variables):
+        1. Secondary education (**isced1997_r**)
+        2. Higher education (**isced1997_r**)
+        3. Children (**ch001_**)
+        4. Marriage Status (**mar_stat**)
+    - Outcome: Labor participation (**ep013_mod**)
 2. Summary statistics tables
 
 ### Section 2: Estimation
