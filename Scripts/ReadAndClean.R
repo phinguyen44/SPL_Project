@@ -12,38 +12,50 @@
 
 rm(list = ls())
 
-# Detach all Packages
-library("utils")
-
-choiceV = c("continue", "stop execution")
-titleV = c("Cleaning Session. Detach all Packages?!")
-userChoice = utils::menu(choices = choiceV, graphics = TRUE, title = titleV)
-
-if(userChoice == 1)
-  {
-  
-  lapply(paste('package:', names(sessionInfo()$otherPkgs), sep=""),
-         detach, character.only = TRUE, unload = TRUE)
-
-  warning("Cleaning Session!\nAll packages are being detached!")
-                    
-  } else{
-    
-    warning("You are proceeding without a clean session. ")
-                      
-        }
-
 # Adjust your working directory
 wd = file.path(Sys.getenv("USERPROFILE"),"/splrepo/SPL_Project")
 setwd(wd)
 
-install.packages("needs")
-library(needs)
+# Define required packages and install them if necessary. 
+neededPackages = c("dplyr", "tidyr", "purrr", "ggplot2", "countrycode", "utils")
+allPackages = c(neededPackages %in% installed.packages()[,"Package"]) 
 
-needs(dplyr, tidyr, purrr, ggplot2, countrycode)
+if(!all(allPackages))
+  {
+  
+  # Find missing packages
+  missingIDX = which(allPackages == FALSE) # Retrieve index of missing packages
+  lapply(missingIDX, install.packages) # Install all packages which cannot be found.
+  
+}
 
+
+# Detach all loaded Packages
+choiceV = c("continue", "stop execution")
+titleV = c("Cleaning Session. Detach all Packages?!")
+userChoice = utils::menu(choices = choiceV, graphics = TRUE, title = titleV)
+
+
+# Check if any packages are loaded
+nPackages = length(names(sessionInfo()$otherPkgs))
+
+if(userChoice == 1 & nPackages != 0) # Only need to detach any Package if at least one is loaded
+{
+ 
+  lapply(paste('package:', names(sessionInfo()$otherPkgs), sep=""),
+         detach, character.only = TRUE, unload = TRUE)
+  
+  warning("Cleaning Session!\nAll packages are being detached!")
+  
+} else{warning("You are proceeding without a clean session. ")}
+
+
+# Load all defined packages
+lapply(neededPackages, function(z) library(z, character.only = TRUE))
+
+# Load dataset
 load("Data/easySHARE_rel6_0_0.rda")
-dat.input = easySHARE_rel6_0_0 # don't overwrite
+dat.input = easySHARE_rel6_0_0 # always use unique dataset input
 rm(easySHARE_rel6_0_0)
 
 ################################################################################
