@@ -16,6 +16,9 @@ rm(list = ls())
 wd = file.path(Sys.getenv("HOME"),"/Documents/Projects/SPL_Project")
 setwd(wd)
 
+install.packages("needs")
+library(needs)
+
 needs(dplyr, tidyr, purrr, ggplot2, countrycode)
 
 load("Data/easySHARE_rel6_0_0.rda")
@@ -49,8 +52,10 @@ df = apply(dat, 2, function(z) {
 
 df = data.frame(df) 
 
-# if working hours is NA, means they don't work
+# if working hours is NA, this means individuals don't work
 df$ep013_mod[is.na(df$ep013_mod)] = 0
+# crosscheck this with variable ep005
+
 
 # Create dummies and clean naming conventions for ease
 country_list = c("BEL", "NLD", "FRA", "SWE", "DEU", "GRC", "ITA", "ESP", "DNK",
