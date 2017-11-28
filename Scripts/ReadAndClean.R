@@ -13,7 +13,7 @@
 rm(list = ls())
 
 # Adjust your working directory
-wd = file.path(Sys.getenv("USERPROFILE"),"/splrepo/SPL_Project")
+wd = file.path(Sys.getenv("USERPROFILE"),"/splrepo/SPL_Project/Data")
 setwd(wd)
 
 # Define required packages and install them if necessary. 
@@ -49,7 +49,7 @@ if(userChoice == 1 & nPackages != 0) {
 lapply(neededPackages, function(z) library(z, character.only = TRUE))
 
 # Load dataset
-load("Data/easySHARE_rel6_0_0.rda")
+load("easySHARE_rel6_0_0.rda")
 dat.input = easySHARE_rel6_0_0 # always use unique dataset input
 rm(easySHARE_rel6_0_0)
 
