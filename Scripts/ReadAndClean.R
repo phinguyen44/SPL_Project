@@ -142,18 +142,19 @@ standardize = function(x){
 val  = (x - mean) / std
 return(val)
 }
-# Comment for report: mention that gives same results as inbuilt function
-
+# Comment for report: mention that gives same results as inbuilt function (scale)
 
 idx = sapply(df.out, is.numeric)
+idx = seq(1:length(idx))[idx]
+# gives a vector of integer column positions of numeric variables 
 
-# this will modify each element in place
+
+# Creating separate data set with standardized numeric variables for regression
 df.reg = df.out %>% 
-  mutate_at(.vars = vars(children, h_maxgrip, h_chronic), 
+  mutate_at(.vars = vars(idx), 
             .funs = standardize)
 
-# TO DO use indexing to apply standardizing to df.out
+# TO DO: declare wave as categorical variable -> otherwise will be standadized
 
-
-
+rm(list= ls()[!(ls() %in% c('df.out','df.reg'))])
 
