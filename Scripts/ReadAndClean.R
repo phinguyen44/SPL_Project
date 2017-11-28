@@ -18,15 +18,12 @@ setwd(wd)
 
 # Define required packages and install them if necessary. 
 neededPackages = c("dplyr", "tidyr", "purrr", "ggplot2", "countrycode", "utils")
-allPackages = c(neededPackages %in% installed.packages()[,"Package"]) 
+allPackages    = c(neededPackages %in% installed.packages()[,"Package"]) 
 
-if(!all(allPackages))
-  {
-  
+if(!all(allPackages)) {
   # Find missing packages
   missingIDX = which(allPackages == FALSE) # Retrieve index of missing packages
-  lapply(missingIDX, install.packages) # Install all packages which cannot be found.
-  
+  lapply(missingIDX, install.packages) # Install packages which aren't found.
 }
 
 
@@ -39,16 +36,14 @@ userChoice = utils::menu(choices = choiceV, graphics = TRUE, title = titleV)
 # Check if any packages are loaded
 nPackages = length(names(sessionInfo()$otherPkgs))
 
-if(userChoice == 1 & nPackages != 0) # Only need to detach any Package if at least one is loaded
-{
- 
+# Only need to detach any Package if at least one is loaded
+if(userChoice == 1 & nPackages != 0) {
   lapply(paste('package:', names(sessionInfo()$otherPkgs), sep=""),
          detach, character.only = TRUE, unload = TRUE)
-  
-  warning("Cleaning Session!\nAll packages are being detached!")
-  
-} else{warning("You are proceeding without a clean session. ")}
-
+  warning("Cleaning Session!\nAll packages are being detached!")  
+} else {
+  warning("You are proceeding without a clean session. ")
+}
 
 # Load all defined packages
 lapply(neededPackages, function(z) library(z, character.only = TRUE))
@@ -76,8 +71,9 @@ a = c(-2, -3, -4, -7, -9, -12, -13, -14, -15, -16)
 b = c("tocheck","implausible", "tocheck", "uncoded", "notApplicable", 
       "dontKnow", "notAskedWave", "notAskedCountry", "noInformation", 
       "noDropOff")
-missing.value.codes = data.frame(a,b) # This data frame can be used to verify NA codes easily. 
-                                      # But for the encoding only the numeric vector a is necessary.
+missing.value.codes = data.frame(a,b) 
+# This data frame can be used to verify NA codes easily. 
+# But for the encoding only the numeric vector a is necessary.
 
 # Find NA locations and declare them as such
 df.decl = apply(dat, 2, function(z) {
@@ -92,41 +88,40 @@ df = data.frame(df.decl)
 df$ep013_mod[is.na(df$ep013_mod)] = 0
 # crosscheck this with variable ep005
 
-
 # Create dummies and clean naming conventions for ease
 country_list = c("BEL", "NLD", "FRA", "SWE", "DEU", "GRC", "ITA", "ESP", "DNK",
                  "AUT", "CHE")
-country_data = with(countrycode_data, data.frame(iso3c, iso3n)) # country code conversion 
+country_data = with(countrycode_data, data.frame(iso3c, iso3n)) # country code
 df.out       = df %>% 
     dplyr::left_join(country_data, by = c("country_mod" = "iso3n")) %>% 
     dplyr::mutate(country       = iso3c,
-                 age           = floor(age),
-                 age50_54      = age < 55,
-                 age55_59      = age >= 55 & age < 60,
-                 age60_64      = age >= 60,
-                 edu_low       = isced1997_r %in% c(0, 1),
-                 edu_second    = isced1997_r %in% 2:4,
-                 edu_high      = isced1997_r %in% c(5, 6),
-                 children      = ch001_,
-                 married       = mar_stat %in% 1:3,
-                 h_chronic     = chronic_mod,
-                 h_maxgrip     = maxgrip,
-                 h_adla        = adla > 0,
-                 h_overweight  = bmi2 == 3,
-                 h_obese       = bmi2 == 4, 
-                 h_badmental   = eurod > 3,
-                 h_goodsp      = sphus < 4,
-                 labor_supply  = ep013_mod,
-                 labor_ft      = ep013_mod > 32,
-                 labor_pt      = ep013_mod < 32 & ep013_mod > 0,
-                 labor_np      = ep013_mod == 0) %>% 
+                  age           = floor(age),
+                  age50_54      = age < 55,
+                  age55_59      = age >= 55 & age < 60,
+                  age60_64      = age >= 60,
+                  edu_low       = isced1997_r %in% c(0, 1),
+                  edu_second    = isced1997_r %in% 2:4,
+                  edu_high      = isced1997_r %in% c(5, 6),
+                  children      = ch001_,
+                  married       = mar_stat %in% 1:3,
+                  h_chronic     = chronic_mod,
+                  h_maxgrip     = maxgrip,
+                  h_adla        = adla > 0,
+                  h_overweight  = bmi2 == 3,
+                  h_obese       = bmi2 == 4, 
+                  h_badmental   = eurod > 3,
+                  h_goodsp      = sphus < 4,
+                  labor_supply  = ep013_mod,
+                  labor_ft      = ep013_mod > 32,
+                  labor_pt      = ep013_mod < 32 & ep013_mod > 0,
+                  labor_np      = ep013_mod == 0) %>% 
   dplyr::filter(country %in% country_list) %>% 
   dplyr::select(wave, country,              # wave and country
-                 female, children, married,  # demographic details
-                 starts_with("age"),         # age dummy
-                 starts_with("edu_"),        # eduction dummies
-                 starts_with("h_"),          # health indicators
-                 starts_with("labor_")) %>%  # labor supply outcomes 
+                female, children, married,  # demographic details
+                starts_with("age"),         # age dummy
+                starts_with("edu_"),        # eduction dummies
+                starts_with("h_"),          # health indicators
+                starts_with("labor_")) %>%  # labor supply outcomes 
   na.omit() # remove missing values
 
 # TODO: create a function that can read a df and print out relevant statistics (e.g. num rows dropped bc/ na, etc. etc, et.c)
