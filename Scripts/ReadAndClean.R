@@ -128,5 +128,32 @@ df.out       = df %>%
 
 # TODO: don't forget to standardize numeric variables: children, grip strength, health_cond! (do that just for estimation step)
          
+# TODO: all dummies should be of the same type
+#-> e.g. femal is now numeric wheresas age 50_54 is logical
+
 
 rm(list = ls()[ls() != "df.out"])
+
+# create standardized variables for numeric data
+
+standardize = function(x){
+  mean = sum(x)/length(x)
+  std = sd(x)
+val  = (x - mean) / std
+return(val)
+}
+# Comment for report: mention that gives same results as inbuilt function
+
+
+idx = sapply(df.out, is.numeric)
+
+# this will modify each element in place
+df.reg = df.out %>% 
+  mutate_at(.vars = vars(children, h_maxgrip, h_chronic), 
+            .funs = standardize)
+
+# TO DO use indexing to apply standardizing to df.out
+
+
+
+
