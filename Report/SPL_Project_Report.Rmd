@@ -51,16 +51,15 @@ The easySHARE dataset released in spring 2017 is a panel dataset of 108 variable
 
 -> code sniplet here
 
-In this example, with first filter for participation in wave 1 and the age group between 50 and 64 and the select the desired variables as described in Kalwij and Vermeulen (2005).
+In this example, we first filter for participation in wave 1 and the age group between 50 and 64 and the select the desired variables as described in Kalwij and Vermeulen (2005).
 
 Although the overall response rate in the SHARE are comparably high, the data set still has numerous missing values. The reason for this is due to the fact that the study was carried out on a crossnational scale, with some national survey institutions deciding not to participate in all survey modules. This means that the majority of missing values are to be found within observations that have missing values for entire survey modules or waves. The reason for the missing values are documented well in the "Guide to easySHARE release 6.0.0" and specifically coded. For example, the numbers -13 and -14 refer to “not asked in this wave” and “not asked in this country”. Since this coding scheme is not useful for the purpose of our analysis, we decided on recoding all of the missing values as "NA". To this end, we defined a function based on the missing codes provided by SHARE that finds the NAs in the data and declares them as such. 
 
 -> code snipet here
 
-Since the study carried out by Kalwij and Vermeulen (2005) is based on the use of mostly binary data, we needed to construct numerous dummies based on the orginal data.
+Since the study carried out by Kalwij and Vermeulen (2005) is based on the use of mostly binary data, we needed to construct numerous dummies based on the orginal data. 
 
 -> code snipet here
-
 
 The resulting dataframe containes XXX observations of YYY variables.  
 
@@ -69,6 +68,7 @@ The resulting dataframe containes XXX observations of YYY variables.
 - use packe ddd -> match offical ISO code with country name
 - create country list with all countries in study (not Israel)
 - defined dummies
+
 
 
 ```{r cars}

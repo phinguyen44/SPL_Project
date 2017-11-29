@@ -36,6 +36,11 @@ Statistical Programming Languages Group Project
         3. Children (**ch001_**)
         4. Marriage Status (**mar_stat**)
     - Outcome: Labor participation (**ep013_mod**)
+    - Standardize:
+        1. Grip strength (**maxgrip**)
+        2. Number of children (**ch001_**)
+        3. Number of chronic diseases (**chronic_mod**)
+
 2. Summary statistics tables
 
 ### Section 2: Estimation
