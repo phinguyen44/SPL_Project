@@ -21,7 +21,7 @@ setwd(wd)
 # LOAD NECESSARY PACKAGES & DATA
 
 # List all packages needed for session
-neededPackages = c("dplyr", "tidyr", "ggplot2", "countrycode")
+neededPackages = c("dplyr", "tidyr", "ggplot2", "magrittr", "countrycode")
 allPackages    = c(neededPackages %in% installed.packages()[,"Package"]) 
 
 # Install packages (if not already installed) 
@@ -70,21 +70,27 @@ df.decl = apply(dat, 2, function(z) {
 
 df = data.frame(df.decl) 
 
-# if working hours is NA, this means individuals don't work
+# If working hours is NA, this means individuals don't work
 df$ep013_mod[is.na(df$ep013_mod)] = 0
-# crosscheck this with variable ep005
+# TODO: crosscheck this with variable ep005
 
-# Create dummies and clean naming conventions for ease
+# Get country information from "countrycode" package
 country_list = c("BEL", "NLD", "FRA", "SWE", "DEU", "GRC", "ITA", "ESP", "DNK",
                  "AUT", "CHE")
-country_data = with(countrycode_data, data.frame(iso3c, iso3n)) # country code
+country_data = with(countrycode_data, data.frame(iso3c, iso3n))
+
+# Variables are cleaned, converted into human-readable naming conventions, and
+# converted to dummies as described in the paper
 df.out       = df %>% 
     dplyr::left_join(country_data, by = c("country_mod" = "iso3n")) %>% 
-    dplyr::mutate(country       = iso3c,
-                  age           = floor(age),
+    dplyr::filter(iso3c %in% country_list) %>% 
+    dplyr::mutate(wave          = factor(wave),
+                  country       = factor(iso3c),
+                  female        = as.logical(female),
                   age50_54      = age < 55,
                   age55_59      = age >= 55 & age < 60,
                   age60_64      = age >= 60,
+                  age           = factor(floor(age)),
                   edu_low       = isced1997_r %in% c(0, 1),
                   edu_second    = isced1997_r %in% 2:4,
                   edu_high      = isced1997_r %in% c(5, 6),
@@ -100,47 +106,36 @@ df.out       = df %>%
                   labor_supply  = ep013_mod,
                   labor_ft      = ep013_mod > 32,
                   labor_pt      = ep013_mod < 32 & ep013_mod > 0,
-                  labor_np      = ep013_mod == 0) %>% 
-  dplyr::filter(country %in% country_list) %>% 
-  dplyr::select(wave, country,              # wave and country
-                female, children, married,  # demographic details
-                starts_with("age"),         # age dummy
-                starts_with("edu_"),        # eduction dummies
-                starts_with("h_"),          # health indicators
-                starts_with("labor_")) %>%  # labor supply outcomes 
-  na.omit() # remove missing values
+                  labor_np      = ep013_mod == 0) %>%
+    dplyr::select(wave, country,              # wave and country
+                female, children, married,    # demographic details
+                starts_with("age"),           # age dummy
+                starts_with("edu_"),          # eduction dummies
+                starts_with("h_"),            # health indicators
+                starts_with("labor_")) %>%    # labor supply outcomes 
+    na.omit() %>%                             # remove missing values
+    set_rownames(NULL)                        # reset row numbering
+    
 
 # TODO: create a function that can read a df and print out relevant statistics (e.g. num rows dropped bc/ na, etc. etc, et.c)
 
-# TODO: don't forget to standardize numeric variables: children, grip strength, health_cond! (do that just for estimation step)
-         
-# TODO: all dummies should be of the same type
-#-> e.g. femal is now numeric wheresas age 50_54 is logical
-
-
-rm(list = ls()[ls() != "df.out"])
-
 # create standardized variables for numeric data
-
-standardize = function(x){
-  mean = sum(x)/length(x)
-  std = sd(x)
-val  = (x - mean) / std
-return(val)
+standardize = function(x) {
+    mean = sum(x)/length(x)
+    std  = sd(x)
+    val  = (x - mean) / std
+    return(val)
 }
 # Comment for report: mention that gives same results as inbuilt function (scale)
 
+# gives a vector of integer column positions of numeric variables 
 idx = sapply(df.out, is.numeric)
 idx = seq(1:length(idx))[idx]
-# gives a vector of integer column positions of numeric variables 
-
 
 # Creating separate data set with standardized numeric variables for regression
 df.reg = df.out %>% 
   mutate_at(.vars = vars(idx), 
             .funs = standardize)
 
-# TO DO: declare wave as categorical variable -> otherwise will be standadized
-
+# df.out is for analysis, df.reg is for estimation
 rm(list= ls()[!(ls() %in% c('df.out','df.reg'))])
-
