@@ -74,6 +74,9 @@ df = data.frame(df.decl)
 df$ep013_mod[is.na(df$ep013_mod)] = 0
 # TODO: crosscheck this with variable ep005
 
+################################################################################
+# CREATE DATA FRAMES FOR ANALYSIS AND ESTIMATION
+
 # Get country information from "countrycode" package
 country_list = c("BEL", "NLD", "FRA", "SWE", "DEU", "GRC", "ITA", "ESP", "DNK",
                  "AUT", "CHE")
@@ -84,9 +87,8 @@ country_data = with(countrycode_data, data.frame(iso3c, iso3n))
 df.out       = df %>% 
     dplyr::left_join(country_data, by = c("country_mod" = "iso3n")) %>% 
     dplyr::filter(iso3c %in% country_list) %>% 
-    dplyr::mutate(wave          = factor(wave),
-                  country       = factor(iso3c),
-                  female        = as.logical(female),
+    dplyr::mutate(country       = factor(iso3c),
+                  gender        = factor(ifelse(female, "FEMALE", "MALE")),
                   age50_54      = age < 55,
                   age55_59      = age >= 55 & age < 60,
                   age60_64      = age >= 60,
@@ -95,7 +97,7 @@ df.out       = df %>%
                   edu_second    = isced1997_r %in% 2:4,
                   edu_high      = isced1997_r %in% c(5, 6),
                   children      = ch001_,
-                  married       = mar_stat %in% 1:3,
+                  couple        = mar_stat %in% 1:3,
                   h_chronic     = chronic_mod,
                   h_maxgrip     = maxgrip,
                   h_adla        = adla > 0,
@@ -103,39 +105,65 @@ df.out       = df %>%
                   h_obese       = bmi2 == 4, 
                   h_badmental   = eurod > 3,
                   h_goodsp      = sphus < 4,
-                  labor_supply  = ep013_mod,
                   labor_ft      = ep013_mod > 32,
                   labor_pt      = ep013_mod < 32 & ep013_mod > 0,
                   labor_np      = ep013_mod == 0) %>%
-    dplyr::select(wave, country,              # wave and country
-                female, children, married,    # demographic details
-                starts_with("age"),           # age dummy
-                starts_with("edu_"),          # eduction dummies
-                starts_with("h_"),            # health indicators
-                starts_with("labor_")) %>%    # labor supply outcomes 
-    na.omit() %>%                             # remove missing values
-    set_rownames(NULL)                        # reset row numbering
+    dplyr::select(country, gender,              # country and gender
+                  starts_with("age"),           # age dummy
+                  starts_with("h_"),            # health indicators
+                  starts_with("edu_"),          # eduction dummies
+                  children, couple,             # demographic details
+                  starts_with("labor_")) %>%    # labor supply outcomes 
+    na.omit() %>%                               # remove missing values
+    set_rownames(NULL)                          # reset row numbering
     
+# TODO: create a function that can read a df and print out relevant statistics 
+# (e.g. num rows dropped bc/ na, etc. etc, et.c). Or generalize so separate
+# variables can be used. (e.g. create a standard "clean" function for working 
+# with the SHARE data set)
+# TODO: determine threshold for "severe" and "mild" conditions (currently we
+# just set it as numeric
 
-# TODO: create a function that can read a df and print out relevant statistics (e.g. num rows dropped bc/ na, etc. etc, et.c)
-
-# create standardized variables for numeric data
+# Create standardized variables for numeric data
 standardize = function(x) {
     mean = sum(x)/length(x)
     std  = sd(x)
     val  = (x - mean) / std
     return(val)
 }
-# Comment for report: mention that gives same results as inbuilt function (scale)
+# TODO: Comment in report: mention it gives same results as inbuilt function 
+# (scale)
 
-# gives a vector of integer column positions of numeric variables 
+# Gives a vector of integer column positions of numeric variables 
 idx = sapply(df.out, is.numeric)
 idx = seq(1:length(idx))[idx]
 
-# Creating separate data set with standardized numeric variables for regression
+# Creating separate data set with standardized numeric variables for regression,
+# then reselect variables as described in paper (e.g. self-reported health is 
+# removed)
 df.reg = df.out %>% 
-  mutate_at(.vars = vars(idx), 
-            .funs = standardize)
+    mutate_at(.vars = vars(idx), 
+              .funs = standardize) %>% 
+    mutate(labor_participation = !labor_np) %>% # invert to get labor_part rate
+    select(country, gender, age, 
+           h_chronic, h_adla, h_obese, h_maxgrip,
+           edu_second, edu_high, children, couple,
+           labor_participation)
+    
+# Create a list of data frames by country and gender, to be used in regression
+df.splits  = split(df.reg, f = list(df.reg$country, df.reg$gender), drop = TRUE)
 
-# df.out is for analysis, df.reg is for estimation
-rm(list= ls()[!(ls() %in% c('df.out','df.reg'))])
+# Create necessary dummary variables for regression
+dummify = function(data.frame) {
+    data.frame = data.frame %>% 
+        select(-country, -gender)                # remove country/gender
+    model      = ~ 0 + .                         # needed to remove intercept
+    new.df     = model.matrix(model, data.frame) # create dummies
+    new.df     = data.frame(new.df)
+    return(new.df)
+}
+
+df.splits = lapply(df.splits, dummify)
+
+# df.out is for analysis, df.reg and df.splits are for estimation
+rm(list= ls()[!(ls() %in% c("df.out", "df.splits", "df.reg"))])
