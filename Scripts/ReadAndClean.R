@@ -28,11 +28,11 @@ allPackages    = c(neededPackages %in% installed.packages()[,"Package"])
 if(!all(allPackages)) {
   missingIDX = which(allPackages == FALSE)
   needed     = neededPackages[missingIDX]
-  lapply(.needed, install.packages)
+  lapply(needed, install.packages)
 }
 
 # Load all defined packages
-lapply(neededPackages, require, character.only = TRUE)
+lapply(neededPackages, library, character.only = TRUE)
 
 # Load dataset
 load("easySHARE_rel6_0_0.rda")
