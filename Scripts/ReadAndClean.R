@@ -8,49 +8,35 @@
 ################################################################################
 
 ################################################################################
-# LOAD DATA
+# SET WORKING DIRECTORY
+# Note: Only this part must be changed for the rest of the script to run.
 
 rm(list = ls())
 
-# Adjust your working directory
-wd = file.path(Sys.getenv("USERPROFILE"),"/splrepo/SPL_Project/Data")
+# Adjust your working directory to where your local repository is located
+wd = file.path("~/Documents/Projects/SPL_Project")
 setwd(wd)
 
-# Define required packages and install them if necessary. 
-neededPackages = c("dplyr", "tidyr", "purrr", "ggplot2", "countrycode", "utils")
+################################################################################
+# LOAD NECESSARY PACKAGES & DATA
+
+# List all packages needed for session
+neededPackages = c("dplyr", "tidyr", "ggplot2", "countrycode")
 allPackages    = c(neededPackages %in% installed.packages()[,"Package"]) 
 
+# Install packages (if not already installed) 
 if(!all(allPackages)) {
-  # Find missing packages
-  missingIDX = which(allPackages == FALSE) # Retrieve index of missing packages
-  lapply(missingIDX, install.packages) # Install packages which aren't found.
-}
-
-
-# Detach all loaded Packages
-choiceV = c("continue", "stop execution")
-titleV = c("Cleaning Session. Detach all Packages?!")
-userChoice = utils::menu(choices = choiceV, graphics = TRUE, title = titleV)
-
-
-# Check if any packages are loaded
-nPackages = length(names(sessionInfo()$otherPkgs))
-
-# Only need to detach any Package if at least one is loaded
-if(userChoice == 1 & nPackages != 0) {
-  lapply(paste('package:', names(sessionInfo()$otherPkgs), sep=""),
-         detach, character.only = TRUE, unload = TRUE)
-  warning("Cleaning Session!\nAll packages are being detached!")  
-} else {
-  warning("You are proceeding without a clean session. ")
+  missingIDX = which(allPackages == FALSE)
+  needed     = neededPackages[missingIDX]
+  lapply(.needed, install.packages)
 }
 
 # Load all defined packages
-lapply(neededPackages, function(z) library(z, character.only = TRUE))
+lapply(neededPackages, require, character.only = TRUE)
 
 # Load dataset
 load("easySHARE_rel6_0_0.rda")
-dat.input = easySHARE_rel6_0_0 # always use unique dataset input
+dat.input = easySHARE_rel6_0_0 
 rm(easySHARE_rel6_0_0)
 
 ################################################################################
