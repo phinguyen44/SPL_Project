@@ -42,6 +42,31 @@ Statistical Programming Languages Group Project
         3. Number of chronic diseases (**chronic_mod**)
 
 2. Summary statistics tables
+ - Tables to be built:
+     1. Sample statistics and age classes per country (p. 17)
+            - number of observation per country
+            - percentage of observation withhin each country
+            stratified by age groups : Age 50-54, Age 55-59, Age 60-64
+            
+     2. Health indicators per country (p. 17-18)
+            - percentage of entire sample (Europe) within category of
+              each of eight health indicators
+     
+     3. Labour force participation men per country (p. 18)
+            - percentage of working men withhin each country
+            stratified by age groups : Age 50-54, Age 55-59, Age 60-64
+            
+     4. Labour force participation women per country (p. 19)
+          - percentage of working women withhin each country
+            stratified by age groups : Age 50-54, Age 55-59, Age 60-64
+            
+     5. Labour supply choice men (p. 19)
+            - percentage of men withhin each country
+            stratified by labor groups : Nonparticipation, Half Time, Full Time
+     
+     6. Labour supply choice women (p. 20)
+            - percentage of men withhin each country
+            stratified by labor groups : Nonparticipation, Half Time, Full Time
 
 ### Section 2: Estimation
 
