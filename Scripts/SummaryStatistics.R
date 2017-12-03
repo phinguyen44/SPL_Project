@@ -101,12 +101,13 @@ sum.stats = data.frame(
                        h_obese_p    =   group.percentage(df.out$h_obese),  
                        h_badment_p  =   group.percentage(df.out$h_badmental),  
                        h_goodsp_p   =   group.percentage(df.out$h_goodsp)))
+
 rownames(sum.stats) = levels(df.out$country)
 
 names(sum.stats) = c(paste0(c("Female", "Male"), " Labor Participation Share"),
                      "Oberservations",
-                     paste0("Age ", rep(c("50-54", "55-59", "60-64"), 2), c(rep(" ", 3), rep(" Obs"), 3)),
-                     paste0(c("Chronic diseases", "ADLs", "Max. grip strength"), (" (mean)")),
+                     paste0("Age ", rep(c("50-54", "55-59", "60-64"), 2), c(rep(" ", 3), rep(" Obs", 3))),
+                     paste0(c("Chronic diseases", "Max. grip strength", "ADLs"), (" (mean)")),
                      paste0(c("Overweight", "Obese", " Bad mental health", "Good self-perceived health"),
                             " (in %)"))
 # Comment: Can we improve creating summary statistics by looping over certain variables?
@@ -118,50 +119,40 @@ names(sum.stats) = c(paste0(c("Female", "Male"), " Labor Participation Share"),
 ################################################################################
 # VISUALIZE SUMMARY STATISTICS IN TABLES
 
-# TODO: create function for table output
 
-
-DF <- data.frame(Ticker=c("", "", "", "IBM", "AAPL", "MSFT"),
-                 Name=c("Dow Jones", "S&P 500", "Technology", 
-                        "IBM", "Apple", "Microsoft"),
-                 Value=accounting(c(15988.08, 1880.33, NA, 
-                                    130.00, 97.05, 50.99)),
-                 Change=percent(c(-0.0239, -0.0216, 0.021, 
-                                  -0.0219, -0.0248, -0.0399)))
-
-formattable(DF, list(
-  Name=formatter(
-    "row ",
-    style = x ~ ifelse(x == "Technology", 
-                       style(font.weight = "bold"), NA)),
-  Value = color_tile("white", "green"),
-  Change = above_mean_bold 
-))
-
-
-formattable(DF1, list(
-  Observations = sign_formatter
-            ))
-
-# my formatting function
+# Formatting function for showing entries above mean in bold
 above_mean_bold = formatter("span", 
-                            style = x ~ style("font-weight" = ifelse(x > mean(x), "bold", NA)))
-DF1 = data.frame(sum.stats[3:5])
+                           style = i ~ style("font-weight" = ifelse(i > mean(i), "bold", NA)))
 
-formattable(DF1, list(
-  Observations = above_mean_bold
-))
 
-# not working
+# Creating a summary statistics table with conditional formatting
+sum.stats.out = function(DF){
+  
+  # create an ouput table based on row-specific criteria
+  formattable(DF, lapply(DF, function(x) {
+  
+  # show above mean entries for non-percentage variables in bold
+    if (max(x) > 1  & max (x) < 100){
+        formatter("span", style = i ~ style("font-weight" = ifelse(i > mean(i), "bold", NA)))
+      
+  # apply conditional formatting to percentage variables by coloring
+    } else if (max (x) <= 1){
+        color_tile('white', 'lightblue')
+      
+  # Leave number of observations unformatted
+      } else {
+          formatter("span", style = NA)
+          
+}}))}
 
-# formatting with inbuilt function
-formattable(DF1, list(
-  Observations = sign_formatter
-))
+DF1 = data.frame(sum.stats[3:6])
 
-# also not working: 
-#Fehler in create_obj(x, "formattable", list(formatter = formatter, format = list(...),  : 
-                                              #Objekt 'sign_formatter' nicht gefunden
+sum.stats.out(sum.stats)
+sum.stats.out(DF1)
 
+# TODO
+# Change layout of output table: adjust when variable name is large
+# Show percentage entries
+# Show name of countries
 
 
