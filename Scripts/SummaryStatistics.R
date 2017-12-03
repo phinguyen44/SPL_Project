@@ -121,11 +121,6 @@ names(sum.stats) = c(paste0(c("Female", "Male"), " Labor Participation Share"),
 # TODO: create function for table output
 
 
-k = function(y){formattable(x = y)}  
-
-k(sum.stats[,1:4])
-
-
 DF <- data.frame(Ticker=c("", "", "", "IBM", "AAPL", "MSFT"),
                  Name=c("Dow Jones", "S&P 500", "Technology", 
                         "IBM", "Apple", "Microsoft"),
@@ -140,15 +135,9 @@ formattable(DF, list(
     style = x ~ ifelse(x == "Technology", 
                        style(font.weight = "bold"), NA)),
   Value = color_tile("white", "green"),
-  Change = formatter(
-    "span",
-    style = x ~ style(color = ifelse(x < 0 , "red", "green")),
-    x ~ icontext(ifelse(x < 0, "arrow-down", "arrow-up"), x)))
-)
+  Change = above_mean_bold 
+))
 
-# Creates a formatter function showing above mean values on bold
-above_mean_bold = formatter("span", 
-                            style = x ~ style("font-weight" = ifelse(x > mean(x), "bold", NA)))
 
 formattable(DF1, list(
   Observations = sign_formatter
