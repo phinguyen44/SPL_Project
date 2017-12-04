@@ -150,6 +150,19 @@ DF1 = data.frame(sum.stats[3:6])
 sum.stats.out(sum.stats)
 sum.stats.out(DF1)
 
+################################################
+
+# Source: https://stackoverflow.com/questions/38833219/command-for-exporting-saving-table-made-with-formattable-package-in-r
+
+# Solution Style: as_htmlwidget and then print screen
+
+# Required for export_formattable
+
+library("htmltools") # for html_print
+install.packages("webshot")
+library("webshot")
+install_phantomjs()
+
 # TODO
 # Change layout of output table: adjust when variable name is large
 # Show percentage entries
@@ -167,5 +180,5 @@ export_formattable <- function(f, file, width = "100%", height = NULL,
           delay = delay)
 }
 
-export_formattable(sum.stats.out(DF1))
+export_formattable(sum.stats.out(DF1), file = "test.png")
 
