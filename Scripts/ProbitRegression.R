@@ -36,6 +36,24 @@ lapply(neededPackages, library, character.only = TRUE)
 
 ################################################################################
 
+# Probit for each country and gender 
+allModels = lapply(df.splits, function(z){
+  
+  z = z[-z$age50] # Multicollinearity
+  
+  model = glm(z$labor_participationTRUE ~., family = binomial(link = "probit"), data = z)
+  
+  return(model)
+  
+})
+
+
+# Return summaries
+allSummaries = lapply(allModels, summary)
+
+
+### Tests Below
+
 # Try out regression for German men
 mydf = data.frame(df.splits[15])
 names(mydf)
