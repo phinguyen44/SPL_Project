@@ -142,13 +142,16 @@ sum.stats.out = function(DF){
   # Leave number of observations unformatted
       } else {
           formatter("span", style = NA)
-}}), 
-align = "c"
-)}
+        
+  # Specify table options: aligned numbers, 2 decimal digits with floating numbers
+}}), options(digits=3, format="d"), align = "c"
+)} # Attention: format "d" is not being correctly recognized, decimal digits not displayed for max grip
 
 DF1 = data.frame(sum.stats[3:6])
 
 sum.stats.out(sum.stats)
+
+
 sum.stats.out(DF1)
 
 ################################################
@@ -167,6 +170,7 @@ install_phantomjs()
 # Change layout of output table: adjust when variable name is large
 # Show percentage entries
 # Show name of countries
+# Maybe: Improve creationg of summary statistics (e.g. lapply)
 
 export_formattable <- function(f, file, width = "100%", height = NULL, 
                                background = "white", delay = 0.2)
