@@ -147,7 +147,7 @@ sum.stats.out = function(DF){
 }}), options(digits=3, format="d"), align = "c"
 )} # Attention: format "d" is not being correctly recognized, decimal digits not displayed for max grip
 
-DF1 = data.frame(sum.stats[3:6])
+DF1 = sum.stats[3:6]
 
 sum.stats.out(sum.stats)
 
