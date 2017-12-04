@@ -33,6 +33,9 @@ if(!all(allPackages)) {
 # Load all defined packages
 lapply(neededPackages, library, character.only = TRUE)
 
+install.packages("mdscore") # for Wald Test
+library("mdscore")
+
 
 ################################################################################
 
@@ -50,6 +53,49 @@ allModels = lapply(df.splits, function(z){
 
 # Return summaries
 allSummaries = lapply(allModels, summary)
+
+
+# Wald Test
+
+wald.log = list() # Save Wald Test Output
+
+for(i in 1:length(allModels)){
+  
+  # Get Element
+  ModelElement = allModels[[i]]
+  
+  # Specify number of coefficients: Columns - 1 (dependent Variable)
+  nTerms = ncol(ModelElement$data) - 1
+  
+  testOutput = try(wald.test(ModelElement, terms = nTerms))
+  
+  if(class(testOutput) == "try-error"){
+    
+    # Display warning and investigate
+    msg = paste0("Wald Test failed for Model Element ", i)
+    warning(msg)
+    
+    wald.log[[i]] = "Error"
+    
+    next
+    
+  } else{
+    
+    wald.log[[i]] = testOutput
+    next
+    
+  }
+  
+  rm(ModelElement) # clean up
+
+  next
+  
+}
+
+
+
+
+
 
 
 ### Tests Below
