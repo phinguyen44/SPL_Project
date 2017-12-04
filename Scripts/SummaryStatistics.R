@@ -26,7 +26,7 @@ rm(list= ls()[!(ls() %in% c("df.out"))])
 # LOAD NECESSARY PACKAGES & DATA
 
 # List all packages needed for session
-neededPackages = c("dplyr", "formattable")
+neededPackages = c("dplyr", "formattable", "webshot", "htmltools" )
 allPackages    = c(neededPackages %in% installed.packages()[,"Package"]) 
 
 # Install packages (if not already installed) 
@@ -159,7 +159,6 @@ sum.stats.out(DF1)
 # Required for export_formattable
 
 library("htmltools") # for html_print
-install.packages("webshot")
 library("webshot")
 install_phantomjs()
 
