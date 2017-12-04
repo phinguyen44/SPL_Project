@@ -97,18 +97,3 @@ modelNames = names(allModels)
 wald.df = data.frame(modelNames, wald.bound)
 
 
-
-
-### Tests Below
-
-# Try out regression for German men
-mydf = data.frame(df.splits[15])
-names(mydf)
-
-RegModel = glm(DEU.MALE.labor_participationTRUE ~ .- DEU.MALE.age50, family = binomial(link = "probit"), 
-                data = mydf)
- 
-summary(RegModel)
-
-
-sum(mydf$DEU.MALE.labor_participationTRUE)/length(mydf$DEU.MALE.labor_participationTRUE)
