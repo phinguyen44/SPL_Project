@@ -48,7 +48,7 @@ dat = dat.input %>%
   select(wave, country_mod,                          # dataset details
          female, age, isced1997_r, ch001_, mar_stat, # demographic variables
          chronic_mod, maxgrip, adla, bmi2, eurod, sphus, # health indicators
-         ep013_mod)                                  # labor (outcome var)
+         ep013_mod, ep005_)                              # labor (outcome var)
 
 rm(dat.input)
 
@@ -70,9 +70,12 @@ df.decl = apply(dat, 2, function(z) {
 
 df = data.frame(df.decl) 
 
-# If working hours is NA, this means individuals don't work
-df$ep013_mod[is.na(df$ep013_mod)] = 0
-# TODO: crosscheck this with variable ep005
+# If working hours is NA and job status is not employed, this means individuals don't work
+# If working hours is NA and job status is employed, we assume part time work
+df$ep013_mod[is.na(df$ep013_mod) & df$ep005_ != 2] = 0
+df$ep013_mod[is.na(df$ep013_mod) & df$ep005_ == 2] = 1
+
+#To Do: What to do with employed people (ep005_ == 2) with 0 working hours (ep013_mod)
 
 ################################################################################
 # CREATE DATA FRAMES FOR ANALYSIS AND ESTIMATION
