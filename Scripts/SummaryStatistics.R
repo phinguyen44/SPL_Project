@@ -142,8 +142,9 @@ sum.stats.out = function(DF){
   # Leave number of observations unformatted
       } else {
           formatter("span", style = NA)
-          
-}}))}
+}}), 
+align = "c"
+)}
 
 DF1 = data.frame(sum.stats[3:6])
 
