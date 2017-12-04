@@ -92,8 +92,9 @@ for(i in 1:length(allModels)){
   
 }
 
-
-
+wald.bound = do.call("rbind.data.frame", wald.log)
+modelNames = names(allModels)
+wald.df = data.frame(modelNames, wald.bound)
 
 
 
