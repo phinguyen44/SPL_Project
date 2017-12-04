@@ -40,7 +40,7 @@ lapply(neededPackages, library, character.only = TRUE)
 mydf = data.frame(df.splits[15])
 names(mydf)
 
-RegModel = glm(DEU.MALE.labor_participationTRUE ~., family = binomial(link = "probit"), 
+RegModel = glm(DEU.MALE.labor_participationTRUE ~ .- DEU.MALE.age50, family = binomial(link = "probit"), 
                 data = mydf)
  
 summary(RegModel)
