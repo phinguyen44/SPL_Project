@@ -122,6 +122,33 @@ W
 g$result
 # => results are equal :) 
 
+########## Construct a general Wald Test ################
+
+# W = t(theta_est) %*% [Var_theta_est]^(-1) %*% theta_est
+
+joint.wald.test = function(theta, model.summary, spec, signf.l){
+  joint.wald.test= numeric(3)
+  names(joint.wald.test) = c("W","p-value", "df")
+  Var_theta_est = vcov(model.summary)
+  W = t(theta[spec,1]) %*% solve(Var_theta_est[spec,spec]) %*% theta[spec,1]
+  chi2 = qchisq(signf.l, df=length(spec))
+  pval = 1-pchisq(W,length(spec))
+  joint.wald.test[1] = W 
+  joint.wald.test[2] = pval
+  joint.wald.test[3] = length(spec)
+  joint.wald.test
+}
+
+joint.wald.test(allSummaries$AUT.FEMALE$coefficients, allSummaries$AUT.FEMALE, 16:19, 0.95)
+# => results are equal :) 
+
+joint.wald.test(allSummaries$CHE.MALE$coefficients, allSummaries$CHE.MALE, 16:19, 0.95)
+
+
+# TODO:
+# Calculate Var_est_theta_inv by hand
+
+
 ######### JUST SOME NOTES #########
 
 
