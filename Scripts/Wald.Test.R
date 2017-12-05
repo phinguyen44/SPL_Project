@@ -61,10 +61,12 @@ for(i in 1:length(allModels)){
   # Get Element
   ModelElement = allModels[[i]]
   
-  # Specify number of coefficients: Columns - 1 (dependent Variable)
-  nTerms = ncol(ModelElement$data) - 1
+  # Specify the of coefficients to be tested: only health variable
+  health = c(16:19)
   
-  testOutput = try(wald.test(ModelElement, terms = nTerms))
+  # Test only the joint significance of health variables
+  # TODO: select health coefficients in a more efficient manner -> some Models have less coefficients
+  testOutput = try(wald.test(b = coef(ModelElement), Sigma = vcov(ModelElement), Terms = health)$result)
   
   if(class(testOutput) == "try-error"){
     
@@ -89,19 +91,30 @@ for(i in 1:length(allModels)){
   
 }
 
-wald.bound = do.call("rbind.data.frame", wald.log)
+wald.bound = t(as.data.frame(wald.log))
 modelNames = names(allModels)
 wald.df = data.frame(modelNames, wald.bound)
+
 
 ############ Create our own Wald Test ###############
 
 ############ First get results from waldtest packes for female Austrian ###########
 
-install.packages("aod")
 library(aod)
 library(numDeriv)
 
-## Multivariate Case
+## Multivariate Case for Wald Test
+
+R = matrix(0, nrow = 23, ncol = 23)
+coef.H0 = c(16:19) # Coefficients to be tested
+# Assign restrictions to R and r
+for (i in min(coef.H0):max(coef.H0)){ R[i,i] = 1} 
+r = rep(0, length(coef.H0))
+theta = allSummaries$AUT.FEMALE$coefficients
+
+R %*% b
+#=> our test statistics reduces to:
+
 # W = (theta_est - theta_zero)' [Var_est(theta_est)]^(-1)*theta_est - theta_zero)
 #   = (theta_est)' *[Var_est(theta_est)]^(-1)* (theta_est)
 
@@ -147,12 +160,22 @@ joint.wald.test(allSummaries$CHE.MALE$coefficients, allSummaries$CHE.MALE, 16:19
 
 # TODO:
 # Calculate Var_est_theta_inv by hand
+# make Wald Test more general for all hypothesis? 
+
+sigma_est = ((allSummaries$AUT.FEMALE$coefficients[,2])%*%
+             t(allSummaries$AUT.FEMALE$coefficients[,2]))/ length(allSummaries$AUT.FEMALE$coefficients[,2])
+
+X = as.matrix(allModels$AUT.FEMALE$data)
+XX_inv = solve(t(X) %*% X)
+
+Var.theta = sigma_est %*% XX_inv
 
 
 ######### JUST SOME NOTES #########
 
 
-
+t(allSummaries$AUT.FEMALE$cov.unscaled)%*%
+  (allSummaries$AUT.FEMALE$df.residual)
 
 
 ## Univariate Case
