@@ -60,7 +60,7 @@ Statistical Programming Languages Group Project
             1. percentage of men withhin each country stratified by labor groups:
                 1. Nonparticipation, Half Time, Full Time
         6. Labour supply choice women (p. 20)
-        1. percentage of men withhin each country stratified by labor groups:
+            1. percentage of men withhin each country stratified by labor groups:
                 1. Nonparticipation, Half Time, Full Time
 
 ### Section 2: Estimation
