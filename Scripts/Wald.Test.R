@@ -118,57 +118,80 @@ R %*% b
 # W = (theta_est - theta_zero)' [Var_est(theta_est)]^(-1)*theta_est - theta_zero)
 #   = (theta_est)' *[Var_est(theta_est)]^(-1)* (theta_est)
 
-
-# Example for Austrain women
-allSummaries$AUT.FEMALE
-
-theta_est_t= t(allSummaries$AUT.FEMALE$coefficients[16:19,1])
-theta_est  = allSummaries$AUT.FEMALE$coefficients[16:19,1]
-Var_est_theta_inv = solve(vcov(allSummaries$AUT.FEMALE)[16:19, 16:19])
-
-W = theta_est_t %*% Var_est_theta_inv %*% theta_est
-
-pchisq(W, df=23, lower.tail=FALSE)
-
-g = wald.test(b = coef(allModels$AUT.FEMALE), Sigma = vcov(allModels$AUT.FEMALE), Terms = 16:19)
-W 
-g$result
-# => results are equal :) 
-
-########## Construct a general Wald Test ################
+########## Construct a Wald Test for joint significance ################
 
 # W = t(theta_est) %*% [Var_theta_est]^(-1) %*% theta_est
 
-joint.wald.test = function(theta, model.summary, spec, signf.l){
-  joint.wald.test= numeric(3)
-  names(joint.wald.test) = c("W","p-value", "df")
+joint.wald.test = function(model.summary, spec, signf.l){
+  
+  # Define test elements
+  joint.wald.test= numeric(6)
+  names(joint.wald.test) = c("Name","W","p-value", "df", "H0" , "Decision")
+  theta = model.summary$coefficients
   Var_theta_est = vcov(model.summary)
+  
+  # Wald test statistic
   W = t(theta[spec,1]) %*% solve(Var_theta_est[spec,spec]) %*% theta[spec,1]
+  
+  # Set up test output
   chi2 = qchisq(signf.l, df=length(spec))
   pval = 1-pchisq(W,length(spec))
-  joint.wald.test[1] = W 
-  joint.wald.test[2] = pval
-  joint.wald.test[3] = length(spec)
+  joint.wald.test[1] = "Chi2 test"
+  joint.wald.test[2] = format(   W, digits = 4) 
+  joint.wald.test[3] = format(pval, digits = 4)
+  joint.wald.test[4] = length(spec)
+  joint.wald.test[5] = paste0("All coef. equal to 0")
+  joint.wald.test[6] = ifelse(pval <= 1- signf.l, "Reject H0", "Cannot reject H0")
   joint.wald.test
 }
 
-joint.wald.test(allSummaries$AUT.FEMALE$coefficients, allSummaries$AUT.FEMALE, 16:19, 0.95)
-# => results are equal :) 
-
-joint.wald.test(allSummaries$CHE.MALE$coefficients, allSummaries$CHE.MALE, 16:19, 0.95)
+# Check whether Test works
+joint.wald.test(allSummaries$AUT.FEMALE, 16:19, 0.95)
+wald.test(b = coef(allModels$AUT.FEMALE), Sigma = vcov(allModels$AUT.FEMALE), Terms = 16:19)
 
 
 # TODO:
-# Calculate Var_est_theta_inv by hand
+# for which model input does function work? just glm model output?
 # make Wald Test more general for all hypothesis? 
 
-sigma_est = ((allSummaries$AUT.FEMALE$coefficients[,2])%*%
-             t(allSummaries$AUT.FEMALE$coefficients[,2]))/ length(allSummaries$AUT.FEMALE$coefficients[,2])
+ ########## Construct a general Wald Test for linear hypothesis ################
 
-X = as.matrix(allModels$AUT.FEMALE$data)
-XX_inv = solve(t(X) %*% X)
+# If you want to test special linear hypothesis, define R matrix and r vector
 
-Var.theta = sigma_est %*% XX_inv
+k = length(model.summary$coefficients)
+
+R = diag(length(model.summary$coefficients))
+r = rep(0, length(model.summary$coefficients))
+
+# TO DO: Change test statistic
+
+joint.wald.test = function(model.summary, R, r ,signf.l){
+  
+  # Define test elements
+  joint.wald.test= numeric(6)
+  names(joint.wald.test) = c("Name","W","p-value", "df", "H0" , "Decision")
+  theta = coef(model.summary)
+  Var_theta_est = vcov(model.summary)
+  R = ifelse(is.null(R), diag(length(model.summary$coefficients)), R)
+  r = ifelse(is.null(r), rep(0, length(model.summary$coefficients)), r)
+  
+  # Wald test statistic
+  W = t(theta[spec,1]) %*% solve(Var_theta_est[spec,spec]) %*% theta[spec,1]
+  
+  # Set up test output
+  chi2 = qchisq(signf.l, df=length(spec))
+  pval = 1-pchisq(W,length(spec))
+  joint.wald.test[1] = "Chi2 test"
+  joint.wald.test[2] = format(   W, digits = 4) 
+  joint.wald.test[3] = format(pval, digits = 4)
+  joint.wald.test[4] = length(spec)
+  joint.wald.test[5] = paste0("All coef. equal to 0")
+  joint.wald.test[6] = ifelse(pval <= 1- signf.l, "Reject H0", "Cannot reject H0")
+  joint.wald.test
+}
+
+
+
 
 
 ######### JUST SOME NOTES #########
