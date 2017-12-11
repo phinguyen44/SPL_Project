@@ -8,42 +8,35 @@
 ################################################################################
 
 ################################################################################
+# SET WORKING DIRECTORY
 
-#SET WORKING DIRECTORY
-  
-#Note: Only this part must be changed for the rest of the script to run.
-  
+# Note: Only this part must be changed for the rest of the script to run.
 rm(list = ls())
 
-#Adjust your working directory to where your local repository is located
-  
+# Adjust your working directory to where your local repository is located
 wd = file.path("~/Documents/Projects/SPL_Project")
 setwd(wd)
   
-  ################################################################################
-  
-#SOURCE DATA*
-
-#source from quantlet 1
+################################################################################
+# SOURCE DATA
     
-source("Scripts/ReadAndClean.R") # not working
+source("Scripts/ReadAndClean.R")
+datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
   
 #Only keep relevant data sets
-    
-rm(list= ls()[!(ls() %in% c("df.out"))])
-
+df.out = datasets$df.out
+rm(datasets)
 
 # Ideas for functions:
 # Creates table that shows percentages within each stratum / substratum
 # function selecting metric and gives labour participation rate as output
 # tables could also use conditional formatting -> colour entries 
 
-
 ################################################################################
 # LOAD NECESSARY PACKAGES & DATA
 
 # List all packages needed for session
-neededPackages = c("dplyr", "formattable", "webshot", "htmltools" )
+neededPackages = c("dplyr", "formattable", "webshot", "htmltools", "webshot")
 allPackages    = c(neededPackages %in% installed.packages()[,"Package"]) 
 
 # Install packages (if not already installed) 
@@ -59,45 +52,48 @@ lapply(neededPackages, library, character.only = TRUE)
 ################################################################################
 # CREATE DATA FRAME FOR SUMMARY STATISTICS
 
-
-
 # Function for calculation group shares (percentage or mean) per country
-# Function gives out mean as default and percentage if any additional option entry is provided
+# Function gives out mean as default and percentage if any additional option
+# entry is provided
 
 group.share = function(y, share.option = NULL) {
-  
 # give out group mean for variable by country as default
-  if (is.null(share.option)){
-         tapply(X= y, 
-           INDEX = df.out$country, 
-           FUN   = function(x) {
-             val = sum(x)/length(x)
-     return(val)
-           })
-    
-# for further numeric option entry return percentage
-  } else {
-            perc = percent(
-          tapply(X= y, 
-            INDEX = df.out$country, 
-            FUN   = function(x) {
-            val = sum(x)/length(x)
-            if (val > 1){
-              warning('Group percentage share exceeds defined range')
-              return(val)
-            } else {
-              return(val)
-            }
-  }))
-           
-    return(perc)
-}}
+    if (is.null(share.option)) {
+        tapply(X     = y, 
+               INDEX = df.out$country, 
+               FUN   = function(x) {
+                   val = sum(x)/length(x)
+                   return(val)
+               }
+        )
+        
+    # for further numeric option entry return percentage
+    } else {
+        perc = percent(
+            tapply(X     = y, 
+                   INDEX = df.out$country, 
+                   FUN   = function(x) {
+                       val = sum(x)/length(x)
+                       if (val > 1) {
+                           warning('Group percentage share exceeds defined
+                                   range')
+                           return(val)
+                       } else {
+                           return(val)
+                       }
+                   }
+            )
+        )
+        return(perc)
+    }
+}
 
 # Function for calculating labor particpation rate per country
-labor.part.share = by(df.out, list(df.out$country), function(z){
+labor.part.share = by(df.out, list(df.out$country), function(z) {
   
   # Create Index Vector seperated by gender
-  IDX_w_l = ifelse({z$gender=="FEMALE"} & {z$labor_ft | z$labor_pt}, TRUE, FALSE)
+  IDX_w_l = ifelse({z$gender=="FEMALE"} & {z$labor_ft | z$labor_pt}, TRUE, 
+                   FALSE)
   IDX_m_l = ifelse({z$gender=="MALE"} & {z$labor_ft | z$labor_pt}, TRUE, FALSE)
   
   # Calculate percentages
@@ -106,11 +102,12 @@ labor.part.share = by(df.out, list(df.out$country), function(z){
   
   # Create Names
   output.list = list(perc_w, perc_m)
-  names(output.list) = c(paste0(c("Female", "Male"), " Labor Participation Share"))
+  names(output.list) = c(paste0(c("Female", "Male"), " Labor Participation
+                                Share"))
   
   return(output.list)
-  
-})
+}
+)
 
 labor.part.share.df = do.call(rbind.data.frame, labor.part.share)
 names(labor.part.share.df) = c(paste0(c("Female", "Male"), " Labor Participation Share"))
@@ -136,39 +133,36 @@ sum.stats = data.frame(
 rownames(sum.stats) = levels(df.out$country)
 
 names(sum.stats) = c(paste0(c("Female", "Male"), " Labor Participation Share"),
-                     "Oberservations",
-                     paste0("Age ", rep(c("50-54", "55-59", "60-64"), 2), c(rep(" ", 3), rep(" Obs", 3))),
+                     "Observations", paste0("Age ", rep(c("50-54", "55-59", "60-64"), 2), c(rep(" ", 3), rep(" Obs", 3))),
                      paste0(c("Chronic diseases", "Max. grip strength", "ADLs"), (" (mean)")),
                      paste0(c("Overweight", "Obese", " Bad mental health", "Good self-perceived health"),
                             " (in %)"))
 
-# Comment: Can we improve creating summary statistics by looping over certain variables?
-# Comment: Adla percentages are way too low compared to article!!!
-
-# Comment: labour participation rates are way to low!!! I think this has to do with the
-
+# TODO: Can we improve creating summary statistics by looping over certain
+# variables?
+# TODO: Adla percentages are way too low compared to article!!!
+# TODO: labour participation rates are way to low!!! I think this has to do with the way that we define labor participation
 
 ################################################################################
 # VISUALIZE SUMMARY STATISTICS IN TABLES
 
-
 # Formatting function for showing entries above mean in bold
-above_mean_bold = formatter("span", 
-                           style = i ~ style("font-weight" = ifelse(i > mean(i), "bold", NA)))
+above_mean_bold = formatter(
+    "span", style = i ~ style("font-weight" = ifelse(i > mean(i), "bold", NA)))
 
 
 # Creating a summary statistics table with conditional formatting
-sum.stats.out = function(DF){
-  
+sum.stats.out = function(DF) {
   # create an ouput table based on row-specific criteria
   formattable(DF, lapply(DF, function(x) {
-  
   # show above mean entries for non-percentage variables in bold
     if (max(x) > 1  & max (x) < 100){
-        formatter("span", style = i ~ style("font-weight" = ifelse(i > mean(i), "bold", NA)))
+        formatter(
+            "span", style = i ~ style(
+                "font-weight" = ifelse(i > mean(i), "bold", NA)))
       
   # apply conditional formatting to percentage variables by coloring
-    } else if (max (x) <= 1){
+    } else if (max (x) <= 1) {
         color_tile('white', 'lightblue')
       
   # Leave number of observations unformatted
@@ -183,7 +177,6 @@ DF1 = sum.stats[3:6]
 
 sum.stats.out(sum.stats)
 
-
 sum.stats.out(DF1)
 
 ################################################
@@ -191,11 +184,6 @@ sum.stats.out(DF1)
 # Source: https://stackoverflow.com/questions/38833219/command-for-exporting-saving-table-made-with-formattable-package-in-r
 
 # Solution Style: as_htmlwidget and then print screen
-
-# Required for export_formattable
-
-library("htmltools") # for html_print
-library("webshot")
 install_phantomjs()
 
 # TODO
@@ -219,4 +207,3 @@ export_formattable <- function(f, file, width = "100%", height = NULL,
 }
 
 export_formattable(sum.stats.out(DF1), file = "test.png")
-
