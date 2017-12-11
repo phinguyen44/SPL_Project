@@ -98,30 +98,43 @@ wald.df = data.frame(modelNames, wald.bound)
 #Calculate marginal effects and standard errors
 
 
+
 All.marg.effects = lapply(allModels, function(y){
-  for (i in 1:length(allModels)){
-    x = allModels[[i]]
-    pdf = mean(dnorm(predict(x, type = "link")))
-    m.e. = pdf*coef(x)
-    return(m.e.)
-  }
+    
+    # Initialize vector for results
+    marg.effects      = vector("list", 2)
+    
+    #Calculate marginal effects
+    pdf               = mean(dnorm(predict(y, type = "link")))
+    marg.effects[[1]] = pdf*coef(y)
+    
+    #Calculate baseline probabilities of employment
+    X                   = y$data
+    X_mean              = apply(X, 2, mean)
+    beta                = marg.effects[[1]]
+    baseline            = X_mean %*% beta
+    prob                = pnorm(baseline) 
+    marg.effects[[2]]   = prob
+   
+     return(marg.effects)
+  
 })
+
+#Calculate predicted participation probability of average individual
+#Try first for Belgian female
+
 
 
 # Check with paper
 formattable(data.frame(All.marg.effects))
 
+
 # Crosscheck with margins package: requires other input format
 
-margins
 
-All.marg.effects2 = lapply(allModels, function(y){
-    for (i in 1:length(allModels)){
-        x = allModels[[i]]
-        m.e. = margins(x)
-        return(m.e.)
-    }
-})
+
+
+    
 
 
 
