@@ -20,7 +20,7 @@ rm(list= ls()[!(ls() %in% c("df.reg", "df.splits"))])
 # LOAD NECESSARY PACKAGES & DATA
 
 # List all packages needed for session
-neededPackages = c("aod", "devtools")
+neededPackages = c("aod", "devtools", "margins")
 allPackages    = c(neededPackages %in% installed.packages()[,"Package"]) 
 
 # Install packages (if not already installed) 
@@ -94,4 +94,41 @@ wald.bound = t(as.data.frame(wald.log))
 modelNames = names(allModels)
 wald.df = data.frame(modelNames, wald.bound)
 
+################################################################################
+#Calculate marginal effects and standard errors
+
+
+All.marg.effects = lapply(allModels, function(y){
+  for (i in 1:length(allModels)){
+    x = allModels[[i]]
+    pdf = mean(dnorm(predict(x, type = "link")))
+    m.e. = pdf*coef(x)
+    return(m.e.)
+  }
+})
+
+
+# Check with paper
+formattable(data.frame(All.marg.effects))
+
+# Crosscheck with margins package: requires other input format
+
+margins
+
+All.marg.effects2 = lapply(allModels, function(y){
+    for (i in 1:length(allModels)){
+        x = allModels[[i]]
+        m.e. = margins(x)
+        return(m.e.)
+    }
+})
+
+
+
+
+################################################################################
+
+#Wald Test goes here
+
+################################################################################
 
