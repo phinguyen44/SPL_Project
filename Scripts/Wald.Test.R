@@ -37,11 +37,11 @@ lapply(neededPackages, library, character.only = TRUE)
 ################################################################################
 
 # Probit for each country and gender 
-allModels = lapply(df.splits, function(z){
+allModels  = lapply(df.splits, function(z){
   
-  z = z[-z$age50] # Multicollinearity
+         z = z[-z$age50] # Multicollinearity
   
-  model = glm(z$labor_participationTRUE ~., family = binomial(link = "probit"), data = z)
+     model = glm(z$labor_participationTRUE ~., family = binomial(link = "probit"), data = z)
   
   return(model)
   
@@ -62,16 +62,16 @@ for(i in 1:length(allModels)){
   ModelElement = allModels[[i]]
   
   # Specify the of coefficients to be tested: only health variable
-  health = c(16:19)
+  health       = c(16:19)
   
   # Test only the joint significance of health variables
   # TODO: select health coefficients in a more efficient manner -> some Models have less coefficients
-  testOutput = try(wald.test(b = coef(ModelElement), Sigma = vcov(ModelElement), Terms = health)$result)
+  testOutput   = try(wald.test(b = coef(ModelElement), Sigma = vcov(ModelElement), Terms = health)$result)
   
   if(class(testOutput) == "try-error"){
     
     # Display warning and investigate
-    msg = paste0("Wald Test failed for Model Element ", i)
+    msg        = paste0("Wald Test failed for Model Element ", i)
     warning(msg)
     
     wald.log[[i]] = "Error"
@@ -125,22 +125,22 @@ R %*% b
 joint.wald.test = function(model.summary, spec, signf.l){
   
   # Define test elements
-  joint.wald.test= numeric(6)
+  joint.wald.test        = numeric(6)
   names(joint.wald.test) = c("Name","W","p-value", "df", "H0" , "Decision")
-  theta = model.summary$coefficients
-  Var_theta_est = vcov(model.summary)
+  beta                   = model.summary$coefficients[,1]
+  Var_beta_est           = vcov(model.summary)
   
   # Wald test statistic
-  W = t(theta[spec,1]) %*% solve(Var_theta_est[spec,spec]) %*% theta[spec,1]
+  W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
   
   # Set up test output
-  chi2 = qchisq(signf.l, df=length(spec))
-  pval = 1-pchisq(W,length(spec))
+  chi2               = qchisq(signf.l, df=length(spec))
+  pval               = 1-pchisq(W,length(spec))
   joint.wald.test[1] = "Chi2 test"
   joint.wald.test[2] = format(   W, digits = 4) 
   joint.wald.test[3] = format(pval, digits = 4)
   joint.wald.test[4] = length(spec)
-  joint.wald.test[5] = paste0("All coef. equal to 0")
+  joint.wald.test[5] = "b equal to 0"
   joint.wald.test[6] = ifelse(pval <= 1- signf.l, "Reject H0", "Cannot reject H0")
   joint.wald.test
 }
@@ -158,40 +158,56 @@ wald.test(b = coef(allModels$AUT.FEMALE), Sigma = vcov(allModels$AUT.FEMALE), Te
 
 # If you want to test special linear hypothesis, define R matrix and r vector
 
-k = length(model.summary$coefficients)
-
-R = diag(length(model.summary$coefficients))
-r = rep(0, length(model.summary$coefficients))
+k = 23
+R = diag(1, k)
+r = rep(0, length(k))
 
 # TO DO: Change test statistic
 
-joint.wald.test = function(model.summary, R, r ,signf.l){
+general.wald.test = function(model.summary, signf.l, R = NULL, r = NULL){
   
   # Define test elements
-  joint.wald.test= numeric(6)
-  names(joint.wald.test) = c("Name","W","p-value", "df", "H0" , "Decision")
-  theta = coef(model.summary)
-  Var_theta_est = vcov(model.summary)
-  R = ifelse(is.null(R), diag(length(model.summary$coefficients)), R)
-  r = ifelse(is.null(r), rep(0, length(model.summary$coefficients)), r)
+  general.wald.test        = numeric(6)
+  names(general.wald.test) = c("Name","W","p-value", "df", "H0" , "Decision")
+  beta                     = model.summary$coefficients[, 1]
+  Var_beta_est             = vcov(model.summary)
+ 
+  # Set up restriction matrix/vector for linear hypothesis
+  # default option is joint significants of all coefficients
+   R  = if (is.null(R)){
+    R = diag(1, length(beta)) # default of R is identity matrix 
+   } else {
+    R = R}
+    
+  r   = if (is.null(r)){
+    r = rep(0, length(beta)) # default for r is null vector
+  } else {
+    r = r}
   
   # Wald test statistic
-  W = t(theta[spec,1]) %*% solve(Var_theta_est[spec,spec]) %*% theta[spec,1]
+  W = t(R%*%beta - r) %*% solve(R%*% Var_beta_est %*% t(R)) %*% (R%*%beta - r)
   
   # Set up test output
-  chi2 = qchisq(signf.l, df=length(spec))
-  pval = 1-pchisq(W,length(spec))
-  joint.wald.test[1] = "Chi2 test"
-  joint.wald.test[2] = format(   W, digits = 4) 
-  joint.wald.test[3] = format(pval, digits = 4)
-  joint.wald.test[4] = length(spec)
-  joint.wald.test[5] = paste0("All coef. equal to 0")
-  joint.wald.test[6] = ifelse(pval <= 1- signf.l, "Reject H0", "Cannot reject H0")
-  joint.wald.test
+  chi2                 = qchisq(signf.l, df=length(r))
+  pval                 = 1-pchisq(W,length(r))
+  general.wald.test[1] = "Chi2 test"
+  general.wald.test[2] = format(   W, digits = 4) 
+  general.wald.test[3] = format(pval, digits = 4)
+  general.wald.test[4] = length(r)
+  general.wald.test[5] = "R*b = r"
+  general.wald.test[6] = ifelse(pval <= 1- signf.l, "Reject H0", "Cannot reject H0")
+  general.wald.test
 }
 
+ 
+# Test whether it works
+B = matrix(0, nrow=2, ncol= 23)
+B[1, 4:5] = 1
+B[2, 4] = 2
+C = c(2,1)
+b = allSummaries$AUT.FEMALE$coefficients[,1]
 
-
+general.wald.test(allSummaries$AUT.FEMALE, 0.95, B, C)
 
 
 ######### JUST SOME NOTES #########
