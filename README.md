@@ -42,36 +42,26 @@ Statistical Programming Languages Group Project
         3. Number of chronic diseases (**chronic_mod**)
 
 2. Summary statistics tables
- - Tables to be built (pages indicate location in paper):
-     1. Sample statistics and age classes per country (p. 17)
+    - Tables to be built (pages indicate location in paper):
+        1. Sample statistics and age classes per country (p. 17)
             1. number of observation per country
-            2. percentage of observation withhin each country
+            2. percentage of observation within each country
             3. stratified by age groups:
-              1. Age 50-54, Age 55-59, Age 60-64
-            
-     2. Health indicators per country (p. 17-18)
-            1. percentage of entire sample (Europe) within category of
-              each of eight health indicators
-     
-     3. Labour force participation men per country (p. 18)
-            1. percentage of working men withhin each country
-            stratified by age groups : 
-              1. Age 50-54, Age 55-59, Age 60-64
-            
-     4. Labour force participation women per country (p. 19)
-            1. percentage of working women withhin each country
-            stratified by age groups : 
-              1. Age 50-54, Age 55-59, Age 60-64
-            
-     5. Labour supply choice men (p. 19)
-            1. percentage of men withhin each country
-            stratified by labor groups:
-            1. Nonparticipation, Half Time, Full Time
-     
-     6. Labour supply choice women (p. 20)
-            1. percentage of men withhin each country
-            stratified by labor groups: 
-              1. Nonparticipation, Half Time, Full Time
+                1. Age 50-54, Age 55-59, Age 60-64
+        2. Health indicators per country (p. 17-18)
+            1. percentage of entire sample (Europe) within category of each of eight health indicators
+        3. Labour force participation men per country (p. 18)
+            1. percentage of working men within each country stratified by age groups:
+                1. Age 50-54, Age 55-59, Age 60-64
+        4. Labour force participation women per country (p. 19)
+            1. percentage of working women within each country stratified by age groups:
+                1. Age 50-54, Age 55-59, Age 60-64
+        5. Labour supply choice men (p. 19)
+            1. percentage of men withhin each country stratified by labor groups:
+                1. Nonparticipation, Half Time, Full Time
+        6. Labour supply choice women (p. 20)
+            1. percentage of men withhin each country stratified by labor groups:
+                1. Nonparticipation, Half Time, Full Time
 
 ### Section 2: Estimation
 
