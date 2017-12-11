@@ -25,8 +25,8 @@ needs(ggplot2, countrycode, viridis, geofacet, ggridges)
 ##################################################################################################
 # Data Preparation
 
-casp_country = df.loc %>% 
-  group_by(loc_country) %>% 
+casp_country = df.loc %>%
+  group_by(loc_country) %>%
   summarize(avg_casp = round(mean(casp, na.rm = TRUE),2))
 
 coordinates = readxl::read_excel("Examples/Coordinates.xlsx", sheet = 1)
@@ -41,12 +41,12 @@ df = left_join(coordinates, codes, by = c("Country" = "country.name.en")) %>%
 df.loc = df.loc %>% filter(loc_country != "ISR")
 
 # remove NA's and reorder
-df.noNA     = df %>% 
-  filter(!is.na(avg_casp)) %>% 
-  arrange(avg_casp) %>% 
+df.noNA     = df %>%
+  filter(!is.na(avg_casp)) %>%
+  arrange(avg_casp) %>%
   mutate(loc_country=factor(loc_country, unique(loc_country)))
-df.loc.noNA = df.loc %>% 
-  filter(!is.na(casp)) %>% 
+df.loc.noNA = df.loc %>%
+  filter(!is.na(casp)) %>%
   group_by(loc_country) %>%
   mutate(m = mean(casp)) %>%
   arrange(m) %>%
@@ -119,6 +119,6 @@ p3 = ggplot(data = df.loc.noNA, aes(x = casp, y = loc_country)) +
 p3
 # TODO: order by mean? color by mean value?
 
-ggsave("Output/Distribution-CASPbyCountry.png", plot = last_plot(), width = 6, height = 8, units = "in")
+ggsave("Old/Output/Distribution-CASPbyCountry.png", plot = last_plot(), width = 6, height = 8, units = "in")
 
 ## TODO: geofacet
