@@ -9,10 +9,27 @@
 
 ################################################################################
 
-# Comment: How should we start this quantlet? Load the pre-processd data set?
-# Specify with data must be loaded? 
+#SET WORKING DIRECTORY
+  
+#Note: Only this part must be changed for the rest of the script to run.
+  
+rm(list = ls())
 
+#Adjust your working directory to where your local repository is located
+  
+wd = file.path("~/Documents/Projects/SPL_Project")
+setwd(wd)
+  
+  ################################################################################
+  
+#SOURCE DATA*
 
+#source from quantlet 1
+    
+source("Scripts/ReadAndClean.R") # not working
+  
+#Only keep relevant data sets
+    
 rm(list= ls()[!(ls() %in% c("df.out"))])
 
 
@@ -44,34 +61,48 @@ lapply(neededPackages, library, character.only = TRUE)
 
 
 
-# Function for calculation group percentages per country
-group.percentage     = function(y){tapply(X = y, INDEX = df.out$country, 
-                      FUN = function(x){
-                        val = percent(sum(x)/length(x))
-                        return(val)
-                      })} 
+# Function for calculation group shares (percentage or mean) per country
+# Function gives out mean as default and percentage if any additional option entry is provided
 
-
-# TODO: why is this not return a percentage entry?
+group.share = function(y, share.option = NULL) {
+  
+# give out group mean for variable by country as default
+  if (is.null(share.option)){
+         tapply(X= y, 
+           INDEX = df.out$country, 
+           FUN   = function(x) {
+             val = sum(x)/length(x)
+     return(val)
+           })
+    
+# for further numeric option entry return percentage
+  } else {
+            perc = percent(
+          tapply(X= y, 
+            INDEX = df.out$country, 
+            FUN   = function(x) {
+            val = sum(x)/length(x)
+            if (val > 1){
+              warning('Group percentage share exceeds defined range')
+              return(val)
+            } else {
+              return(val)
+            }
+  }))
+           
+    return(perc)
+}}
 
 # Function for calculating labor particpation rate per country
 labor.part.share = by(df.out, list(df.out$country), function(z){
   
   # Create Index Vector seperated by gender
   IDX_w_l = ifelse({z$gender=="FEMALE"} & {z$labor_ft | z$labor_pt}, TRUE, FALSE)
-  IDX_m_l = ifelse({z$gender=="MALE"}   & {z$labor_ft | z$labor_pt}, TRUE, FALSE)
-  
-  # Count 
-  working_w = sum(ifelse(IDX_w_l, 1, 0))
-  working_m = sum(ifelse(IDX_m_l, 1, 0))
-  
-  # Get Length in order to calculate percentages
-  len_w = length(IDX_w_l)
-  len_m = length(IDX_m_l)
+  IDX_m_l = ifelse({z$gender=="MALE"} & {z$labor_ft | z$labor_pt}, TRUE, FALSE)
   
   # Calculate percentages
-  perc_w = working_w / len_w
-  perc_m = working_m / len_m
+  perc_w = sum(IDX_w_l) / length(IDX_w_l)
+  perc_m = sum(IDX_m_l) / length(IDX_m_l)
   
   # Create Names
   output.list = list(perc_w, perc_m)
@@ -87,20 +118,20 @@ names(labor.part.share.df) = c(paste0(c("Female", "Male"), " Labor Participation
 # Creating summary statistics dataframe with percentage entries/mean
 sum.stats = data.frame(
           cbind(labor.part.share.df, matrix(nrow = 11, ncol = 0)) %>% 
-                mutate(observation  = summary(df.out$country),
-                       age50_54_p   =   group.percentage(df.out$age50_54),
-                       age55_59_p   =   group.percentage(df.out$age55_59),
-                       age60_64_p   =   group.percentage(df.out$age60_64),
-                       age50_54_n   =   age50_54_p * observation, 
-                       age55_59_n   =   age55_59_p * observation,
-                       age60_64_n   =   age60_64_p * observation,
-                       h_chronic_p  =   group.percentage(df.out$h_chronic),
-                       h_maxgrip_p  =   group.percentage(df.out$h_maxgrip),
-                       h_adla_p     =   group.percentage(df.out$h_adla),
-                       h_overweigh_p=   group.percentage(df.out$h_overweight),  
-                       h_obese_p    =   group.percentage(df.out$h_obese),  
-                       h_badment_p  =   group.percentage(df.out$h_badmental),  
-                       h_goodsp_p   =   group.percentage(df.out$h_goodsp)))
+                mutate(observation  =   summary(df.out$country),
+                       age50_54_p   =   group.share(df.out$age50_54, 1),
+                       age55_59_p   =   group.share(df.out$age55_59, 1),
+                       age60_64_p   =   group.share(df.out$age60_64, 1),
+                       age50_54_n   =   as.numeric(age50_54_p * observation), 
+                       age55_59_n   =   as.numeric(age55_59_p * observation),
+                       age60_64_n   =   as.numeric(age60_64_p * observation),
+                       h_chronic_p  =   group.share(df.out$h_chronic),
+                       h_maxgrip_p  =   group.share(df.out$h_maxgrip),
+                       h_adla_p     =   group.share(df.out$h_adla),
+                       h_overweigh_p=   group.share(df.out$h_overweight, 1),  
+                       h_obese_p    =   group.share(df.out$h_obese, 1),  
+                       h_badment_p  =   group.share(df.out$h_badmental, 1),  
+                       h_goodsp_p   =   group.share(df.out$h_goodsp, 1)))
 
 rownames(sum.stats) = levels(df.out$country)
 
@@ -110,10 +141,11 @@ names(sum.stats) = c(paste0(c("Female", "Male"), " Labor Participation Share"),
                      paste0(c("Chronic diseases", "Max. grip strength", "ADLs"), (" (mean)")),
                      paste0(c("Overweight", "Obese", " Bad mental health", "Good self-perceived health"),
                             " (in %)"))
+
 # Comment: Can we improve creating summary statistics by looping over certain variables?
 # Comment: Adla percentages are way too low compared to article!!!
+
 # Comment: labour participation rates are way to low!!! I think this has to do with the
-# assumption that 0 hours are interpreted as not working
 
 
 ################################################################################
@@ -171,6 +203,8 @@ install_phantomjs()
 # Show percentage entries
 # Show name of countries
 # Maybe: Improve creationg of summary statistics (e.g. lapply)
+# Question: Why do we define names for labor.part.share twice?
+# Caution: group.percentage function needs additional option entry as numeric
 
 export_formattable <- function(f, file, width = "100%", height = NULL, 
                                background = "white", delay = 0.2)
