@@ -102,19 +102,41 @@ wald.df = data.frame(modelNames, wald.bound)
 All.marg.effects = lapply(allModels, function(y){
     
     # Initialize vector for results
-    marg.effects      = vector("list", 2)
+    marg.effects      = vector("list", 3)
     
-    #Calculate marginal effects
-    pdf               = mean(dnorm(predict(y, type = "link")))
-    marg.effects[[1]] = pdf*coef(y)
+    #Calculate average of the sample marginal effects
+    pdf.pred            = mean(dnorm(predict(y, type = "link")))
+    marg.effects[[1]]   = pdf.pred *coef(y)
+    #Comment:remove constant???
     
+    #Alternative: Calculate average marginal effects
+    X                   = y$data
+   # Calculate mean per variable
+    X_mean              = apply(X, 2, mean)
+    pdf.pred.mean       = dnorm(X_mean %*% coef(y))
+    pdf.pred.mean       = rep(pdf.pred.mean, 23)
+    # why cannot replace 23 by coef(y)?
+    
+    # Calculate pred. value + 1
+    X_mean.adj          = matrix(rep(X_mean, length(coef(y))), 
+                                 nrow = length(coef(y)), byrow = TRUE) + 
+                                 diag(1, length(coef(y)))
+    pred.mean.adj       = X_mean.adj %*% coef(y)
+    # use dnorm or pnorm?
+    pdf.pred.mean.adj   = dnorm(pred.mean.adj - pdf.pred.mean)
+    marg.effects[[2]]   = pdf.pred.mean.adj
+    #Check whether corect   
+    #see http://researchrepository.ucd.ie/bitstream/handle/10197/3404/WP11_22.pdf?sequence=1
+    
+    
+    # Look this up!!!
     #Calculate baseline probabilities of employment
     X                   = y$data
     X_mean              = apply(X, 2, mean)
     beta                = marg.effects[[1]]
     baseline            = X_mean %*% beta
     prob                = pnorm(baseline) 
-    marg.effects[[2]]   = prob
+    marg.effects[[3]]   = prob
    
      return(marg.effects)
   
