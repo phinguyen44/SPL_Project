@@ -83,9 +83,10 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda") {
     # CREATE DATA FRAMES FOR ANALYSIS AND ESTIMATION
 
     # Get country information from "countrycode" package
-    country_list = c("BEL", "NLD", "FRA", "SWE", "DEU", "GRC", "ITA", "ESP", "DNK",
-                     "AUT", "CHE")
-    country_data = with(countrycode_data, data.frame(iso3c, iso3n))
+    country_list = c("BEL", "NLD", "FRA", "SWE", "DEU", "GRC", "ITA", "ESP", 
+                     "DNK", "AUT", "CHE")
+    country_data = with(countrycode_data, 
+                        data.frame(iso3c, iso3n, country.name.en))
 
     # Variables are cleaned, converted into human-readable naming conventions, 
     # and converted to dummies as described in the paper
@@ -94,7 +95,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda") {
     df.out       = df %>%
         dplyr::left_join(country_data, by = c("country_mod" = "iso3n")) %>%
         dplyr::filter(iso3c %in% country_list) %>%
-        dplyr::mutate(country       = factor(iso3c),
+        dplyr::mutate(country       = factor(country.name.en),
                       gender        = factor(ifelse(female, "FEMALE", "MALE")),
                       age50_54      = age < 55,
                       age55_59      = age >= 55 & age < 60,
