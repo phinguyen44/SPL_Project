@@ -10,7 +10,7 @@
 #
 ################################################################################
 
-read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda") {
+read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wave = 1) {
 
     # LOAD NECESSARY PACKAGES & DATA
     # List all packages needed for session
@@ -46,7 +46,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda") {
         sep = "\n")
     
     dat = dat.input %>%
-        filter(wave == "1" & (age <= 64 & age >= 50)) %>%  # wave 1 & age filter
+        filter(wave == wave & (age <= 64 & age >= 50)) %>%  # wave & age filter
         select(wave, country_mod,                          # dataset details
                female, age, isced1997_r, ch001_, mar_stat, # demo variables
                chronic_mod, maxgrip, adla, bmi2, eurod, sphus, # health indices
