@@ -113,7 +113,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
                       h_obese       = bmi2 == 4,
                       h_badmental   = eurod > 3,
                       h_goodsp      = sphus < 4,
-                      labor_ft      = ep013_mod > 32,
+                      labor_ft      = ep013_mod >= 32,
                       labor_pt      = ep013_mod < 32 & ep013_mod > 0,
                       labor_np      = ep013_mod == 0) %>%
         dplyr::select(country, gender,              # country and gender
