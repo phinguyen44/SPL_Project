@@ -9,7 +9,10 @@
 
 # TODO: 
 # Change functions to define level of aggregation (namely, get total)
+# Lapply the group.share fxn for the sum.stats table?
 # BOLD THE TOTALS
+# Add titles to tables
+# Formatting of tables
 
 ################################################################################
 # SET WORKING DIRECTORY
@@ -41,7 +44,7 @@ rm(datasets)
 # List all packages needed for session
 neededPackages = c("dplyr", "magrittr", "purrr",
                    "formattable", "webshot", "htmltools", "webshot")
-allPackages    = c(neededPackages %in% installed.packages()[,"Package"]) 
+allPackages    = c(neededPackages %in% installed.packages()[ , "Package"]) 
 
 # Install packages (if not already installed) 
 if(!all(allPackages)) {
@@ -108,30 +111,35 @@ labor.part.share.df = spread(labor.part.share, Var3, output.v) %>%
     set_colnames(c("Country", "Gender", agegroups))
 
 # Labor supply choice tables
-labor.supply.f = df.out %>% filter(gender == "FEMALE")
-labor.supply.m = df.out %>% filter(gender == "MALE")
+df.female = df.out %>% filter(gender == "FEMALE")
+df.male   = df.out %>% filter(gender == "MALE")
+vars      = names(df.out)[grep("labor", names(df.out))][3:1] # invert
 
-vars = names(df.out)[grep("labor", names(df.out))]
-new = lapply(vars, function(x) group.share(df.out, x, 1))
-labor.supply.m = lapply(vars, function(x) group.share(labor.supply.m[[x]],1))
+labor.supply.f    = lapply(vars, function(x) group.share(df.female, x, 1))
+labor.supply.f.df = as.data.frame(Reduce("cbind", labor.supply.f)) %>% 
+    set_colnames(c("Nonparticipation", "Half time", "Full time"))
+
+labor.supply.m    = lapply(vars, function(x) group.share(df.male, x, 1))
+labor.supply.m.df = as.data.frame(Reduce("cbind", labor.supply.m)) %>% 
+    set_colnames(c("Nonparticipation", "Half time", "Full time"))
 
 # Creating summary statistics dataframe with percentage entries/mean
 sum.stats = labor.m[1] %>% 
     mutate (
         observation   = summary(df.out$country),
-        age50_54_p    = group.share(df.out$age50_54, 1),
-        age55_59_p    = group.share(df.out$age55_59, 1),
-        age60_64_p    = group.share(df.out$age60_64, 1),
+        age50_54_p    = group.share(df.out, "age50_54", 1),
+        age55_59_p    = group.share(df.out, "age55_59", 1),
+        age60_64_p    = group.share(df.out, "age60_64", 1),
         age50_54_n    = as.numeric(age50_54_p * observation), 
         age55_59_n    = as.numeric(age55_59_p * observation),
         age60_64_n    = as.numeric(age60_64_p * observation),
-        h_chronic_p   = group.share(df.out$h_chronic),
-        h_adla_p      = group.share(df.out$h_adla, 1),
-        h_maxgrip_p   = group.share(df.out$h_maxgrip),
-        h_overweigh_p = group.share(df.out$h_overweight, 1), 
-        h_obese_p     = group.share(df.out$h_obese, 1),  
-        h_badment_p   = group.share(df.out$h_badmental, 1),  
-        h_goodsp_p    = group.share(df.out$h_goodsp, 1)
+        h_chronic_p   = group.share(df.out, "h_chronic"),
+        h_adla_p      = group.share(df.out, "h_adla", 1),
+        h_maxgrip_p   = group.share(df.out, "h_maxgrip"),
+        h_overweigh_p = group.share(df.out, "h_overweight", 1), 
+        h_obese_p     = group.share(df.out, "h_obese", 1),  
+        h_badment_p   = group.share(df.out, "h_badmental", 1),  
+        h_goodsp_p    = group.share(df.out, "h_goodsp", 1)
     ) %>% 
     set_rownames(levels(df.out$country)) %>% 
     select(-Country)
@@ -176,13 +184,22 @@ sum.stats.out = function(DF) {
 DF1 = sum.stats[, 1:4]
 DF2 = sum.stats[, 8:10]
 DF3 = sum.stats[, 11:14]
-DF4 = labor.part.share.df %>% filter(Gender == "MALE") %>% select(-Gender)
-DF5 = labor.part.share.df %>% filter(Gender == "FEMALE") %>% select(-Gender)
+DF4 = labor.part.share.df %>% 
+    filter(Gender == "MALE") %>% 
+    set_rownames(levels(df.out$country)) %>% 
+    select(-Gender, -Country) %>% 
+    set_colnames(paste0("Age ", rep(c("50-54", "55-59", "60-64"))))
+DF5 = labor.part.share.df %>% 
+    filter(Gender == "FEMALE") %>% 
+    set_rownames(levels(df.out$country)) %>% 
+    select(-Gender, -Country) %>% 
+    set_colnames(paste0("Age ", rep(c("50-54", "55-59", "60-64"))))
+DF6 = labor.supply.m.df
+DF7 = labor.supply.f.df
 
-# TODO: Tables 4 - 6
 # TODO: loop through tables, use map to insert totals, print all
-sum.stats.out(sum.stats)
-sum.stats.out(DF1)
+listDF = list(DF1=DF1, DF2=DF2, DF3=DF3, DF4=DF4, DF5=DF5, DF6=DF6, DF7=DF7)
+# lapply(listDF, sum.stats.out)
 
 ################################################################################
 # Export
@@ -201,4 +218,7 @@ export_formattable = function(f, file, width = "100%", height = NULL,
             delay = delay)
 }
 
-export_formattable(sum.stats.out(DF1), file = "test.png")
+
+map2(listDF, names(listDF), function(a, b) {
+    export_formattable(sum.stats.out(a), file = paste0("Output/", b, ".png"))
+})
