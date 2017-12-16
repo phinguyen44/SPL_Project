@@ -8,7 +8,7 @@
 ################################################################################
 
 # TODO: 
-# Change functions to define level of aggregation (namely, get total)
+# Clean up code... it's hideous
 # Lapply the group.share fxn for the sum.stats table?
 # Formatting of tables: Bold, fix column widths, add titles
 
@@ -60,21 +60,32 @@ lapply(neededPackages, library, character.only = TRUE)
 # Function for calculation group shares (percentage or mean) per country
 # Function gives out mean as default and percentage if any additional option
 # entry is provided
-group.share = function(df, y, share.option = FALSE) {
+group.share = function(df, y, share.option = FALSE, agg.country = TRUE) {
     # give out group mean for variable by country as default
-    if (share.option) {
-        final = percent(tapply(df[[y]], df$country, function(x) {
-            val = sum(x)/length(x)
-            if (val > 1) {
+    if (agg.country) {
+        if (share.option) {
+            final = percent(tapply(df[[y]], df$country, function(x) {
+                val = sum(x)/length(x)
+                if (val > 1) {
+                    warning("Group percentage share exceeds defined range")
+                }
+                return(val)
+            }))
+        } else {
+            final = tapply(df[[y]], df$country, function(x) {
+                val = sum(x)/length(x)
+                return(val)
+            })
+        }
+    } else { # return total if country-level aggregation not specified
+        if (share.option) {
+            final = percent(sum(df[[y]])/length(df[[y]]))
+            if (final > 1) {
                 warning("Group percentage share exceeds defined range")
             }
-            return(val)
-        }))
-    } else {
-        final = tapply(df[[y]], df$country, function(x) {
-            val = sum(x)/length(x)
-            return(val)
-        })
+        } else {
+            final = sum(df[[y]])/length(df[[y]])
+            }
     }
     return(final)
 }
@@ -114,23 +125,21 @@ df.male   = df.out %>% filter(gender == "MALE")
 vars      = names(df.out)[grep("labor", names(df.out))][3:1] # invert
 
 labor.supply.f    = lapply(vars, function(x) group.share(df.female, x, 1))
-labor.supply.f.df = as.data.frame(Reduce("cbind", labor.supply.f)) %>% 
+labor.supply.f.df = do.call(cbind.data.frame, labor.supply.f) %>% 
     set_colnames(c("Nonparticipation", "Half time", "Full time"))
 
 labor.supply.m    = lapply(vars, function(x) group.share(df.male, x, 1))
-labor.supply.m.df = as.data.frame(Reduce("cbind", labor.supply.m)) %>% 
+labor.supply.m.df = do.call(cbind.data.frame, labor.supply.m) %>% 
     set_colnames(c("Nonparticipation", "Half time", "Full time"))
 
 # Creating summary statistics dataframe with percentage entries/mean
-sum.stats = labor.m[1] %>% 
+sum.stats = labor.part.share.df[,c(1,2)] %>% 
+    filter(Gender == "MALE") %>% 
     mutate (
         observation   = summary(df.out$country),
         age50_54_p    = group.share(df.out, "age50_54", 1),
         age55_59_p    = group.share(df.out, "age55_59", 1),
         age60_64_p    = group.share(df.out, "age60_64", 1),
-        age50_54_n    = as.numeric(age50_54_p * observation), 
-        age55_59_n    = as.numeric(age55_59_p * observation),
-        age60_64_n    = as.numeric(age60_64_p * observation),
         h_chronic_p   = group.share(df.out, "h_chronic"),
         h_adla_p      = group.share(df.out, "h_adla", 1),
         h_maxgrip_p   = group.share(df.out, "h_maxgrip"),
@@ -140,16 +149,67 @@ sum.stats = labor.m[1] %>%
         h_goodsp_p    = group.share(df.out, "h_goodsp", 1)
     ) %>% 
     set_rownames(levels(df.out$country)) %>% 
-    select(-Country)
+    select(-Gender, -Country)
 
 names(sum.stats) = c("Observations", 
-                     paste0("Age ", rep(c("50-54", "55-59", "60-64"), 2), 
-                            c(rep(" ", 3), rep(" Obs", 3))),
+                     paste0("Age ", c("50-54", "55-59", "60-64")),
                      "Num chronic diseases (mean)",
                      "ADLs (in %)",
                      "Max grip strength (mean)", 
                      paste0(c("Overweight", "Obese", " Bad mental health", 
                               "Good self-perceived health"), " (in %)"))
+
+################################################################################
+# GET TOTALS
+
+## Total labor participation rate
+total.labor = function(df, .gender, .age) {
+    dataset = df %>% 
+        filter(gender == .gender & get(.age) == TRUE)
+    denom = nrow(dataset)
+    numer = with(dataset, sum(labor_ft | labor_pt))
+    perc  = percent(round(numer/denom, 4))
+    
+    return(perc)
+}
+
+# use expand.grid to get all combinations of country / gender / age
+args.tot      = with(df.out, 
+                     expand.grid(levels(gender), agegroups, 
+                                 stringsAsFactors = FALSE))
+args.list.tot = list(g = as.vector(t(args.tot[1])), 
+                     a = as.vector(t(args.tot[2])))
+
+# Map over multiple arguments
+output.tot   = pmap(args.list.tot, function(g, a) total.labor(df.out, g, a))
+output.v.tot = do.call("c", output.tot)
+
+total.labor.part    = cbind(args, output.v)
+total.labor.part.df = spread(total.labor.part, Var2, output.v) %>% 
+    arrange(desc(Var1)) %>% 
+    set_colnames(c( "Gender", agegroups))
+
+## TOTAL Labor supply choice tables
+tot.supply.f    = lapply(vars, function(x) group.share(df.female, x, 1, 0))
+tot.supply.f.df = do.call(cbind.data.frame, tot.supply.f) %>% 
+    set_colnames(c("Nonparticipation", "Half time", "Full time"))
+
+tot.supply.m    = lapply(vars, function(x) group.share(df.male, x, 1, 0))
+tot.supply.m.df = do.call(cbind.data.frame, tot.supply.f) %>% 
+    set_colnames(c("Nonparticipation", "Half time", "Full time"))
+
+## TOTAL sum stats
+perc.vars = c("age50_54", "age55_59", "age60_64",
+              "h_adla", "h_overweight", "h_obese", "h_badmental", "h_goodsp")
+num.vars  = c("h_chronic", "h_maxgrip")
+
+obs      = nrow(df.out)
+percs    = lapply(perc.vars, function(x) group.share(df.out, x, 1, 0))
+nums     = lapply(num.vars, function(x) group.share(df.out, x, 0, 0))
+all.list = list(obs, percs, nums)
+sum.stats.tot = do.call(cbind.data.frame, all.list) %>% 
+    select(1, 2, 3, 4, 10, 5, 11, 6, 7, 8, 9, 10) %>% # reorder
+    set_colnames(names(sum.stats))
 
 ################################################################################
 # VISUALIZE SUMMARY STATISTICS IN TABLES
@@ -180,8 +240,8 @@ sum.stats.out = function(DF) {
 
 # prepare all DF's
 DF1 = sum.stats[, 1:4]
-DF2 = sum.stats[, 8:10]
-DF3 = sum.stats[, 11:14]
+DF2 = sum.stats[, 5:7]
+DF3 = sum.stats[, 8:11]
 DF4 = labor.part.share.df %>% 
     filter(Gender == "MALE") %>% 
     set_rownames(levels(df.out$country)) %>% 
