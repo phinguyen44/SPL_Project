@@ -8,11 +8,8 @@
 ################################################################################
 
 # TODO: 
-# Change layout of output table: adjust when variable name is large
-# Show percentage entries
-# Maybe: Improve creation of summary statistics (e.g. lapply)
-# Question: Why do we define names for labor.part.share twice?
-# Caution: group.percentage function needs additional option entry as numeric
+# Change functions to define level of aggregation (namely, get total)
+# BOLD THE TOTALS
 
 ################################################################################
 # SET WORKING DIRECTORY
@@ -37,13 +34,12 @@ rm(datasets)
 # Ideas for functions:
 # Creates table that shows percentages within each stratum / substratum
 # function selecting metric and gives labour participation rate as output
-# tables could also use conditional formatting -> colour entries 
 
 ################################################################################
 # LOAD NECESSARY PACKAGES & DATA
 
 # List all packages needed for session
-neededPackages = c("dplyr", "magrittr", 
+neededPackages = c("dplyr", "magrittr", "purrr",
                    "formattable", "webshot", "htmltools", "webshot")
 allPackages    = c(neededPackages %in% installed.packages()[,"Package"]) 
 
@@ -63,11 +59,10 @@ lapply(neededPackages, library, character.only = TRUE)
 # Function for calculation group shares (percentage or mean) per country
 # Function gives out mean as default and percentage if any additional option
 # entry is provided
-
-group.share = function(y, share.option = FALSE) {
+group.share = function(df, y, share.option = FALSE) {
     # give out group mean for variable by country as default
     if (share.option) {
-        perc = percent(tapply(y, df.out$country, function(x) {
+        final = percent(tapply(df[[y]], df$country, function(x) {
             val = sum(x)/length(x)
             if (val > 1) {
                 warning("Group percentage share exceeds defined range")
@@ -75,41 +70,54 @@ group.share = function(y, share.option = FALSE) {
             return(val)
         }))
     } else {
-        tapply(y, df.out$country, function(x) {
-            sum(x)/length(x)
+        final = tapply(df[[y]], df$country, function(x) {
+            val = sum(x)/length(x)
+            return(val)
         })
     }
+    return(final)
 }
 
-# Function for calculating labor participation rate per country
-labor.part.fxn = function(z) {
+# Function for calculating labor participation rate per country / gender / age
+labor = function(df, .country, .gender, .age) {
+    dataset = df %>% 
+        filter(country == .country & gender == .gender & get(.age) == TRUE)
+    denom = nrow(dataset)
+    numer = with(dataset, sum(labor_ft | labor_pt))
+    perc  = percent(round(numer/denom, 4))
     
-    # Create Index Vector separated by gender
-    IDX_w_l = with(z, ifelse(
-        gender == "FEMALE" & (labor_ft | labor_pt), TRUE, FALSE))
-    IDX_m_l = with(z, ifelse(
-        gender == "MALE" & (labor_ft | labor_pt), TRUE, FALSE))
-    
-    # Calculate percentages
-    perc_w = round(sum(IDX_w_l) / length(IDX_w_l), 4)
-    perc_m = round(sum(IDX_m_l) / length(IDX_m_l), 4)
-    
-    # Create Names
-    output.list = list(perc_w, perc_m)
-    names(output.list) = c(
-        paste0(c("Female", "Male"), " Labor Participation Share")
-    )
-    return(output.list)
+    return(perc)
 }
 
-labor.part.share    = by(df.out, list(df.out$country), labor.part.fxn)
-labor.part.share.df = do.call(rbind.data.frame, labor.part.share) %>% 
-    set_colnames(c(paste0(c("Female", "Male"), " Labor Participation Share")))
-# TODO: format as percentage
+# use expand.grid to get all combinations of country / gender / age
+agegroups = names(df.out[, 4:6])
+args      = with(df.out, 
+                 expand.grid(levels(country), levels(gender), agegroups, 
+                             stringsAsFactors = FALSE))
+args.list = list(c = as.vector(t(args[1])), 
+                 g = as.vector(t(args[2])), 
+                 a = as.vector(t(args[3])))
+
+# Map over multiple arguments
+output   = pmap(args.list, function(c, g, a) labor(df.out, c, g, a))
+output.v = do.call("c", output)
+
+labor.part.share    = cbind(args, output.v)
+labor.part.share.df = spread(labor.part.share, Var3, output.v) %>% 
+    arrange(desc(Var2)) %>% 
+    set_colnames(c("Country", "Gender", agegroups))
+
+# Labor supply choice tables
+labor.supply.f = df.out %>% filter(gender == "FEMALE")
+labor.supply.m = df.out %>% filter(gender == "MALE")
+
+vars = names(df.out)[grep("labor", names(df.out))]
+new = lapply(vars, function(x) group.share(df.out, x, 1))
+labor.supply.m = lapply(vars, function(x) group.share(labor.supply.m[[x]],1))
 
 # Creating summary statistics dataframe with percentage entries/mean
-sum.stats = labor.part.share.df %>% 
-    mutate(
+sum.stats = labor.m[1] %>% 
+    mutate (
         observation   = summary(df.out$country),
         age50_54_p    = group.share(df.out$age50_54, 1),
         age55_59_p    = group.share(df.out$age55_59, 1),
@@ -118,26 +126,24 @@ sum.stats = labor.part.share.df %>%
         age55_59_n    = as.numeric(age55_59_p * observation),
         age60_64_n    = as.numeric(age60_64_p * observation),
         h_chronic_p   = group.share(df.out$h_chronic),
-        h_maxgrip_p   = group.share(df.out$h_maxgrip),
         h_adla_p      = group.share(df.out$h_adla, 1),
-        h_overweigh_p = group.share(df.out$h_overweight, 1),  
+        h_maxgrip_p   = group.share(df.out$h_maxgrip),
+        h_overweigh_p = group.share(df.out$h_overweight, 1), 
         h_obese_p     = group.share(df.out$h_obese, 1),  
         h_badment_p   = group.share(df.out$h_badmental, 1),  
         h_goodsp_p    = group.share(df.out$h_goodsp, 1)
     ) %>% 
-    set_rownames(levels(df.out$country))
+    set_rownames(levels(df.out$country)) %>% 
+    select(-Country)
 
-names(sum.stats) = c(paste0(c("Female", "Male"), " Labor Participation Share"),
-                     "Observations", 
+names(sum.stats) = c("Observations", 
                      paste0("Age ", rep(c("50-54", "55-59", "60-64"), 2), 
                             c(rep(" ", 3), rep(" Obs", 3))),
-                     paste0(c("Chronic diseases", "Max. grip strength", "ADLs"),
-                            (" (mean)")),
+                     "Num chronic diseases (mean)",
+                     "ADLs (in %)",
+                     "Max grip strength (mean)", 
                      paste0(c("Overweight", "Obese", " Bad mental health", 
                               "Good self-perceived health"), " (in %)"))
-
-# TODO: Can we improve creating summary statistics by looping over certain
-# variables? Yea - just use df.out as base then rbind labor.part.share.df
 
 ################################################################################
 # VISUALIZE SUMMARY STATISTICS IN TABLES
@@ -166,7 +172,15 @@ sum.stats.out = function(DF) {
                 align = "c")
 }
 
-DF1 = sum.stats[3:6]
+# prepare all DF's
+DF1 = sum.stats[, 1:4]
+DF2 = sum.stats[, 8:10]
+DF3 = sum.stats[, 11:14]
+DF4 = labor.part.share.df %>% filter(Gender == "MALE") %>% select(-Gender)
+DF5 = labor.part.share.df %>% filter(Gender == "FEMALE") %>% select(-Gender)
+
+# TODO: Tables 4 - 6
+# TODO: loop through tables, use map to insert totals, print all
 sum.stats.out(sum.stats)
 sum.stats.out(DF1)
 
@@ -176,8 +190,6 @@ sum.stats.out(DF1)
 # Source: https://stackoverflow.com/questions/38833219/command-for-exporting-saving-table-made-with-formattable-package-in-r
 
 # Solution Style: as_htmlwidget and then print screen
-install_phantomjs()
-
 export_formattable = function(f, file, width = "100%", height = NULL, 
                               background = "white", delay = 0.2) {
     w    = as.htmlwidget(f, width = width, height = height)
