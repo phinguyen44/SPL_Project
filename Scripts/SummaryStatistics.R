@@ -10,9 +10,7 @@
 # TODO: 
 # Change functions to define level of aggregation (namely, get total)
 # Lapply the group.share fxn for the sum.stats table?
-# BOLD THE TOTALS
-# Add titles to tables
-# Formatting of tables
+# Formatting of tables: Bold, fix column widths, add titles
 
 ################################################################################
 # SET WORKING DIRECTORY
@@ -217,7 +215,6 @@ export_formattable = function(f, file, width = "100%", height = NULL,
             selector = ".formattable_widget",
             delay = delay)
 }
-
 
 map2(listDF, names(listDF), function(a, b) {
     export_formattable(sum.stats.out(a), file = paste0("Output/", b, ".png"))
