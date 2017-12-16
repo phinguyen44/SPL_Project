@@ -20,9 +20,9 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
 
     # Install packages (if not already installed)
     if (!all(allPackages)) {
-    missingIDX = which(allPackages == FALSE)
-    needed     = neededPackages[missingIDX]
-    lapply(needed, install.packages)
+        missingIDX = which(allPackages == FALSE)
+        needed     = neededPackages[missingIDX]
+        lapply(needed, install.packages)
     }
 
     # Load all defined packages
@@ -46,8 +46,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
         sep = "\n")
     
     dat = dat.input %>%
-        filter(wave == wav & (age <= 64 & age >= 50)) %>%  # wave & age filter
-        select(wave, country_mod,                          # dataset details
+        dplyr::filter(wave == wav & (age <= 64 & age >= 50)) %>% 
+        dplyr::select(wave, country_mod,                 # dataset details
                female, age, isced1997_r, ch001_, mar_stat, # demo variables
                chronic_mod, maxgrip, adla, bmi2, eurod, sphus, # health indices
                ep013_mod, ep005_)                          # labor (outcome var)
@@ -157,7 +157,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
         mutate_at(.vars = vars(idx),
                   .funs = standardize) %>%
         mutate(labor_participation = !labor_np) %>% # invert to get labor_part
-        select(country, gender, age,
+        dplyr::select(country, gender, age,
                h_chronic, h_adla, h_obese, h_maxgrip,
                edu_second, edu_high, children, couple,
                labor_participation)
@@ -170,7 +170,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     # Create necessary dummary variables for regression
     dummify = function(data.frame) {
         data.frame = data.frame %>%
-            select(-country, -gender)               # remove country/gender
+            dplyr::select(-country, -gender)        # remove country/gender
         model      = ~ 0 + .                        # needed to remove intercept
         new.df     = model.matrix(model, data.frame)# create dummies
         new.df     = data.frame(new.df)
