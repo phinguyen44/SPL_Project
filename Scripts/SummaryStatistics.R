@@ -255,9 +255,7 @@ DF5 = labor.part.share.df %>%
 DF6 = labor.supply.m.df
 DF7 = labor.supply.f.df
 
-# TODO: loop through tables, use map to insert totals, print all
 listDF = list(DF1=DF1, DF2=DF2, DF3=DF3, DF4=DF4, DF5=DF5, DF6=DF6, DF7=DF7)
-# lapply(listDF, sum.stats.out)
 
 ################################################################################
 # Export
