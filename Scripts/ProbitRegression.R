@@ -26,7 +26,6 @@ df.splits = datasets$df.splits
 rm(datasets)
 
 
-
 ################################################################################
 # LOAD NECESSARY PACKAGES & DATA
 
@@ -108,7 +107,7 @@ for(i in 1:length(allSummaries)){
   if(class(testOutput) == "try-error"){
    
       
-# TODO: reformulate error messahe function 
+# TODO: reformulate error message function 
     # Display warning and investigate
     msg = paste0("Wald Test failed for Model Element ", i)
     warning(msg)
@@ -131,9 +130,8 @@ for(i in 1:length(allSummaries)){
   
 }
 
-wald.bound = t(as.data.frame(wald.log2))
-modelNames = names(allModels)
-wald.df = data.frame(modelNames, wald.bound)
+wald.bound = t(as.data.frame(wald.log))
+rownames(wald.bound) = names(allModels)
 
 
 ################################################################################
