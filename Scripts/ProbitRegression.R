@@ -1,4 +1,4 @@
-yx################################################################################
+################################################################################
 # Probit.Regression
 #
 ################################################################################
@@ -20,7 +20,7 @@ rm(list= ls()[!(ls() %in% c("df.reg", "df.splits"))])
 # LOAD NECESSARY PACKAGES & DATA
 
 # List all packages needed for session
-neededPackages = c("aod", "devtools", "margins")
+neededPackages = c("aod", "devtools", "margins", "mfx")
 allPackages    = c(neededPackages %in% installed.packages()[,"Package"]) 
 
 # Install packages (if not already installed) 
@@ -97,9 +97,16 @@ wald.df = data.frame(modelNames, wald.bound)
 ################################################################################
 #Calculate marginal effects and standard errors
 
-
-
-
+# Same structure as before, but must calculate model again. 
+mfx.Models = lapply(df.splits, function(z){
+  
+  z = z[-z$age50] # Multicollinearity
+  
+  res = probitmfx(z$labor_participationTRUE ~.,atmean = TRUE,  data = z)
+  
+  return(res)
+  
+})
 
 
 
