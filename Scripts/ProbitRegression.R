@@ -13,7 +13,18 @@
 # Specify with data must be loaded? 
 
 
-rm(list= ls()[!(ls() %in% c("df.reg", "df.splits"))])
+rm(list= ls())
+
+################################################################################
+# SOURCE DATA
+
+source("Scripts/ReadAndClean.R")
+datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
+
+#Only keep relevant data sets
+df.splits = datasets$df.splits
+rm(datasets)
+
 
 
 ################################################################################
@@ -50,25 +61,54 @@ allModels = lapply(df.splits, function(z){
 # Return summaries
 allSummaries = lapply(allModels, summary)
 
+################################################################################
+# Wald Test for joint significance
 
-# Wald Test
+joint.wald.test = function(model.summary, spec, signf.l){
+    
+    # Define test elements
+    joint.wald.test        = numeric(6)
+    names(joint.wald.test) = c("Name","W","p-value", "df", "H0" , "Decision")
+    beta                   = model.summary$coefficients[,1]
+    Var_beta_est           = vcov(model.summary)
+    
+    # Wald test statistic
+    W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
+    
+    # Set up test output
+    chi2               = qchisq(signf.l, df=length(spec))
+    pval               = 1-pchisq(W,length(spec))
+    joint.wald.test[1] = "Chi2 test"
+    joint.wald.test[2] = format(   W, digits = 4) 
+    joint.wald.test[3] = format(pval, digits = 4)
+    joint.wald.test[4] = length(spec)
+    joint.wald.test[5] = "b equal to 0"
+    joint.wald.test[6] = ifelse(pval <= 1- signf.l, "Reject H0", "Cannot reject H0")
+    joint.wald.test
+}
+
+
+################################################################################
+
+# Wald Test for all models
 
 wald.log = list() # Save Wald Test Output
 
-for(i in 1:length(allModels)){
+for(i in 1:length(allSummaries)){
   
   # Get Element
-  ModelElement = allModels[[i]]
+  SummaryElement = allSummaries[[i]]
   
   # Specify the of coefficients to be tested: only health variable
   health = c(16:19)
   
   # Test only the joint significance of health variables
-  # TODO: select health coefficients in a more efficient manner -> some Models have less coefficients
-  testOutput = try(wald.test(b = coef(ModelElement), Sigma = vcov(ModelElement), Terms = health)$result)
+  testOutput = joint.wald.test(allSummaries[[i]], health, 0.95)
   
   if(class(testOutput) == "try-error"){
-    
+   
+      
+# TODO: reformulate error messahe function 
     # Display warning and investigate
     msg = paste0("Wald Test failed for Model Element ", i)
     warning(msg)
@@ -84,135 +124,48 @@ for(i in 1:length(allModels)){
     
   }
   
-  rm(ModelElement) # clean up
+ #TODO: clean up is not working
+  rm(SummaryElement) # clean up
 
   next
   
 }
 
-wald.bound = t(as.data.frame(wald.log))
+wald.bound = t(as.data.frame(wald.log2))
 modelNames = names(allModels)
 wald.df = data.frame(modelNames, wald.bound)
 
+
 ################################################################################
-#Calculate marginal effects and standard errors
+# Calculate employment probability
+
+empl.prob = function(model){
+    
+    # Calculate average person per country & gender 
+        X                   = model$data
+        X_mean              = data.frame(t(apply(X, 2, mean)))
+        
+    # Predict probability of being employed of average person
+        empl.probability    = predict(object = model, newdata =  X_mean, type = "response")
+        return(empl.probability)
+}
+
+empl.Models = lapply(allModels, empl.prob)
+ 
+################################################################################
+# Calculate marginal effects and standard errors
 
 # Same structure as before, but must calculate model again. 
 mfx.Models = lapply(df.splits, function(z){
-  
-  z = z[-z$age50] # Multicollinearity
-  
-  res = probitmfx(z$labor_participationTRUE ~.,atmean = TRUE,  data = z)
-  
-  return(res)
-  
-})
-
-
-
-
-
-
-
-
     
-
-
-
+    z = z[-z$age50] # Multicollinearity
+    
+    res = probitmfx(z$labor_participationTRUE ~.,atmean = TRUE,  data = z)
+    
+    return(res)
+    
+})
 
 ################################################################################
-
-#Wald Test goes here
-
-################################################################################
-
-
-All.marg.effects = lapply(allModels, function(y){
-    
-    # Initialize vector for results
-    marg.effects      = vector("list", 2)
-    
-    #Calculate average of the sample marginal effects
-    pdf.pred            = mean(dnorm(predict(y, type = "link")))
-    marg.effects[[1]]   = pdf.pred *coef(y)
-    #Comment:remove constant???
-    
-    
-    #Check whether corect   
-    #see http://researchrepository.ucd.ie/bitstream/handle/10197/3404/WP11_22.pdf?sequence=1
-    #marg. are all very low... why? this seems to be wrong
-    
-    # Look this up!!!
-    #Calculate baseline probabilities of employment
-    X                   = y$data
-    X_mean              = apply(X, 2, mean)
-    beta                = marg.effects[[1]]
-    baseline            = X_mean %*% beta
-    prob                = pnorm(baseline) 
-    marg.effects[[2]]   = prob
-    
-    return(marg.effects)
-    
-})
-
-
-
-
-
-
-
-
-All.marg.effects = lapply(allModels, function(y){
-    
-    # Initialize vector for results
-    marg.effects      = vector("list", 3)
-    
-    #Calculate average of the sample marginal effects
-    pdf.pred            = mean(dnorm(predict(y, type = "link")))
-    marg.effects[[1]]   = pdf.pred *coef(y)
-    #Comment:remove constant???
-    
-    #Alternative: Calculate average marginal effects
-    X                   = y$data
-    # Calculate mean per variable
-    X_mean              = apply(X, 2, mean)
-    pdf.pred.mean       = dnorm(X_mean %*% coef(y))
-    pdf.pred.mean       = rep(pdf.pred.mean, length(coef(y)))
-    
-    # Calculate pred. value with x + 1
-    X_mean.adj          = matrix(rep(X_mean, length(coef(y))), 
-                                 nrow = length(coef(y)), byrow = TRUE) + 
-        diag(1, length(coef(y)))
-    pdf.pred.mean.adj   = dnorm(X_mean.adj %*% coef(y))
-    # use dnorm or pnorm?
-    pdf.pred.mean.adj   = pdf.pred.mean.adj - pdf.pred.mean
-    marg.effects[[2]]   = pdf.pred.mean.adj
-    #Check whether corect   
-    #see http://researchrepository.ucd.ie/bitstream/handle/10197/3404/WP11_22.pdf?sequence=1
-    #marg. are all very low... why? this seems to be wrong
-    
-    # Look this up!!!
-    #Calculate baseline probabilities of employment
-    X                   = y$data
-    X_mean              = apply(X, 2, mean)
-    beta                = marg.effects[[1]]
-    baseline            = X_mean %*% beta
-    prob                = pnorm(baseline) 
-    marg.effects[[3]]   = prob
-    
-    return(marg.effects)
-    
-})
-
-#Calculate predicted participation probability of average individual
-#Try first for Belgian female
-
-
-
-# Check with paper
-formattable(data.frame(All.marg.effects))
-
-
-# Crosscheck with margins package: requires other input format
 
 
