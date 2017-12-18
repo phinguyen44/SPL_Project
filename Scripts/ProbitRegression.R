@@ -25,6 +25,8 @@ datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
 df.splits = datasets$df.splits
 rm(datasets)
 
+# Load own-built Wald tests
+source("Scripts/LoadWald.R")
 
 ################################################################################
 # LOAD NECESSARY PACKAGES & DATA
@@ -56,35 +58,8 @@ allModels = lapply(df.splits, function(z){
   
 })
 
-
 # Return summaries
 allSummaries = lapply(allModels, summary)
-
-################################################################################
-# Wald Test for joint significance
-
-joint.wald.test = function(model.summary, spec, signf.l){
-    
-    # Define test elements
-    joint.wald.test        = numeric(6)
-    names(joint.wald.test) = c("Name","W","p-value", "df", "H0" , "Decision")
-    beta                   = model.summary$coefficients[,1]
-    Var_beta_est           = vcov(model.summary)
-    
-    # Wald test statistic
-    W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
-    
-    # Set up test output
-    chi2               = qchisq(signf.l, df=length(spec))
-    pval               = 1-pchisq(W,length(spec))
-    joint.wald.test[1] = "Chi2 test"
-    joint.wald.test[2] = format(   W, digits = 4) 
-    joint.wald.test[3] = format(pval, digits = 4)
-    joint.wald.test[4] = length(spec)
-    joint.wald.test[5] = "b equal to 0"
-    joint.wald.test[6] = ifelse(pval <= 1- signf.l, "Reject H0", "Cannot reject H0")
-    joint.wald.test
-}
 
 
 ################################################################################
@@ -98,11 +73,12 @@ for(i in 1:length(allSummaries)){
   # Get Element
   SummaryElement = allSummaries[[i]]
   
-  # Specify the of coefficients to be tested: only health variable
+  # Specify the of coefficients to be tested: only health variables
   health = c(16:19)
   
+  
   # Test only the joint significance of health variables
-  testOutput = joint.wald.test(allSummaries[[i]], health, 0.95)
+  testOutput = try(joint.wald.test(allSummaries[[i]], health, 0.95))
   
   if(class(testOutput) == "try-error"){
    
@@ -114,19 +90,14 @@ for(i in 1:length(allSummaries)){
     
     wald.log[[i]] = "Error"
     
-    next
     
   } else{
     
     wald.log[[i]] = testOutput
-    next
     
   }
   
- #TODO: clean up is not working
   rm(SummaryElement) # clean up
-
-  next
   
 }
 
