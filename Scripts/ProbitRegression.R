@@ -104,6 +104,12 @@ for(i in 1:length(allSummaries)){
 wald.bound = t(as.data.frame(wald.log))
 rownames(wald.bound) = names(allModels)
 
+# Cross check with wald.test from aod package
+wald.check = ls()
+for (i in 1:length(allModels)){
+    wald.test(Sigma = vcov(i), b = coef(i), Terms = 16:19)
+    wald.check[[i]] wald.test
+    }
 
 ################################################################################
 # Calculate employment probability
