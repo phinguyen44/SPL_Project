@@ -42,170 +42,65 @@ allModels = lapply(df.splits, function(z){
 # Return summaries
 allSummaries = lapply(allModels, summary)
 
-
-#NOTE: Current participation rates seem not to be estimated with probit. 
-#Rather, those are the rate from sum stats.
+#TODO: Use source file for model estimation
 
 
+# Calculate employment rate based on whole population with mean probability
 
-# APPROACH 1: Calculate employment rate based on average individual
-
-# Calculate baseline employment probability
-
-empl.prob = function(model){
+# Estimate current employment rate
+empl.rate.current       = function(model){
     
-    # Calculate average person per country & gender 
-    X                   = model$data
-    X_mean              = data.frame(t(apply(X, 2, mean)))
+    # Select data from model
+     X               = model$data
     
-    # Predict probability of being employed of average person
-    empl.probability    = predict(object = model, newdata =  X_mean, type = "response")
-    return(empl.probability)
+    # Predict probability of being employed of all individuals
+    empl.probability = predict(object = model, newdata =  X, type = "response")
+
+    # Calculate predicted current employment rate
+    empl.rate        = sum(empl.probability)  / length(empl.probability)
+    
+    return(empl.rate)
 }
 
-empl.Models = lapply(allModels, empl.prob)
+empl.current = lapply(allModels, empl.rate.current )
 
-empl.prob.cf = function(model){
+empl.rate.counterfact   = function(model){
     
-    # Calculate average person per country & gender 
+    # Select data from model
     X                   = model$data
-    X_mean              = data.frame(t(apply(X, 2, mean)))
+    
+    #Create counterfactual data set with ideal health condition
+    X_cf                = X
+    
+    # Find ideal health conditions by finding the minimum value for each variable
+    X_min               = data.frame(t(apply(X, 2, min)))
+    
+    # Replace mean values by values representing no health issues
+     names.vec          = c("h_chronic", "h_adlaTRUE", "h_obeseTRUE")
+     X_cf[, names.vec]  = X_min[names.vec]
+    
+    # Find individuals who are 50 years old
+    names.vec.age = c("age51", "age52", "age53", "age54", "age55", "age56", "age57", "age58", 
+                   "age59", "age60", "age61", "age62", "age63", "age64")
+    IND_row_50    = apply(X[, names.vec.age], 1, sum) # 50 year olds have a zero
+    
+    # Create index vector for 50 and 51 year olds
+    age_50_51     = ifelse(IND_row_50 == 0 | X$age51 == 1, 1,0)
+    
+    # Calculate max grip mean of individuals age 50-51 and replace
+    X_cf[, c("h_maxgrip")] =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
+
+    # Predict probability of being employed of all individuals
+    empl.probability    = predict(object = model, newdata =  X_cf, type = "response")
    
-    # Define no negative health condition
-    X_mean_cf           = X_mean
-    X_min               = data.frame(t(apply(X, 2, min)))
-    
-    # Replace mean values by values representing no health issues
-    X_mean_cf[15:17]    = X_min[15:17]
-    
-    # Find individuals who are 50 years old
-    IND_row_50 = apply(X[, 1:14], 1, sum) # 50 year olds have a zero
-    age_50_51 = ifelse(IND_row_50==0 | X$age51 == 1, 1,0)
-    
-    # Calculate max grip mean of individuals age 50-51 and replace
-    X_mean_cf[18]       =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
-
-    # Predict probability of being employed of average person
-    empl.probability    = predict(object = model, newdata =  X_mean_cf, type = "response")
-    return(empl.probability)
-}
-
-empl.cf.Models = lapply(allModels, empl.prob.cf)
-
-(employment= data.frame(cbind(empl.Models, empl.cf.Models)))
-
-
-# Why is employment in Switzerland going down -> chronic diseases has positive coefficient
-
-
-
-# APPROACH 2: Calculate employment rate based on whole population with naive threshold
-
-
-empl.prob2 = function(model){
-    
-    # Calculate average person per country & gender 
-    X                   = model$data
-    
-    # Predict probability of being employed of all individuals
-    empl.probability    = predict(object = model, newdata =  X, type = "response")
-    empl.ind            = ifelse(empl.probability >=0.5, 1, 0)
-    
-    # Calculate employment rate
-    empl.rate           = sum(empl.ind)  / length(empl.ind)
-    return(empl.rate)
-}
-
-empl.Models2 = lapply(allModels, empl.prob2)
-
-## Gives very low employment rate
-
-
-
-empl.prob.cf2 = function(model){
-    
-    # Calculate average person per country & gender 
-    X                   = model$data
-    X_mean              = data.frame(t(apply(X, 2, mean)))
-    X_cf                = X
-    
-    # Define no negative health condition
-    X_mean_cf           = X_mean
-    X_min               = data.frame(t(apply(X, 2, min)))
-    
-    # Replace mean values by values representing no health issues
-    X_cf[15:17]    = X_min[15:17]
-    
-    # Find individuals who are 50 years old
-    IND_row_50 = apply(X[, 1:14], 1, sum) # 50 year olds have a zero
-    age_50_51 = ifelse(IND_row_50==0 | X$age51 == 1, 1,0)
-    
-    # Calculate max grip mean of individuals age 50-51 and replace
-    X_cf[18]       =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
-    
-    # Predict probability of being employed of all individuals
-    empl.probability    = predict(object = model, newdata =  X_cf, type = "response")
-    empl.ind            = ifelse(empl.probability >=0.5, 1, 0)
-    
-    # Calculate employment rate
-    empl.rate           = sum(empl.ind)  / length(empl.ind)
-    return(empl.rate)
-}
-
-empl.cf.Models2 = lapply(allModels, empl.prob.cf2)
-
-(employment2= data.frame(cbind(empl.Models2, empl.cf.Models2)))
-
-
-# APPROACH 3: Calculate employment rate based on whole population with mean probability
-
-empl.prob3 = function(model){
-    
-    # Calculate average person per country & gender 
-    X                   = model$data
-    
-    # Predict probability of being employed of all individuals
-    empl.probability    = predict(object = model, newdata =  X, type = "response")
-    empl.ind            = ifelse(empl.probability >=0.5, 1, 0)
-    
-    # Calculate employment rate
-    empl.rate           = sum(empl.ind)  / length(empl.ind)
-    return(empl.rate)
-}
-
-empl.Models3 = lapply(allModels, empl.prob3)
-
-empl.prob.cf3 = function(model){
-    
-    # Calculate average person per country & gender 
-    X                   = model$data
-    X_mean              = data.frame(t(apply(X, 2, mean)))
-    X_cf                = X
-    
-    # Define no negative health condition
-    X_mean_cf           = X_mean
-    X_min               = data.frame(t(apply(X, 2, min)))
-    
-    # Replace mean values by values representing no health issues
-    X_cf[15:17]    = X_min[15:17]
-    
-    # Find individuals who are 50 years old
-    IND_row_50 = apply(X[, 1:14], 1, sum) # 50 year olds have a zero
-    age_50_51 = ifelse(IND_row_50==0 | X$age51 == 1, 1,0)
-    
-    # Calculate max grip mean of individuals age 50-51 and replace
-    X_cf[18]       =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
-    
-    # Predict probability of being employed of all individuals
-    empl.probability    = predict(object = model, newdata =  X_cf, type = "response")
-    # Calculate employment rate: assumption: mean of probability converges to empl. rate
+    # Calculate predicted counterfactual employment rate
     empl.rate           = sum(empl.probability)  / length(empl.probability)
     return(empl.rate)
 }
 
-empl.cf.Models3 = lapply(allModels, empl.prob.cf3)
+empl.counterfact = lapply(allModels, empl.rate.counterfact)
 
-(employment3= data.frame(cbind(empl.Models3, empl.cf.Models3)))
+(employment= data.frame(cbind(empl.current, empl.counterfact)))
 
+# Note: the expected value of probability converges to true population mean
 
-(compare = data.frame(cbind(empl.cf.Models, empl.cf.Models2, empl.cf.Models3)))
