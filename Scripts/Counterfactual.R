@@ -19,7 +19,6 @@ datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
 
 #Only keep relevant data sets
 df.splits = datasets$df.splits
-df.reg = datasets$df.reg
 rm(datasets)
 
 
@@ -44,6 +43,8 @@ allSummaries = lapply(allModels, summary)
 
 #TODO: Use source file for model estimation
 
+################################################################################
+# Counterfactual Exercise
 
 # Calculate employment rate based on whole population with mean probability
 
@@ -103,4 +104,8 @@ empl.counterfact = lapply(allModels, empl.rate.counterfact)
 (employment= data.frame(cbind(empl.current, empl.counterfact)))
 
 # Note: the expected value of probability converges to true population mean
+
+
+################################################################################
+# Counterfactual exercise for each age group
 
