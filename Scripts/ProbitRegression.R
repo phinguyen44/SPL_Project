@@ -82,9 +82,7 @@ for(i in 1:length(allSummaries)){
   
   if(class(testOutput) == "try-error"){
    
-      
-# TODO: reformulate error message function 
-    # Display warning and investigate
+    
     msg = paste0("Wald Test failed for Model Element ", i)
     warning(msg)
     
@@ -101,15 +99,49 @@ for(i in 1:length(allSummaries)){
   
 }
 
-wald.bound = t(as.data.frame(wald.log))
-rownames(wald.bound) = names(allModels)
+wald.bound = as.data.frame(wald.log)
+colnames(wald.bound) = names(allModels)
 
 # Cross check with wald.test from aod package
-wald.check = ls()
-for (i in 1:length(allModels)){
-    wald.test(Sigma = vcov(i), b = coef(i), Terms = 16:19)
-    wald.check[[i]] wald.test
+
+wald.check = list() # Save Wald Test Output
+for(i in 1:length(allModels)){
+    
+    # Get Element
+    ModelElement = allModels[[i]]
+   
+     # Specify the of coefficients to be tested: only health variable
+    health = c(16:19)
+    
+    # Test only the joint significance of health variables
+    testOutput = try(wald.test(b = coef(ModelElement), Sigma = vcov(ModelElement), Terms = health)$result)
+    if(class(testOutput) == "try-error"){
+        
+        # Display warning and investigate
+        msg = paste0("Wald Test failed for Model Element ", i)
+        warning(msg)
+        
+        wald.log[[i]] = "Error"
+        
+        next
+        
+    } else{
+        
+        wald.log[[i]] = testOutput
+        next
     }
+    
+    rm(ModelElement) # clean up
+    
+    next
+    
+}
+
+wald.check = as.data.frame(wald.log)
+colnames(wald.check) = names(allModels)
+
+wald.bound[3,] 
+wald.check[3,]
 
 ################################################################################
 # Calculate employment probability

@@ -27,6 +27,8 @@ joint.wald.test = function(model.summary, spec, signf.l){
 
 ################################################################################
 # General Wald Test for linear hypothesis
+# Manually define linear hypothesis
+# Note: R must be a square matrix with length of number of coefficients
 
 
 general.wald.test = function(model.summary, signf.l, R = NULL, r = NULL){
@@ -63,3 +65,6 @@ general.wald.test = function(model.summary, signf.l, R = NULL, r = NULL){
     general.wald.test[6] = ifelse(pval <= 1- signf.l, "Reject H0", "Cannot reject H0")
     general.wald.test
 }
+
+general.wald.test(allSummaries$AUT.FEMALE, 0.95, R, r)
+
