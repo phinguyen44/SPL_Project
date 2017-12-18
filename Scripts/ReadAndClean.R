@@ -144,28 +144,32 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
         val  = (x - mean) / std
         return(val)
     }
-    # TODO: Comment in report: mention it gives same results as inbuilt function
-    # (scale)
-
-    # Gives a vector of integer column positions of numeric variables
-    idx = sapply(df.out, is.numeric)
-    idx = seq(1:length(idx))[idx]
-
-    # Creating separate data set with standardized numeric variables for 
-    # regression, then reselect variables as described in paper (e.g. self-           # reported health is removed)
-    df.reg = df.out %>%
-        mutate_at(.vars = vars(idx),
-                  .funs = standardize) %>%
-        mutate(labor_participation = !labor_np) %>% # invert to get labor_part
-        dplyr::select(country, gender, age,
-               h_chronic, h_adla, h_obese, h_maxgrip,
-               edu_second, edu_high, children, couple,
-               labor_participation)
-
-    # Create a list of data frames by country and gender, to be used in 
-    # regression
-    df.splits  = split(df.reg, f = list(df.reg$country, df.reg$gender), 
-                       drop = TRUE)
+    
+    # Standardize and select correct variables
+    standardize.df = function(df) {
+        # Gives a vector of integer column positions of numeric variables
+        idx = sapply(df, is.numeric)
+        idx = seq(1:length(idx))[idx]
+        
+        # Creating separate data set with standardized numeric variables for 
+        # regression, then reselect variables as described in paper (e.g. self-           # reported health is removed)
+        df.reg = df %>%
+            mutate_at(.vars = vars(idx),
+                      .funs = standardize) %>%
+            mutate(labor_participation = !labor_np) %>% # invert to get labor_pt
+            dplyr::select(country, gender, age,
+                          h_chronic, h_adla, h_obese, h_maxgrip,
+                          edu_second, edu_high, children, couple,
+                          labor_participation)
+        
+        return(df.reg)
+    }
+    
+    # Split data frames into country/gender splits, then standardize numeric
+    splits    = split(df.out, f = list(df.reg$country, df.reg$gender), 
+                      drop = TRUE)
+    df.reg    = standardize.df(df.out)
+    df.splits = lapply(splits, standardize.df)
 
     # Create necessary dummary variables for regression
     dummify = function(data.frame) {
