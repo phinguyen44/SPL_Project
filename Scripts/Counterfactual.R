@@ -19,7 +19,10 @@ datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
 
 #Only keep relevant data sets
 df.splits = datasets$df.splits
+df.reg = datasets$df.reg
 rm(datasets)
+
+
 
 
 ################################################################################
@@ -153,3 +156,56 @@ empl.cf.Models2 = lapply(allModels, empl.prob.cf2)
 
 (employment2= data.frame(cbind(empl.Models2, empl.cf.Models2)))
 
+
+# APPROACH 3: Calculate employment rate based on whole population with mean probability
+
+empl.prob3 = function(model){
+    
+    # Calculate average person per country & gender 
+    X                   = model$data
+    
+    # Predict probability of being employed of all individuals
+    empl.probability    = predict(object = model, newdata =  X, type = "response")
+    empl.ind            = ifelse(empl.probability >=0.5, 1, 0)
+    
+    # Calculate employment rate
+    empl.rate           = sum(empl.ind)  / length(empl.ind)
+    return(empl.rate)
+}
+
+empl.Models3 = lapply(allModels, empl.prob3)
+
+empl.prob.cf3 = function(model){
+    
+    # Calculate average person per country & gender 
+    X                   = model$data
+    X_mean              = data.frame(t(apply(X, 2, mean)))
+    X_cf                = X
+    
+    # Define no negative health condition
+    X_mean_cf           = X_mean
+    X_min               = data.frame(t(apply(X, 2, min)))
+    
+    # Replace mean values by values representing no health issues
+    X_cf[15:17]    = X_min[15:17]
+    
+    # Find individuals who are 50 years old
+    IND_row_50 = apply(X[, 1:14], 1, sum) # 50 year olds have a zero
+    age_50_51 = ifelse(IND_row_50==0 | X$age51 == 1, 1,0)
+    
+    # Calculate max grip mean of individuals age 50-51 and replace
+    X_cf[18]       =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
+    
+    # Predict probability of being employed of all individuals
+    empl.probability    = predict(object = model, newdata =  X_cf, type = "response")
+    # Calculate employment rate: assumption: mean of probability converges to empl. rate
+    empl.rate           = sum(empl.probability)  / length(empl.probability)
+    return(empl.rate)
+}
+
+empl.cf.Models3 = lapply(allModels, empl.prob.cf3)
+
+(employment3= data.frame(cbind(empl.Models3, empl.cf.Models3)))
+
+
+(compare = data.frame(cbind(empl.cf.Models, empl.cf.Models2, empl.cf.Models3)))
