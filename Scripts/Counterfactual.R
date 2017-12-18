@@ -40,6 +40,8 @@ allModels = lapply(df.splits, function(z){
 allSummaries = lapply(allModels, summary)
 
 
+# APPROACH 1: Calculate employment rate based on average individual
+
 # Calculate baseline employment probability
 
 empl.prob = function(model){
@@ -68,9 +70,13 @@ empl.prob.cf = function(model){
     # Replace mean values by values representing no health issues
     X_mean_cf[15:17]    = X_min[15:17]
     
-#TODO: Replace mean maxgrip by maxgrip of age group 50-51
+    # Find individuals who are 50 years old
+    IND_row_50 = apply(X[, 1:14], 1, sum) # 50 year olds have a zero
+    age_50_51 = ifelse(IND_row_50==0 | X$age51 == 1, 1,0)
     
-    
+    # Calculate max grip mean of individuals age 50-51 and replace
+    X_mean_cf[18]       =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
+
     # Predict probability of being employed of average person
     empl.probability    = predict(object = model, newdata =  X_mean_cf, type = "response")
     return(empl.probability)
@@ -81,4 +87,26 @@ empl.cf.Models = lapply(allModels, empl.prob.cf)
 employment= data.frame(cbind(empl.Models, empl.cf.Models))
 
 
-# Why is employment in Switzerland going down???
+# Why is employment in Switzerland going down -> chronic diseases has positive coefficient
+
+
+
+# APPROACH 2: Calculate employment rate based on whole population with naive threshold
+
+
+empl.prob2 = function(model){
+    
+    # Calculate average person per country & gender 
+    X                   = model$data
+    
+    # Predict probability of being employed of average person
+    empl.probability    = predict(object = model, newdata =  X, type = "response")
+    empl.ind            = ifelse(empl.probability >=0.5, 1, 0)
+    empl.rate           = sum(empl.ind)  / length(empl.ind)
+    return(empl.rate)
+}
+
+empl.Models2 = lapply(allModels, empl.prob2)
+
+## Gives very low employment rate
+
