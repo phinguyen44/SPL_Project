@@ -143,6 +143,9 @@ colnames(wald.check) = names(allModels)
 wald.bound[3,] 
 wald.check[3,]
 
+rm(list= ls()[!(ls() %in% c("allModels", "allSummaries", "wald.bound", "df.splits"))])
+
+
 ################################################################################
 # Calculate employment probability
 

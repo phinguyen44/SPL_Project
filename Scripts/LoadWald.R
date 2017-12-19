@@ -24,11 +24,17 @@ joint.wald.test = function(model.summary, spec, signf.l){
     joint.wald.test
 }
 
-
 ################################################################################
-# General Wald Test for linear hypothesis
-# Manually define linear hypothesis
-# Note: R must be a square matrix with length of number of coefficients
+## Wald Test for linear hypothesis
+
+# Note: This a general Wald test for linear hypothesis of model beta coefficients
+# m = number of hypothesis
+# beta is vector of coefficients
+# R is Jacobian matrix of size m x n_beta, r is restriction function size m x 1
+# Example: H0: b1 + b2 = 1 and b1 = 0  (2 resitrciotns, m = 2)
+# R = 1 1 0 0 ...0      and r = 1
+#     1 0 0 0 ...0              0 
+#ToDo: incorporate error/warnings if R and r are not specified correctly (i.e. wrong dimensions)
 
 
 general.wald.test = function(model.summary, signf.l, R = NULL, r = NULL){
@@ -66,5 +72,16 @@ general.wald.test = function(model.summary, signf.l, R = NULL, r = NULL){
     general.wald.test
 }
 
-general.wald.test(allSummaries$AUT.FEMALE, 0.95, R, r)
+
+# Test whether it works
+B = matrix(0, nrow=2, ncol= 23)
+B[1, 4] = 1
+B[2, 5] = 2
+C = c(0,0)
+b = allSummaries$AUT.FEMALE$coefficients[,1]
+
+general.wald.test(allSummaries$AUT.FEMALE, 0.95, B, C)
+joint.wald.test(allSummaries$AUT.FEMALE, 4:5 , 0.95)
+
+################################################################################
 
