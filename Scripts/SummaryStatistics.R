@@ -194,7 +194,7 @@ install_phantomjs()
 # Question: Why do we define names for labor.part.share twice?
 # Caution: group.percentage function needs additional option entry as numeric
 
-export_formattable <- function(f, file, width = "100%", height = NULL, 
+export_formattable = function(f, file, width = "100%", height = NULL, 
                                background = "white", delay = 0.2)
 {
   w <- as.htmlwidget(f, width = width, height = height)

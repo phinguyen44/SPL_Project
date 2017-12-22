@@ -29,9 +29,8 @@ rm(datasets)
 # Probit for each country and gender 
 allModels = lapply(df.splits, function(z){
     
-    z = z[-z$age50] # Multicollinearity
     
-    model = glm(z$labor_participationTRUE ~., family = binomial(link = "probit"), data = z)
+    model = glm(z$labor_participationTRUE ~ . -age50, family = binomial(link = "probit"), data = z)
     
     return(model)
     
@@ -80,6 +79,8 @@ empl.rate.counterfact   = function(model){
      names.vec          = c("h_chronic", "h_adlaTRUE", "h_obeseTRUE")
      X_cf[, names.vec]  = X_min[names.vec]
     
+     
+    # TODO: Alternatively: define models differently, such that age50 is made explicit
     # Find individuals who are 50 years old
     names.vec.age = c("age51", "age52", "age53", "age54", "age55", "age56", "age57", "age58", 
                    "age59", "age60", "age61", "age62", "age63", "age64")
@@ -105,7 +106,46 @@ empl.counterfact = lapply(allModels, empl.rate.counterfact)
 
 # Note: the expected value of probability converges to true population mean
 
-
 ################################################################################
 # Counterfactual exercise for each age group
+
+dat = allModels$Austria.FEMALE$data
+summary(dat)
+
+
+# Estimate current employment rate for age groups
+empl.rate.current       = function(model){
+    
+    empl.rate = numeric(3)
+    
+    # Select data from model
+    X               = model$data
+    
+    # Predict probability of being employed of all individuals
+    empl.probability = predict(object = model, newdata =  X, type = "response")
+    
+    names.vec.age.54 = c("age50", "age51", "age52", "age53", "age54") 
+    names.vec.age.59 = c("age55", "age56", "age57", "age58", "age59") 
+    names.vec.age.64 = c("age60", "age61", "age62", "age63", "age64")
+ 
+    # Define index vectors for age groups
+    IND_row_54    = apply(X[, names.vec.age.54], 1, sum)
+    IND_row_59    = apply(X[, names.vec.age.59], 1, sum)
+    IND_row_64    = apply(X[, names.vec.age.64], 1, sum)
+    
+    
+    # Calculate predicted current employment rate for age groups
+    empl.rate[1]        = sum(empl.probability)  / length(empl.probability)
+    empl.rate[2] 
+    empl.rate[3] 
+    
+    return(empl.rate)
+}
+
+empl.current = lapply(allModels, empl.rate.current )
+
+
+
+
+
 
