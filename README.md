@@ -77,9 +77,7 @@ Statistical Programming Languages Group Project
 2. Graphics
     - Show distribution for each country (and overlay with average) for quantitative variables (e.g. self-reported health). See [this](https://ourworldindata.org/wp-content/uploads/2017/04/The-distribution-of-life-satisfaction.png) for inspiration.
     - Show a choropleth of scores (for each metric) for countries contained within data set.
-    - Measure [labor force participation over time](https://ourworldindata.org/grapher/share-of-people-who-say-they-are-happy) (using new waves of data). Consider using deciles to show inequalities.
-
-Add notes on data quality and measurement. Do we believe the variables selected are meaningful?
+    - Create a diverging stacked bar chart to show labor supply choice.
 
 ## Team Members
 
