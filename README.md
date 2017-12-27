@@ -75,10 +75,9 @@ Statistical Programming Languages Group Project
 
 1. Counter-Factual: Use current health outcomes as a benchmark for improved counter-factual.
 2. Graphics
-    - Show distribution for each country (and overlay with average) to visualize within-country inequalities (e.g. between East and West Germany). See [this](https://ourworldindata.org/wp-content/uploads/2017/04/The-distribution-of-life-satisfaction.png) for inspiration.
+    - Show distribution for each country (and overlay with average) for quantitative variables (e.g. self-reported health). See [this](https://ourworldindata.org/wp-content/uploads/2017/04/The-distribution-of-life-satisfaction.png) for inspiration.
     - Show a choropleth of scores (for each metric) for countries contained within data set.
     - Measure [labor force participation over time](https://ourworldindata.org/grapher/share-of-people-who-say-they-are-happy) (using new waves of data). Consider using deciles to show inequalities.
-    - [For each country](https://ourworldindata.org/wp-content/uploads/2017/04/Happiness-by-Income-Quintiles-Small-Multiples.png) (use small multiples) show how labor-force participation may change based on the distribution of self-reported health.
 
 Add notes on data quality and measurement. Do we believe the variables selected are meaningful?
 

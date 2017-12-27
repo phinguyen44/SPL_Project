@@ -8,6 +8,8 @@
 # not the correct easySHARE data set and relevant statistics printed (e.g. num
 # rows dropped, variables retained, data type)
 #
+# TODO: Add other health metrics. Like self-reported health. As quantitative.
+#
 ################################################################################
 
 read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
