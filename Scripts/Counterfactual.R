@@ -171,16 +171,16 @@ empl.rate.age       = function(model, group.size = 5, group.low = c(50,55,60)){
     return(empl.rate)
 }
 
-# Calculate current and counterfactual employment rates for ag groups
-empl.current.age     = lapply(allModels, empl.rate.age)
-empl.counterfact.age = lapply(allModels.cf, empl.rate.age)
+# Calculate current and counterfactual employment rates for age groups
+empl.current.age     = t(data.frame(lapply(allModels, empl.rate.age)))
+empl.counterfact.age = t(data.frame(lapply(allModels.cf, empl.rate.age)))
 
-(employment= data.frame(cbind(empl.current.age, empl.counterfact.age)))
-
+employment.age           = cbind(empl.current.age, empl.counterfact.age)
+colnames(employment.age) = paste0(c(rep("empl.current", 3) , rep( "empl.counterfact", 3)), 
+                                  c("50.54","55.59", "60.64"))
 
 # Test for other age groups: Example of employment for each age group
 empl.rate.age(allModels$Austria.FEMALE, group.size = 1, group.low = c(50:63))  
-
 
 
 ################################################################################
