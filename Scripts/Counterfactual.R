@@ -105,8 +105,11 @@ empl.counterfact = lapply(allModels, empl.rate.counterfact)
 model = allModels$Austria.FEMALE
 
 
+# Function for calculation employment rate among agegroups
+# Default arguments: group size and lower bound of age groups (group.low)
+
 # Estimate current employment rate for age groups
-empl.rate.current       = function(model){
+empl.rate.current       = function(model, group.size = 5, group.low = c(50,55,60)){
     
     #Initialize storage of results
     empl.rate = numeric(3)
@@ -123,26 +126,33 @@ empl.rate.current       = function(model){
     IND_row_vec = list()
     
     # Define vector of relevant age groups by youngest age
-    group.vec = c(50,55,60)
-       
-        for (i in group.vec){
+
+        for (i in group.low){
             
-                    # Age groups of five years
-                    k = i + 4
+                    # Define upper bound k of age group
+                    k = i + group.size -1
                     
                     # Create labels and contents of each age group
                     vec.label = paste("names.vec.age", i, sep=".") 
                     
                     # Assign ages to the age groups
                     z = assign(vec.label, paste0("age",i:k))
-          
-          # Assign a 1 to individuals belonging to an age group, 0 otherwise
+                    
+         # For age groups of size 1, use simple indexing (cannot use apply)
+         if (length(z) == 1){
+            
+              IND_row_vec[[i]] = X[, z]
+        
+        # For all age groups greater than size 1      
+         } else {
+                    
+          # Sum over rows to find individuals belonging to age group i
           IND_row_vec[[i]] = apply(X[, z], 1, sum)
-              
+             }
         }
     
     # Extract list of relevant age groups, which are each stored in a list 
-    IND_row_vec   = IND_row_vec[group.vec]
+    IND_row_vec   = IND_row_vec[group.low]
     
 
  # Calculate predicted current employment rate for age groups
@@ -159,9 +169,15 @@ empl.rate.current       = function(model){
 empl.current = lapply(allModels, empl.rate.current )
 
 
-empl.current
+# Test for other age groups: Example of employment for each age group
+empl.rate.current(allModels$Austria.FEMALE, group.size = 1, group.low = c(50:63))  
+
+
+
+
 
 # Remark: Should we use a list or numeric values to store results?
 # Remark: we use paste0 instead of paste becaue it leaves no space in between
-# Should we remove 
+# Define outout formate of counterfactual estimates: list, numeric, etc? 
+        # Should be the same in each estimation
 
