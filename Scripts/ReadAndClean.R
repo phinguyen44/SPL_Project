@@ -166,7 +166,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     }
     
     # Split data frames into country/gender splits, then standardize numeric
-    splits    = split(df.out, f = list(df.reg$country, df.reg$gender), 
+    splits    = split(df.out, f = list(df.out$country, df.out$gender), 
                       drop = TRUE)
     df.reg    = standardize.df(df.out)
     df.splits = lapply(splits, standardize.df)
