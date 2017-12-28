@@ -20,9 +20,9 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
 
     # Install packages (if not already installed)
     if (!all(allPackages)) {
-    missingIDX = which(allPackages == FALSE)
-    needed     = neededPackages[missingIDX]
-    lapply(needed, install.packages)
+        missingIDX = which(allPackages == FALSE)
+        needed     = neededPackages[missingIDX]
+        lapply(needed, install.packages)
     }
 
     # Load all defined packages
@@ -46,8 +46,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
         sep = "\n")
     
     dat = dat.input %>%
-        filter(wave == wav & (age <= 64 & age >= 50)) %>%  # wave & age filter
-        select(wave, country_mod,                          # dataset details
+        dplyr::filter(wave == wav & (age <= 64 & age >= 50)) %>% 
+        dplyr::select(wave, country_mod,                 # dataset details
                female, age, isced1997_r, ch001_, mar_stat, # demo variables
                chronic_mod, maxgrip, adla, bmi2, eurod, sphus, # health indices
                ep013_mod, ep005_)                          # labor (outcome var)
@@ -144,33 +144,37 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
         val  = (x - mean) / std
         return(val)
     }
-    # TODO: Comment in report: mention it gives same results as inbuilt function
-    # (scale)
-
-    # Gives a vector of integer column positions of numeric variables
-    idx = sapply(df.out, is.numeric)
-    idx = seq(1:length(idx))[idx]
-
-    # Creating separate data set with standardized numeric variables for 
-    # regression, then reselect variables as described in paper (e.g. self-           # reported health is removed)
-    df.reg = df.out %>%
-        mutate_at(.vars = vars(idx),
-                  .funs = standardize) %>%
-        mutate(labor_participation = !labor_np) %>% # invert to get labor_part
-        select(country, gender, age,
-               h_chronic, h_adla, h_obese, h_maxgrip,
-               edu_second, edu_high, children, couple,
-               labor_participation)
-
-    # Create a list of data frames by country and gender, to be used in 
-    # regression
-    df.splits  = split(df.reg, f = list(df.reg$country, df.reg$gender), 
-                       drop = TRUE)
+    
+    # Standardize and select correct variables
+    standardize.df = function(df) {
+        # Gives a vector of integer column positions of numeric variables
+        idx = sapply(df, is.numeric)
+        idx = seq(1:length(idx))[idx]
+        
+        # Creating separate data set with standardized numeric variables for 
+        # regression, then reselect variables as described in paper (e.g. self-           # reported health is removed)
+        df.reg = df %>%
+            mutate_at(.vars = vars(idx),
+                      .funs = standardize) %>%
+            mutate(labor_participation = !labor_np) %>% # invert to get labor_pt
+            dplyr::select(country, gender, age,
+                          h_chronic, h_adla, h_obese, h_maxgrip,
+                          edu_second, edu_high, children, couple,
+                          labor_participation)
+        
+        return(df.reg)
+    }
+    
+    # Split data frames into country/gender splits, then standardize numeric
+    splits    = split(df.out, f = list(df.out$country, df.out$gender), 
+                      drop = TRUE)
+    df.reg    = standardize.df(df.out)
+    df.splits = lapply(splits, standardize.df)
 
     # Create necessary dummary variables for regression
     dummify = function(data.frame) {
         data.frame = data.frame %>%
-            select(-country, -gender)               # remove country/gender
+            dplyr::select(-country, -gender)        # remove country/gender
         model      = ~ 0 + .                        # needed to remove intercept
         new.df     = model.matrix(model, data.frame)# create dummies
         new.df     = data.frame(new.df)
