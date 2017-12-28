@@ -78,6 +78,7 @@ Statistical Programming Languages Group Project
     - Show distribution for each country (and overlay with average) for quantitative variables (e.g. self-reported health). See [this](https://ourworldindata.org/wp-content/uploads/2017/04/The-distribution-of-life-satisfaction.png) for inspiration.
     - Show a choropleth of scores (for each metric) for countries contained within data set.
     - Create a diverging stacked bar chart to show labor supply choice.
+    - Grid map [example](https://www.theguardian.com/uk-news/ng-interactive/2017/feb/20/what-the-eu27-want-brexit-red-lines-from-the-other-side-of-the-table)
 
 ## Team Members
 

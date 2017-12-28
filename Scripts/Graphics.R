@@ -5,8 +5,12 @@
 # Description:
 # Create useful graphics (Quantlet 6)
 # 
-# Graphics can be accessed numerous ways.
+# Graphics can be accessed numerous ways. 
+# TODO: describe which ways?
 # Functions are designed to work with df.out created from `ReadAndClean.R`
+# 
+# Quantlet enhances report by including numeric variables for which information
+# is lost in conversion into dummary variables
 # 
 ################################################################################
 
@@ -65,8 +69,10 @@ lapply(neededPackages, library, character.only = TRUE)
 # - either pass a named logical vector containing predicates from data set
 # - or a character vector like c("edu_low = FALSE", "age > 50"). allows for filters outside of just predicates
 
-health.distribution = function(x, 
-                               gender    = "all", 
+# TODO: Add option for no gen/country split?
+
+health.distribution = function(var, 
+                               gen       = "all", 
                                countries = "all", 
                                filters   = "none") {
     
@@ -74,8 +80,8 @@ health.distribution = function(x,
     df.out$age = as.numeric(levels(df.out$age)[df.out$age])
     
     # STOPPING CONDITIONS
-    if (!is.numeric(df.out[[x]])) stop("'x' must be numeric")
-    if (length(gender) > 1 | !all(gender %in% c("all", "MALE", "FEMALE"))) {
+    if (!is.numeric(df.out[[var]])) stop("'var' must be numeric")
+    if (length(gen) > 1 | !all(gen %in% c("all", "MALE", "FEMALE"))) {
         stop("'gender' must be one of 'all', 'MALE', or 'FEMALE'")
     }
     if (length(countries) > 1 & !all(countries %in% levels(df.out$country))) {
@@ -91,21 +97,63 @@ health.distribution = function(x,
     # TODO: Figure out how to do filters
     
     # Set faceting variables
-    if (gender == "all") gender = c("MALE", "FEMALE")
+    if (gen == "all") gen = c("MALE", "FEMALE")
     if (length(countries) == 1) {
-        if (countries == "all") countries = levels (df.out$country)
+        if (countries == "all") countries = levels(df.out$country)
     }
     
-    # p = ggplot(data = df.out, )
-    # should it be histogram or barchart?
+    # TODO: Overlay lines for average as well
+    total.dist = table(df.out[[var]])/nrow(df.out)
+    # TODO: Figure out how to do this for a histogram
+    
+    # if less than 10 values, use geom_bar. otherwise, use geom_hist.
+    varlength = length(unique(df.out[[var]]))
+    
+    plot_bar = ggplot(data = df.out, aes(x = get(var))) + 
+        geom_bar(aes(fill = country)) + 
+        facet_grid(gender ~ country) +
+        
+        theme_minimal() +
+        theme(legend.position = "none") + 
+        theme(panel.grid.minor = element_blank()) + 
+        theme(panel.grid.major.x = element_blank()) +
+        
+        labs(title = "Distribution of ...") +
+        labs(subtitle = "Text2") +
+        
+        theme(plot.title = element_text(size=16)) +
+        theme(plot.subtitle = element_text(size=10, color = "#7F7F7F"))
+    
+    plot_hist = ggplot(data = df.out, aes(x = get(var))) + 
+        geom_histogram(bins = 10, aes(fill = country)) + 
+        facet_grid(gender ~ country) + 
+        
+        theme_minimal() +
+        theme(legend.position = "none") + 
+        theme(panel.grid.minor = element_blank()) + 
+        theme(panel.grid.major.x = element_blank()) +
+        
+        labs(title = "Distribution of ...") +
+        labs(subtitle = "Text2") +
+        
+        theme(plot.title = element_text(size=16)) +
+        theme(plot.subtitle = element_text(size=10, color = "#7F7F7F"))
+    
+    if (varlength <= 10) {
+        plotter = plot_bar
+    } else {
+        plotter = plot_hist
+    }
+    
+    plotter
+    
+    return(plotter)
+    
     
     
 }
 
-###### VIEW LABOR CHOICE
+###### VIEW LABOR CHOICE (AS DIVERGING STACKED BAR CHART)
 # Decide best graph to show. Could be stacked bar, could be bars separate, could be left-side as non working and right-side as working
-
-###### LONGITUDINAL VIEW OF HEALTH
-# Labor force participation over time (compare waves) as well as results of counterfactual study
 
 # I like the idea of "tranching" people into categories based on health outcomes. Maybe we'll see something like how really healthy people have amazing labor rates, but unhealthy people have super garbage rates. And that maybe incremental gains from the unhealthy population will lead to higher participation rates, etc. (How to influence policy!) - inequality of health. For that we'll need to run regression on separate buckets of health outcomes
