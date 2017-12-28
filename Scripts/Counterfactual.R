@@ -48,7 +48,7 @@ allSummaries = lapply(allModels, summary)
 # Calculate employment rate based on whole population with mean probability
 
 # Estimate current employment rate
-empl.rate.current       = function(model){
+empl.rate       = function(model){
     
     # Select data from model
     X               = model$data
@@ -62,9 +62,8 @@ empl.rate.current       = function(model){
     return(empl.rate)
 }
 
-empl.current = lapply(allModels, empl.rate.current )
-
-empl.rate.counterfact   = function(model){
+# Function for defining models with modified dataset (perfect health)
+X.cf   = function(model){
     
     # Select data from model
     X                   = model$data
@@ -86,30 +85,36 @@ empl.rate.counterfact   = function(model){
     X_cf[, c("h_maxgrip")] =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
     
     # Predict probability of being employed of all individuals
-    empl.probability    = predict(object = model, newdata =  X_cf, type = "response")
+    #empl.probability    = predict(object = model, newdata =  X_cf, type = "response")
     
     # Calculate predicted counterfactual employment rate
-    empl.rate           = sum(empl.probability)  / length(empl.probability)
-    return(empl.rate)
+    #empl.rate           = sum(empl.probability)  / length(empl.probability)
+
+    model$data = X_cf
+    return(model)
 }
 
-empl.counterfact = lapply(allModels, empl.rate.counterfact)
+# Returns a list with all models with modified datasets
+allModels.cf = lapply(allModels, X.cf)
+
+# Calculate current and counterfactual employment rates
+empl.current = lapply(allModels, empl.rate)
+empl.counterfact = lapply(allModels.cf, empl.rate)
 
 (employment= data.frame(cbind(empl.current, empl.counterfact)))
 
 # Note: the expected value of probability converges to true population mean
 
+# Question: Should both functions be combined? How does this work with lapply
+
 ################################################################################
 # Counterfactual exercise for each age group
 
-model = allModels$Austria.FEMALE
-
-
-# Function for calculation employment rate among agegroups
+### Function for current and counterfactual employment rate among age groups
 # Default arguments: group size and lower bound of age groups (group.low)
 
 # Estimate current employment rate for age groups
-empl.rate.current       = function(model, group.size = 5, group.low = c(50,55,60)){
+empl.rate.age       = function(model, group.size = 5, group.low = c(50,55,60)){
     
     #Initialize storage of results
     empl.rate = numeric(3)
@@ -166,18 +171,44 @@ empl.rate.current       = function(model, group.size = 5, group.low = c(50,55,60
     return(empl.rate)
 }
 
-empl.current = lapply(allModels, empl.rate.current )
+# Calculate current and counterfactual employment rates for ag groups
+empl.current.age     = lapply(allModels, empl.rate.age)
+empl.counterfact.age = lapply(allModels.cf, empl.rate.age)
+
+(employment= data.frame(cbind(empl.current.age, empl.counterfact.age)))
 
 
 # Test for other age groups: Example of employment for each age group
-empl.rate.current(allModels$Austria.FEMALE, group.size = 1, group.low = c(50:63))  
+empl.rate.age(allModels$Austria.FEMALE, group.size = 1, group.low = c(50:63))  
 
 
 
-
+################################################################################
+# Some Remarks
 
 # Remark: Should we use a list or numeric values to store results?
 # Remark: we use paste0 instead of paste becaue it leaves no space in between
 # Define outout formate of counterfactual estimates: list, numeric, etc? 
         # Should be the same in each estimation
+
+# Idea: Use empl.rate.age function to calculate age group employment for each
+        # age and visualize with graphics
+
+empl.each.age = list()
+
+# Calculate employment for each age for all countries
+ for (i in 1:length(allModels)){
+    
+    k = allModels[[i]]
+    
+    empl.each.age[[i]] = empl.rate.age(k, group.size = 1, group.low = c(50:64))
+    
+}
+
+names(empl.each.age) = names(allModels)
+
+################################################################################
+# Decline in participation due to decline in health condition
+
+
 
