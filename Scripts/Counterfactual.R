@@ -182,6 +182,26 @@ colnames(employment.age) = paste0(c(rep("empl.current", 3) , rep( "empl.counterf
 # Test for other age groups: Example of employment for each age group
 empl.rate.age(allModels$Austria.FEMALE, group.size = 1, group.low = c(50:63))  
 
+################################################################################
+
+# Decline in participation due to decline in health condition
+    
+health.decline = function(X){
+
+    # Differences between counterf. and current participation rates
+    dif.60.64 = X[,"empl.counterfact60.64"] - X[, "empl.current60.64"]
+    dif.50.54 = X[,"empl.counterfact50.54"] - X[, "empl.current50.54"]
+    
+    # Absolute difference in current participation rate
+    dif.abs   = X[,"empl.current50.54"] - X[,"empl.current60.64"]
+
+    measure   =  (dif.60.64 - dif.50.54) / dif.abs 
+   
+     return(measure)
+    }
+
+participation.health = data.frame(health.decline(employment.age))
+
 
 ################################################################################
 # Some Remarks
@@ -189,15 +209,15 @@ empl.rate.age(allModels$Austria.FEMALE, group.size = 1, group.low = c(50:63))
 # Remark: Should we use a list or numeric values to store results?
 # Remark: we use paste0 instead of paste becaue it leaves no space in between
 # Define outout formate of counterfactual estimates: list, numeric, etc? 
-        # Should be the same in each estimation
+# Should be the same in each estimation
 
 # Idea: Use empl.rate.age function to calculate age group employment for each
-        # age and visualize with graphics
+# age and visualize with graphics
 
 empl.each.age = list()
 
 # Calculate employment for each age for all countries
- for (i in 1:length(allModels)){
+for (i in 1:length(allModels)){
     
     k = allModels[[i]]
     
@@ -208,7 +228,5 @@ empl.each.age = list()
 names(empl.each.age) = names(allModels)
 
 ################################################################################
-# Decline in participation due to decline in health condition
-
 
 
