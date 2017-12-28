@@ -71,16 +71,17 @@ lapply(neededPackages, library, character.only = TRUE)
 
 # TODO: Add option for no gen/country split?
 
-health.distribution = function(var, 
-                               gen       = "all", 
-                               countries = "all", 
-                               filters   = "none") {
+health.distribution = function(xvar, 
+                               gen              = "all", 
+                               countries        = "all", 
+                               filters          = "none",
+                               remove.outliers  = TRUE) {
     
     # first convert age to numeric, not factor variable
     df.out$age = as.numeric(levels(df.out$age)[df.out$age])
     
     # STOPPING CONDITIONS
-    if (!is.numeric(df.out[[var]])) stop("'var' must be numeric")
+    if (!is.numeric(df.out[[xvar]])) stop("'xvar' must be numeric")
     if (length(gen) > 1 | !all(gen %in% c("all", "MALE", "FEMALE"))) {
         stop("'gender' must be one of 'all', 'MALE', or 'FEMALE'")
     }
@@ -102,15 +103,33 @@ health.distribution = function(var,
         if (countries == "all") countries = levels(df.out$country)
     }
     
+    # Remove outliers (outside 1.5 IQR of 25% and 75% percentiles)
+    rm.outliers = function(x, na.rm = TRUE) {
+        qnt = quantile(df.out[[x]], probs = c(0.25, 0.75), na.rm = na.rm)
+        out = 1.5*IQR(df.out[[x]], na.rm = na.rm)
+        
+        new.out = df.out
+        new.out[(df.out[[x]] < qnt[1] - out), ] = NA
+        new.out[(df.out[[x]] > qnt[2] + out), ] = NA
+
+        new.out = new.out[complete.cases(new.out), ]
+        return(new.out)
+    }
+    
+    if (remove.outliers) {
+        df.out = rm.outliers(x = xvar)
+    }
+    
     # TODO: Overlay lines for average as well
-    total.dist = table(df.out[[var]])/nrow(df.out)
-    # TODO: Figure out how to do this for a histogram
+    total.dist = table(df.out[[xvar]])/nrow(df.out)
     
-    # if less than 10 values, use geom_bar. otherwise, use geom_hist.
-    varlength = length(unique(df.out[[var]]))
-    
-    plot_bar = ggplot(data = df.out, aes(x = get(var))) + 
-        geom_bar(aes(fill = country)) + 
+    # TODO: show as percentage
+    arg = df.out %>% 
+        group_by(country, gender) %>% 
+        mutate(perc = )
+
+    plot.bar = ggplot(data = df.out, aes(x = get(xvar))) + 
+        geom_bar(aes(fill = country, color = country), alpha = 0.4) + 
         facet_grid(gender ~ country) +
         
         theme_minimal() +
@@ -124,36 +143,15 @@ health.distribution = function(var,
         theme(plot.title = element_text(size=16)) +
         theme(plot.subtitle = element_text(size=10, color = "#7F7F7F"))
     
-    plot_hist = ggplot(data = df.out, aes(x = get(var))) + 
-        geom_histogram(bins = 10, aes(fill = country)) + 
-        facet_grid(gender ~ country) + 
-        
-        theme_minimal() +
-        theme(legend.position = "none") + 
-        theme(panel.grid.minor = element_blank()) + 
-        theme(panel.grid.major.x = element_blank()) +
-        
-        labs(title = "Distribution of ...") +
-        labs(subtitle = "Text2") +
-        
-        theme(plot.title = element_text(size=16)) +
-        theme(plot.subtitle = element_text(size=10, color = "#7F7F7F"))
+    # 
     
-    if (varlength <= 10) {
-        plotter = plot_bar
-    } else {
-        plotter = plot_hist
-    }
+    plot.bar
     
-    plotter
-    
-    return(plotter)
-    
-    
+    return(plot.bar)
     
 }
 
 ###### VIEW LABOR CHOICE (AS DIVERGING STACKED BAR CHART)
-# Decide best graph to show. Could be stacked bar, could be bars separate, could be left-side as non working and right-side as working
+# Decide best graph to show. Could be stacked bar, could be separate bars, could be diveging (like a Likert scale)
 
 # I like the idea of "tranching" people into categories based on health outcomes. Maybe we'll see something like how really healthy people have amazing labor rates, but unhealthy people have super garbage rates. And that maybe incremental gains from the unhealthy population will lead to higher participation rates, etc. (How to influence policy!) - inequality of health. For that we'll need to run regression on separate buckets of health outcomes
