@@ -64,3 +64,5 @@ health.distribution('h_maxgrip', gen = 'MALE')
 health.distribution('h_depression')
 
 health.distribution('h_perceived', remove.outliers = FALSE)
+
+ggsave("Output/healthdistribution.png", plot = last_plot(), width = 8, height = 5, units = "in")
