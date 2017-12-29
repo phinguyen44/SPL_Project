@@ -8,6 +8,8 @@
 # not the correct easySHARE data set and relevant statistics printed (e.g. num
 # rows dropped, variables retained, data type)
 #
+# TODO: Add other health metrics. Like self-reported health. As quantitative.
+#
 ################################################################################
 
 read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
@@ -42,14 +44,13 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     # ENCODE MISSING VALUES
 
     # Organize data.frame by selecting relevant variables
-    cat("Selecting values only from Wave 1 and between ages 50 and 64.", 
-        sep = "\n")
+    cat(infuse("Selecting values only from Wave {{wav}} and between ages 50 and 64.", wav = wav), sep = "\n")
     
     dat = dat.input %>%
         dplyr::filter(wave == wav & (age <= 64 & age >= 50)) %>% 
         dplyr::select(wave, country_mod,                 # dataset details
                female, age, isced1997_r, ch001_, mar_stat, # demo variables
-               chronic_mod, maxgrip, adla, bmi2, eurod, sphus, # health indices
+               chronic_mod, maxgrip, adla, bmi, bmi2, eurod, sphus, # health
                ep013_mod, ep005_)                          # labor (outcome var)
     
     rm(dat.input)
@@ -113,9 +114,13 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
                       h_obese       = bmi2 == 4,
                       h_badmental   = eurod > 3,
                       h_goodsp      = sphus < 4,
+                      h_bmi         = floor(bmi),
+                      h_depression  = eurod,
+                      h_perceived   = sphus,
                       labor_ft      = ep013_mod >= 32,
                       labor_pt      = ep013_mod < 32 & ep013_mod > 0,
-                      labor_np      = ep013_mod == 0) %>%
+                      labor_np      = ep013_mod == 0,
+                      labor_hrs     = floor(ep013_mod)) %>%
         dplyr::select(country, gender,              # country and gender
                       starts_with("age"),           # age dummy
                       starts_with("h_"),            # health indicators
