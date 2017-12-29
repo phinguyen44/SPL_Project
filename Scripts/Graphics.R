@@ -3,78 +3,34 @@
 #
 ################################################################################
 # Description:
-# Create useful graphics (Quantlet 6)
+# Functions designed to create useful graphics (quantlet 6)
 # 
-# Graphics can be accessed numerous ways. 
-# TODO: describe which ways?
-# Functions are designed to work with df.out created from `ReadAndClean.R`
+# xxxx
 # 
-# Quantlet enhances report by including numeric variables for which information
-# is lost in conversion into dummary variables
+# health.distribution(xvar, gen, countries, remove.outliers): show distribution
+# of numeric variable in dataset, facetted by gender and country.
+# Select a numeric variable in xvar (as a string), a vector of genders, and a
+# vector of countries. By default, outliers are removed.
 # 
 ################################################################################
-
-################################################################################
-# SET WORKING DIRECTORY
-
-# Note: Only this part must be changed for the rest of the script to run.
-rm(list = ls())
-
-# Adjust your working directory to where your local repository is located
-wd = file.path("~/Documents/Projects/SPL_Project")
-setwd(wd)
-
-################################################################################
-# SOURCE DATA
-
-source("Scripts/ReadAndClean.R")
-datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
-
-#Only keep relevant data sets
-df.out = datasets$df.out
-rm(datasets)
-
-################################################################################
-# LOAD NECESSARY PACKAGES & DATA
-
-# List all packages needed for session
-neededPackages = c("dplyr", "magrittr", "ggplot2", "scales")
-allPackages    = c(neededPackages %in% installed.packages()[ , "Package"]) 
-
-# Install packages (if not already installed) 
-if(!all(allPackages)) {
-    missingIDX = which(allPackages == FALSE)
-    needed     = neededPackages[missingIDX]
-    lapply(needed, install.packages)
-}
-
-# Load all defined packages
-lapply(neededPackages, library, character.only = TRUE)
-
-################################################################################
-# BUILD GRAPHICS FUNCTION
-
-# TODO: Each is a separate function
 
 ###### LABOR PARTICIPATION RATES ACROSS SEGMENTS
 # Chloropeth of labor participation rates (men & women) (across age groups) - 6 total graphs. ALLOW FOR SELECTION OF T/F variable
 
 ###### VIEW DISTRIBUTION OF NUMERIC VARIABLES
-# SELECT: Numeric variable: shows distribution for each country, then overlays average of entire data set (can potentially select one country, otherwise it defaults to all -> maybe pass a list of countries?)
-# -> allow slicing by dummy variables
+# Numeric variable: shows distribution for each country, then overlays average of entire data set 
+
+# slicing by dummy variables is not included. that can be done before the function is called and then that df can be paseed to this
 
 # by default, gender is "all". can either be "all", "MALE" or "FEMALE"
 # by default, countries is "all". can also pass a character vector of countries
-# by default, filters is "none". 
-# - either pass a named logical vector containing predicates from data set
-# - or a character vector like c("edu_low = FALSE", "age > 50"). allows for filters outside of just predicates
 
 # TODO: Add option for no gen/country split?
+# TODO: Should the entire distribution be overlaid or by gender?
 
 health.distribution = function(xvar, 
                                gen              = "all", 
                                countries        = "all", 
-                               filters          = "none",
                                remove.outliers  = TRUE) {
     
     # first convert age to numeric, not factor variable
@@ -93,15 +49,16 @@ health.distribution = function(xvar,
             stop("'countries' must be 'all' or a character vector containing countries in the `df.out` data frame")
         }
     }
-    # TODO: Add filters stopping condition
-    
-    # TODO: Figure out how to do filters
     
     # Set faceting variables
     if (gen == "all") gen = c("MALE", "FEMALE")
     if (length(countries) == 1) {
         if (countries == "all") countries = levels(df.out$country)
     }
+    
+    # Filter countries/genders as selected
+    df.out = df.out %>% 
+        filter(country %in% countries, gender %in% gen)
     
     # Remove outliers (outside 1.5 IQR of 25% and 75% percentiles)
     rm.outliers = function(x, na.rm = TRUE) {
@@ -116,39 +73,52 @@ health.distribution = function(xvar,
         return(new.out)
     }
     
-    if (remove.outliers) {
-        df.out = rm.outliers(x = xvar)
-    }
+    if (remove.outliers) df.out = rm.outliers(x = xvar)
     
-    # TODO: Overlay lines for average as well
+    # Overlay lines for average over entire data set
     total.dist = table(df.out[[xvar]])/nrow(df.out)
     
-    # TODO: show as percentage
-    arg = df.out %>% 
-        group_by(country, gender) %>% 
-        mutate(perc = )
+    total        = expand.grid(countries, gen, sort(unique(df.out[[xvar]])))
+    names(total) = c("country", "gender", xvar)
+    total        = arrange(total, country, gender, get(xvar))
+    total$value  = rep(total.dist, times = length(countries)*length(gen))
 
     plot.bar = ggplot(data = df.out, aes(x = get(xvar))) + 
-        geom_bar(aes(fill = country, color = country), alpha = 0.4) + 
-        facet_grid(gender ~ country) +
+        
+        geom_bar(aes(fill  = country, 
+                     color = country, 
+                     y     = ..prop..), 
+                 alpha = 0.4) + 
+        
+        geom_errorbar(data = total, aes(x    = get(xvar), 
+                                        ymin = value, 
+                                        ymax = value)) + 
         
         theme_minimal() +
         theme(legend.position = "none") + 
         theme(panel.grid.minor = element_blank()) + 
-        theme(panel.grid.major.x = element_blank()) +
-        
-        labs(title = "Distribution of ...") +
-        labs(subtitle = "Text2") +
+        theme(panel.grid.major = element_blank()) +
+        theme(axis.text.y = element_blank()) +
+
+        labs(title = paste0("Distribution of ", xvar, " by Country")) +
+        labs(subtitle = "Faceted by country & gender. Distribution of the entire data set shown is overlaid on each graph.") +
+        labs(x = xvar) + 
+        labs(y = "") + 
         
         theme(plot.title = element_text(size=16)) +
         theme(plot.subtitle = element_text(size=10, color = "#7F7F7F"))
     
-    # 
-    
-    plot.bar
+    # show correct faceting and titles
+    if (length(gen) == 1) {
+        plot.bar = plot.bar + 
+            labs(subtitle = paste0("Faceted by country. Gender selected is ", gen, ". Distribution of the entire data set shown is overlaid on each graph.")) + 
+            facet_wrap(~ country, ncol = 4)
+    } else {
+        plot.bar = plot.bar + 
+            facet_grid(gender ~ country)
+    }
     
     return(plot.bar)
-    
 }
 
 ###### VIEW LABOR CHOICE (AS DIVERGING STACKED BAR CHART)
