@@ -44,8 +44,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     # ENCODE MISSING VALUES
 
     # Organize data.frame by selecting relevant variables
-    cat("Selecting values only from Wave 1 and between ages 50 and 64.", 
-        sep = "\n")
+    cat(infuse("Selecting values only from Wave {{wav}} and between ages 50 and 64.", wav = wav), sep = "\n")
     
     dat = dat.input %>%
         dplyr::filter(wave == wav & (age <= 64 & age >= 50)) %>% 
