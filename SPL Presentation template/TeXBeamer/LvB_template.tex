@@ -98,11 +98,20 @@ Humboldt--Universität zu Berlin \\}
 
 \frame{
 \frametitle{Outline}
-
 \begin{enumerate}
 \item Motivation
 \item Background
-\item Current project status
+\item Current project status\
+\begin{center}
+\begin{tabular}{ll}
+ \hspace{-4.5cm}
+ Overview on quantlets\\
+   \hspace{-4.5cm}
+  Highlights
+\end{tabular}
+\end{center}
+\item Next steps
+
 \end{enumerate}
 }
 
@@ -124,447 +133,326 @@ Humboldt--Universität zu Berlin \\}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \frame{
-\frametitle{Labour Force Participation of Elderly in Eurpe}
-
+\frametitle{Labour Force Participation of Elderly in Europe}
 \begin{itemize}
 \item Changing demographics in Europe as social \& economic challenge 
-\item Health conditions important
-\item Remember: PDFLaTeX accepts PNG, JPEG and PDF not EPS/PS
-\item If you \emph{need} Postscript, RTFM
+\item Health conditions  \& wellbeing with important employment implications
+\item  Policy recommendation to improve labor force participation of Elderly
+\\
+
 \end{itemize}
+\color{isegreen}
+Research question:  \\
+\color{black}
+How is the labor force participation behavior of individuals aged 50-64 in 11 European countries influenced by different health indicators?
+
 }
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\frametitle{The LvB Beamer Style}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Background}
+\frame[containsverbatim]{
+\frametitle{Background}
+Adriaan Kalwij and Frederic Vermeulen (2005), IZA DP No. 1887 \\
+\newblock{\em Labour Force Participation of the Elderlyin Europe: The Importance of Being Healthy} \\
+\newblock 
 \begin{itemize}
-\item The LvB Beamer Style is defined via \textit{beamerdefs.sty}, \textit{colordef.sty} and \textit{lvblisting.sty}, which must always be provided in the source folder.
-\item All operators are to be defined by \verb(\operatorname{}(. Note the difference:\\
+\item Use of preliminary data set of wave 1 of SHARE data set
+\item Sample of 12,237 individuals from 11 European countries
+\item Investigate employment potential of healthy elderly Europeans
 \begin{center}
 \begin{tabular}{ll}
-$\operatorname{Var}$ & defined by operatorname\\
-$Var$ & not defined by operatorname
+  Multidimensionality of health\\
+  Great variation across countries \\
+  Declining employment related to declining health
 \end{tabular}
 \end{center}
-\item Remember to start and end the displaymath environment by \verb(\[( and \verb(\]( and not \verb($$(.
 \end{itemize}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \frame[containsverbatim]{
-\frametitle{Predefined comands}
+\frametitle{SHARE - Survey of Health, Ageing and Retirement in Europe}
 
+\begin{columns}
+\begin{column}{1.0\textwidth}
 \begin{itemize}
-\item For your convenience you may set up new commands via \verb(\newcommand{}{}(.
-\item This has been done in the two following cases:
-	\begin{itemize}
-	\item Use \verb(\quantnet( to include the quantnet icon (right-aligned):\\
-	\begin{center}
-	\quantnet MVAboxcity
-	\end{center}
-	The name of the quantnet is to be written in black.
-	\item Use \verb(\BBI{}( to link to the BBI:\\
-	\begin{center}
-	\BBI{Carl Friedrich Gauss}
-	\end{center}
-	\end{itemize}
-\item Some commands are already defined, e.g. \verb(\ln( and \verb(\log(
+\item Panel database of micro data on health, socio-economic status and social and family networks 
+\item Over 120,000 individuals aged 50 or older 
+\item 27 participating countries
+\item easySHARE as simplified data set containing comprised information of all waves,
+\newblock available on \href{http://www.share-project.org/special-data-sets/easyshare.html}{http://www.share-project.org/}
+\begin{figure}[htb]
+	\begin{flushright}
+	\includegraphics[scale=0.2]{Figures/easySHARE}	\end{flushright}
+\end{figure}
 \end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\frametitle{Equations}
-\begin{itemize}
-\item Equations covering several lines may be written in the \textit{align} environment instead of the older \textit{eqnarray} environment.\\Only this way it can be ensured, that the colour of the equation and of the according equation numbering match.
-\item \verb(align*( omits the equation numbering, as does \verb(\notag(.
-\end{itemize}
-\begin{columns}[onlytextwidth]
-\begin{column}{0.5\textwidth}
-	\begin{lstlisting}
-	\begin{align}
-	4x + 8 &= (3-2)^2\\
-	4x &= -7 \notag \\
-	x &= -\frac{7}{4}
-	\end{align}
-	\end{lstlisting}
 \end{column}
-\begin{column}{0.5\textwidth}
-	\begin{align}
-	\hspace{-1cm}4x + 8 &= (3-2)^2\\
-	4x &= -7 \notag \\
-	x &= -\frac{7}{4}
-	\end{align}
+\end{columns}
+
+
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Current project status}
+
+
+\frame[containsverbatim]{
+\frametitle{Overview on Quantlets}
+\begin{itemize}
+\item Quantlet 1: Read and Clean easyshare dataset
+\item Quantlet 2: Summary Statistics
+\item         Quantlet 3: Probit Regression
+\item Quantlet 4: Wald Test
+\item         Quantlet 5: Counterfactual exercise
+ \item        Quantlet 6: Graphical representation
+\end{itemize} 
+
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame[containsverbatim]{
+\frametitle{Quantlet 1: Read and Clean easyshare dataset}
+\begin{itemize}
+\item Input: Data frame and wave. Output: List of data frames
+\item Imputation of missing values
+\item Conversion of country data from ISO code to a human-readable format 
+\item Relevant error messages
+\end{itemize} 
+
+
+\begin{columns}
+\begin{column}{0.95\textwidth}
+\begin{lstlisting}
+# Split data frames into country/gender splits, then standardize numeric
+
+splits    = split(df.out, f = list(df.out$country, 
+df.out$gender), drop = TRUE)
+df.reg    = standardize.df(df.out)
+df.splits = lapply(splits, standardize.df)
+
+\end{lstlisting}
+\end{column}
+\end{columns}
+
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\frame[containsverbatim]{
+\frametitle{Quantlet 1: Read and Clean easyshare dataset}
+
+\begin{columns}
+\begin{column}{0.95\textwidth}
+\begin{lstlisting}
+# Create necessary dummary variables for regression
+
+dummify = function(data.frame) {
+        data.frame = data.frame %>%
+            dplyr::select(-country, -gender)       
+        model      = ~ 0 + .                       
+        new.df     = model.matrix(model, data.frame)
+        new.df     = data.frame(new.df)
+        return(new.df)
+    }
+    
+df.splits = lapply(df.splits, dummify)
+
+\end{lstlisting}
 \end{column}
 \end{columns}
 }
 
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame{
-\frametitle{Tables}
-\vspace{-0.5cm}
-\begin{table}
-\begin{center}
-\begin{tabular}{cc} 
-\hline\hline
-Title & Title\\ 
-\hline
-2.13 & 1.45 \\
-3.14 & 6.85 \\
-\hline\hline
-\end{tabular}
-\caption{Include a short, but meaningful caption.}
-\end{center}
-\end{table}
+\frame[containsverbatim]{
+\frametitle{Quantlet 2: Summary Statistics}
 \begin{itemize}
-\item Follow the Cambridge University Press Style.
-\item Not more than 2 decimal digits in a column.
-\item Tables and their captions are to be written in black.
-\end{itemize}
-}
+\item Summary statistic tables of health characteristics of the elderly
+\item contains functions that calculate labor participation rates and type of labor chosen by gender and country
+\item Usage of `pmap` in `purrr` package to loop over groupings
+\item Prints tables into readable html format
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\frametitle{Tables}
-\begin{lstlisting}
-\begin{table}
-\begin{center}
-\begin{tabular}{cc} 
-\hline\hline
-Title & Title\\ 
-\hline
-2.13 & 1.45 \\
-3.14 & 6.85 \\
-\hline\hline
-\end{tabular}
-\caption{Include a short, but meaningful caption.}
-\end{center}
-\end{table}
-\end{lstlisting}
-}
+\end{itemize} 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \frame[containsverbatim]{
-\vspace*{-0.2cm}
-\frametitle{Figures}
-\begin{columns}
-\begin{column}{0.45\textwidth}
-\begin{lstlisting}
+\frametitle{Quantlet 2: Summary Statistics}
+
 \begin{figure}[htb]
 	\begin{center}
-	\includegraphics[scale=0.2]{Figures/vola}
-	\caption{Include a short, but meaningful caption.}
-	\end{center}
+	\includegraphics[scale=0.35]{Figures/df6}	\end{center}
 \end{figure}
+
+
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame[containsverbatim]{
+\frametitle{Quantlet 3: Probit Regression}
+\begin{itemize}
+\item Probit regression for each country and both gender groups based on  `glm` 
+\item Calculation of marginal effects based on `probitmfx`
+\item Wald test using own-built Wald test
+
+\end{itemize} 
+
+\begin{columns}
+\begin{column}{0.95\textwidth}
+\begin{lstlisting}
+
+allModels = lapply(df.splits, function(z){
+           z = z[-z$age50] 
+       model = glm(z$labor_participationTRUE ~., 
+      family = binomial(link = "probit"), data = z)
+return(model)
+ })
+ 
+allSummaries = lapply(allModels, summary)
+
+
 \end{lstlisting}
 \end{column}
-\begin{column}{0.5\textwidth}
-\begin{figure}[ht]
+\end{columns}
+
+
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame[containsverbatim]{
+\frametitle{Quantlet 3: Probit Regression}
+\begin{columns}
+\begin{column}{1.0\textwidth}
+\begin{lstlisting}
+wald.log = list() 
+for(i in 1:length(allSummaries)){
+  SummaryElement = allSummaries[[i]]
+  health = c(16:19)
+  testOutput = try(joint.wald.test(allSummaries[[i]], health, 0.95))
+  
+  if(class(testOutput) == "try-error"){
+    
+    msg = paste0("Wald Test failed for Model Element ", i)
+    warning(msg)
+    wald.log[[i]] = "Error"  
+  } else{   
+    wald.log[[i]] = testOutput  
+  }}
+
+
+\end{lstlisting}
+\end{column}
+\end{columns}
+
+
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame[containsverbatim]{
+\frametitle{Quantlet 4: Wald Test}
+\begin{itemize}
+\item Wald test for joint significance of regression coefficients
+\end{itemize} 
+
+\begin{columns}
+\begin{column}{1.0\textwidth}
+\begin{lstlisting}
+joint.wald.test = function(model.summary, spec, signf.l){
+    
+joint.wald.test        = numeric(6)
+names(joint.wald.test) = c("Name","W","p-value", "df")
+beta                   = model.summary$coefficients[,1]
+Var_beta_est           = vcov(model.summary)
+W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
+
+    chi2               = qchisq(signf.l, df=length(spec))
+    pval               = 1-pchisq(W,length(spec))
+    joint.wald.test[1] = "Chi2 test"
+    joint.wald.test[2] = format(   W, digits = 4)
+
+
+\end{lstlisting}
+\end{column}
+\end{columns}
+
+
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame[containsverbatim]{
+\frametitle{Quantlet 5: Counterfactual exercise}
+\begin{itemize}
+\item Estimation of current and counterfactual employment rate
+\item Definition of data set with perfectly healthy individuals
+\item Calculate decline in participation due to decline in health condition
+
+\end{itemize} 
+
+\begin{columns}
+\begin{column}{1.0\textwidth}
+\begin{lstlisting}
+X.cf   = function(model){
+     X                   = model$data
+     X_cf                = X
+     X_min               = data.frame(t(apply(X, 2, min)))
+     names.vec           = c("h_chronic", "h_adlaTRUE", "h_obeseTRUE")
+     X_cf[, names.vec]  = X_min[names.vec]
+  \end{lstlisting}
+\end{column}
+\end{columns}
+
+
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame[containsverbatim]{
+\frametitle{Quantlet 6: Graphical representation}
+\begin{columns}
+\begin{column}{1.0\textwidth}
+\begin{figure}[htb]
 	\begin{center}
-	\includegraphics[scale=0.2]{Figures/vola}
-	\caption{Include a short, but meaningful caption.}
-	\end{center}
+	\includegraphics[scale=0.38]{Figures/health}	\end{center}
 \end{figure}
 \end{column}
 \end{columns}
-\vspace{0.2cm}
-The caption is, as in tables, to be written in black and please provide any legend in the caption and not in the graph itself.
+
 }
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\frametitle{Examples}
-
-To create an example, use the color \texttt{isegreen} and the following structure:
-
-\begin{columns}[onlytextwidth]
-\begin{column}{0.5\textwidth}
-\begin{lstlisting}
-\color{isegreen}
-\textbf{Example:} Example title
-
-\smallskip
-Here you can state your example, which may also include calculations.
-\color{black}
-\end{lstlisting}
-\end{column}
-\hspace*{0.3cm}\begin{column}{0.5\textwidth}
-\color{isegreen}
-\textbf{Example:} Example title
-
-\smallskip
-Here you can state your example, which may also include calculations.
-\color{black}
-\end{column}
-\end{columns}
-}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\frametitle{Subtitles}
-Subtitles are to be highlighted via bold text and followed by a small skip afterwards (no colon):
-
-\begin{columns}[onlytextwidth]
-\begin{column}{0.5\textwidth}
-\begin{lstlisting}
-\textbf{Subtitle}
-
-\smallskip
-Here you can state the content according to the subtitle.
-\end{lstlisting}
-\end{column}
-\hspace*{0.3cm}\begin{column}{0.5\textwidth}
-\textbf{Subtitle}
-
-\smallskip
-Here you can state the content according to the subtitle.
-\end{column}
-\end{columns}
-
-\bigskip
-This may also be applied to state proofs, theorems etc.
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\frametitle{Brackets}
-\begin{itemize}
-	\item Use the bracket sequence $\left[\left\{\left(a+b=c\right)\right\}\right]$
-	\item Conventional bracket rules represent an exemption of this rule. For example:
-\[Y\sim \operatorname{N}(\mu(X), \sigma(X))\]
-	\item Let \LaTeX\,take care about the correct size by preceding the bracket by \verb(\left( and \verb(\right(.
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Rules}
+\section{Next steps}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \frame[containsverbatim]{
-\frametitle{Rules to write nice slides}
+\frametitle{Next steps for project}
 
 \begin{itemize}
-\item Use \verb(\section{}( and \verb(\subsection{}( to structure your presentation. The section will appear in the upper right corner of your slides.
-\item You can set up hyperlinks via \verb(\label{LINKNAME}( (reference point) and \verb(\ref{LINKNAME}( (reference).
-\item Use, if necessary, \verb(\displaystyle( to force \LaTeX to display fractions in big font size
-\item Remember 
-	\begin{itemize}
-		\item 6-8 lines per slide
-		\item 8 words per line
-	\end{itemize}
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\begin{itemize}
-	\item The numbering of any enumeration should match the colour of the corresponding text (preset colour: black). Modifications may be made through the \textit{itemize} environment:
-\begin{center}
-\verb(\item[\color{isegreen}1.](
-\end{center}
-Itemize items are predefined (blue) and excluded from this rule.
-	\item Use \verb(^{\top}( to write the symbol of transpose, it produces
-\[ x^{\top}y \]
-	\item Use \verb(\ldots( to write the symbol for three dots, it produces
-\[ x \in \{1, \ldots, n \} \]
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\begin{itemize}
-	\item The commands \verb(\widehat{}( and \verb(\widetilde{}( for a hat or a tilde are to be preferred over the the smaller \verb(\hat( respectively \verb(\tilde( commands:\\
-\begin{center}
-$\widehat{Y}$ vs. $\hat{Y}$\\
-$\widetilde{Y}$ vs. $\tilde{Y}$
-\end{center}
-	\item The norm is to be written via \verb(\|(. It produces $\|K\|$
-	\item The $\mathcal{O}$ and {\scriptsize $\mathcal{O}$} for convergence may be written via \verb(\mathcal{O}( and \verb(\mbox{\scriptsize $\mathcal{O}$}(.
-	\item The operator for exponential terms with Euler's $e$ as the base is defined by \verb(\exp(:
-\[\exp(1) \approx 2.718282\]
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\begin{itemize}
-	\item Use \verb(\stackrel{\mathcal{L}}{\rightarrow}( to write the symbol for convergence in distribution and denote the normal distribution by \verb(\operatorname{N}(, this produces
-\[ X \stackrel{\mathcal{L}}{\to} \operatorname{N}(0,\sigma^2) \]
-	\item Use \verb(\operatorname{P}( to write the symbol for probability, it produces
-\[ \operatorname{P} (X = x) = \frac{ \exp(- \lambda) {\lambda}^{x}}{{x}!} \]
-	\item Use \verb(\stackrel{\operatorname{as.}}{\sim}( to write the symbol for asymptotic distribution, it produces \[ X \stackrel{\operatorname{as.}}{\sim} \chi^2\]
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\begin{itemize}
-	\item Use command \verb(\stackrel{\operatorname{def}}{=}( to write the symbol for definition, it produces \[ X \stackrel{\operatorname{def}}{=} \frac{a}{b} \] 
-	\item Use commands \verb(\Re( or \verb(\Im( to write the symbols for the real or imaginary part, it produces \[ X = \Re \{Y \}, Y = \Im \{Z \} \]
-	\item To write the symbols for the minimizing argument, use \verb(\operatorname{arg}\,\underset{x}{\operatorname{min}}(, it produces
-\[ a = \operatorname{arg}\,\underset{x}{\operatorname{min}} \{f(x) \}\]
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\begin{itemize}
-	\item Use \verb(\operatorname{\mathbf{I}}( for the indicator function:
-	\[ \operatorname{\mathbf{I}}\{x<1\}\]
-	\item Use \verb(\log( to write the symbol for the natural logarithm, it produces
-\[  1 = \log\{exp(1)\} \]
-	\item Use \verb(\operatorname{E}( to write the symbol for expectation, it produces \[\operatorname{E}[X] = \mu \]
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\begin{itemize}
-    \item Use \verb(\hyperlink{labelname}{\beamerbutton{Link Name}}( to jump to other parts of your slides \\
-    \hyperlink{labelname}{\beamerbutton{Link Name}}
+\item Add additional graphics (choropleth maps)
+\item Add error messages to Wald tests
+\item Export all replicated results
+\item Review code to assure coherence with style guide
+\item Review code to assure coherence between quantlets
 
 \end{itemize}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Further topics}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\label{labelname}
-\frametitle{Using \texttt{listings} for source}
-
-Slides containing a listing also need [containsverbatim] as option. For 'highlighting' of XploRe keywords see \texttt{listing.tex}.
-
-\begin{center}
-\begin{lstlisting}
-library("metrics")                                   
-randomize(10178)                                     
-z=(uniform(n).>0.5)~(normal(n).<0.5)                
-\end{lstlisting}
-\end{center}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Piecewise Uncovering}
-\subsection{Uncovering}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame{
-\frametitle{Piecewise Uncovering I}
-
-The following example uses $<1-2>$ commands to piecewise hide and uncover text. $<1-2>$ makes the first item appear only on slides 1 and 2, $<2->$ has the second item visible from slide 2 onwards.
-
-\begin{itemize}
-\item<1-2> Itemize environments
-\item<2-> can be uncovered or hidden
-\item<3-> piecewise.
-\end{itemize}
-
-\begin{enumerate}[<+->][(i)]
-\item First Roman point.
-\item Second Roman point, uncovered on second slide.
-\item Last Roman point.
-\end{enumerate}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame{
-\frametitle{Piecewise Uncovering II}
-
-There is an easier way using $\mbox{\textbackslash item}<+->$
-
-\begin{itemize}  
-\item<+-> Itemize environments 
-\item<+-> can be uncovered or hidden
-\item<+-> piecewise.
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Hidding}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame{
-\frametitle{Hiding text\dots}
-
-Text on the first slide.
-
-\onslide<2-3>
-Shown on second and third slide.
-
-\begin{itemize}  
-\item Still shown on 2nd and 3rd slide.
-\onslide<4->
-\item Shown from slide 4 on.
-\onslide<3,5> 
-\item Shown on slides 3 and 5. 
-\end{itemize}
-\onslide
-Shown on all slides.
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Further Information}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame{
-\frametitle{Further Information}
-Further Information can be found in the \LaTeX\, version of this document, where some more details are explained and important specifications are highlighted.
-
-\bigskip
-Suggestions to improve the style or the explanations are welcome!
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame{
-\frametitle{For Further Reading}
-\begin{thebibliography}{aaaaaaaaaaaaaaaaa}
-\beamertemplatearticlebibitems
-\bibitem{Oetiker:2006}
-Tobias Oetiker, Hubert Partl, Irene Hyna and Elisabeth Schlegl
-\newblock{\em The Not So Short Introduction to \LaTeX 2e}
-\newblock available on \href{http://www.ctan.org/tex-archive/info/lshort/english/}{www.ctan.org}, 2008
-\beamertemplatearticlebibitems
-\bibitem{Pakin:2008}
-Scott Pakin
-\newblock{\em The Comprehensive \LaTeX Symbol List}
-\newblock available on \href{http://www.ctan.org/tex-archive/info/symbols/comprehensive/}{www.ctan.org}, 2008
-\beamertemplatebookbibitems
-\bibitem{Eckel:2004}
-Frank Mittelbach and Michel Goossens
-\newblock {\em The \LaTeX{ }Companion -- 2nd ed.}
-\newblock Addison-Wesley, 2004
-\end{thebibliography}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame{
-\frametitle{For Further Reading}
-\begin{thebibliography}{aaaaaaaaaaaaaaaaa}
-\beamertemplatearticlebibitems
-\bibitem{Trettin:2007}
-Mark Trettin and Jürgen Fenn
-\newblock{\em An essential guide to \LaTeX 2e usage}
-\newblock available on \href{http://tug.ctan.org/cgi-bin/ctanPackageInformation.py?id=l2tabu-english}{www.ctan.org}, 2007
-\beamertemplatearticlebibitems
-\bibitem{wiki:index}
-Wikipedia Wiki Books
-\newblock{\em LaTeX-Wörterbuch: InDeX}
-\newblock available on \href{http://de.wikibooks.org/}{www.wikipedia.de}
-\beamertemplatearticlebibitems
-\bibitem{Tantau:2007}
-Till Tantau
-\newblock{\em User Guide to the Beamer Class, Version 3.07}
-\newblock available on \href{http://latex-beamer.sourceforge.net}{www.sourceforge.net}, 2007
-\end{thebibliography}
-}
 
 % Define the end of the document:
 \end{document}
