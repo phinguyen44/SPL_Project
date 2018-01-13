@@ -1,16 +1,14 @@
 \beamer@endinputifotherversion {3.36pt}
 \headcommand {\slideentry {0}{0}{1}{1/1}{}{0}}
 \headcommand {\beamer@framepages {1}{1}}
-\headcommand {\sectionentry {1}{Introduction}{2}{Introduction}{0}}
+\headcommand {\sectionentry {1}{random}{2}{random}{0}}
 \headcommand {\beamer@sectionpages {1}{1}}
 \headcommand {\beamer@subsectionpages {1}{1}}
-\headcommand {\slideentry {1}{0}{1}{1/1}{}{0}}
-\headcommand {\beamer@framepages {1}{1}}
 \headcommand {\slideentry {2}{0}{1}{1/1}{}{0}}
 \headcommand {\beamer@framepages {1}{1}}
-\headcommand {\sectionentry {2}{LvB Beamer Style}{2}{LvB Beamer Style}{0}}
-\headcommand {\beamer@sectionpages {2}{1}}
-\headcommand {\beamer@subsectionpages {2}{1}}
+\headcommand {\sectionentry {2}{Motivation}{2}{Motivation}{0}}
+\headcommand {\beamer@sectionpages {1}{1}}
+\headcommand {\beamer@subsectionpages {1}{1}}
 \headcommand {\beamer@subsectionentry {0}{2}{1}{1}{General ideas}}\headcommand {\beamer@subsectionpages {2}{0}}
 \headcommand {\slideentry {2}{1}{1}{1/1}{General ideas}{0}}
 \headcommand {\beamer@framepages {1}{1}}
@@ -74,4 +72,4 @@
 \headcommand {\beamer@subsectionpages {12}{3}}
 \headcommand {\beamer@sectionpages {12}{3}}
 \headcommand {\beamer@documentpages {3}}
-\headcommand {\def \inserttotalframenumber {27}}
+\headcommand {\def \inserttotalframenumber {26}}

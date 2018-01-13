@@ -44,7 +44,8 @@
 
 % Define the title.Don't forget to insert an abbreviation instead 
 % of "title for footer". It will appear in the lower left corner:
-\title[SPL WS2017/18 - Labour Force Participation in Europe]{Labour Force Participation of the Elderly in Europe  - The importance of being healthy}
+\title[SPL WS2017/18 - Labour Force Participation in Europe]{Labour Force Participation of the Elderly 
+in Europe  - The importance of being healthy}
 
 % Define the authors:
 \authora{Phi Nguyen} % a-c
@@ -57,9 +58,9 @@
 \def\linkc{}
 \vspace{2cm}
 % Define the institute:
-\institute{
-Statistical Programming Languages WS2017/2018
- \\\
+\institute{Statistical Programming Languages \\
+WS2017/2018
+ \\
 
 Ladislaus von Bortkiewicz Chair of Statistics \\
 Humboldt--Universität zu Berlin \\}
@@ -79,32 +80,12 @@ Humboldt--Universität zu Berlin \\}
 
 % The titles of the different sections of you talk, can be included via the \section command. The title will be displayed in the upper left corner. To indicate a new section, repeat the \section command with, of course, another section title
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Introduction}
+\section{random}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % (A numbering of the slides can be useful for corrections, especially if you are
 % dealing with large tex-files)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame{
-\frametitle{Basics}
-Statistics is understanding data by modelling it.
-
-Data \( Y^{(n)} = (Y_{1},\ldots,Y_{n}) \) usually \emph{random}.
-
-\( \mathbbm{P} = \mathscr{L}(Y^{(n)}) \), the \emph{unknown} joint distribution.
-
-Statistical problem: to infer on \( \mathbbm{P} \) from the data \( Y^{(n)} \).
-
-\emph{Parametric} modelling:
-\begin{eqnarray*}
-\mathbbm{P} = \mathbbm{P}_{\boldsymbol{\theta}} \in \left\{\mathbbm{P}_{\boldsymbol{\theta}}, \boldsymbol{\theta} \in \Theta \subset \mathbbm{R}^{p}\right\}.
-\end{eqnarray*}
-
-\emph{Nonparametric} modelling:
-the parametric assumption is not fulfilled, or, equivalently,
-\( p = \infty \).
-}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % No number on outline slide
@@ -119,14 +100,9 @@ the parametric assumption is not fulfilled, or, equivalently,
 \frametitle{Outline}
 
 \begin{enumerate}
-\item Attract the audience \quad \checkmark
-\item The scientific message
-\item Explain the method
-\item Simulations \& discussion of your results
-\item Applications and examples
-\item Almost EOT = end of talk
-\item Provoke few questions
-\item Audience: enjoy what you have learnt
+\item Motivation
+\item Background
+\item Current project status
 \end{enumerate}
 }
 
@@ -138,7 +114,7 @@ the parametric assumption is not fulfilled, or, equivalently,
 \setcounter{section}{1}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{LvB Beamer Style}
+\section{Motivation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Subsections are not visible on the actual slide, but are displayed as bookmarks in the pdf file. Their application facilitates an easy navigation trough large pdf files.
@@ -148,11 +124,11 @@ the parametric assumption is not fulfilled, or, equivalently,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \frame{
-\frametitle{The \texttt{Beamer}-Package}
+\frametitle{Labour Force Participation of Elderly in Eurpe}
 
 \begin{itemize}
-\item \texttt{Beamer} is the latest package to create slides with \LaTeX
-\item Slides need to be compiled to PDF, not DVI/Postscript
+\item Changing demographics in Europe as social \& economic challenge 
+\item Health conditions important
 \item Remember: PDFLaTeX accepts PNG, JPEG and PDF not EPS/PS
 \item If you \emph{need} Postscript, RTFM
 \end{itemize}
