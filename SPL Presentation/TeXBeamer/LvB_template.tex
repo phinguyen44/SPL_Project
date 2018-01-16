@@ -33,7 +33,8 @@
 \pgfdeclareimage[height=2cm]{logobig}{hulogo}
 % Supply the correct logo for your class and change the file name to "logo". The logo will appear in the lower
 % right corner:
-\pgfdeclareimage[height=0.7cm]{logosmall}{Figures/qletlogo}
+\pgfdeclareimage[height=0.7cm]{logosmall}{logo}
+
 
 % Title page outline:
 % use this number to modify the scaling of the headline on title page
@@ -42,10 +43,13 @@
 \renewcommand{\titlescale}{.9}
 \renewcommand{\leftcol}{0.6}
 
+
+
 % Define the title.Don't forget to insert an abbreviation instead 
 % of "title for footer". It will appear in the lower left corner:
 \title[SPL WS2017/18 - Labour Force Participation in Europe]{Labour Force Participation of the Elderly 
 in Europe  - The importance of being healthy}
+
 
 % Define the authors:
 \authora{Phi Nguyen} % a-c
@@ -156,7 +160,9 @@ How is the labor force participation behavior of individuals aged 50-64 in 11 Eu
 \frame[containsverbatim]{
 \frametitle{Background}
 Adriaan Kalwij and Frederic Vermeulen (2005), IZA DP No. 1887 \\
-\newblock{\em Labour Force Participation of the Elderlyin Europe: The Importance of Being Healthy} \\
+\newblock{\em 
+Labour Force Participation of the Elderly
+in Europe: The Importance of Being Healthy} \\
 \newblock 
 \begin{itemize}
 \item Use of preliminary data set of wave 1 of SHARE data set
@@ -425,6 +431,7 @@ X.cf   = function(model){
 \begin{figure}[htb]
 	\begin{center}
 	\includegraphics[scale=0.38]{Figures/health}	\end{center}
+
 \end{figure}
 \end{column}
 \end{columns}
@@ -449,6 +456,8 @@ X.cf   = function(model){
 \item Review code to assure coherence between quantlets
 
 \end{itemize}
+	\href{https://github.com/phister/SPL_Project}{\quantnet}
+
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
