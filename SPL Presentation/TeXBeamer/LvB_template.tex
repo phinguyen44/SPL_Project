@@ -104,7 +104,7 @@ Humboldt--Universität zu Berlin \\}
 \frametitle{Outline}
 \begin{enumerate}
 \item Motivation
-\item Background
+\item Background \& Methods
 \item Current project status\
 \begin{center}
 \begin{tabular}{ll}
@@ -139,16 +139,24 @@ Humboldt--Universität zu Berlin \\}
 \frame{
 \frametitle{Labour Force Participation of Elderly in Europe}
 \begin{itemize}
-\item Changing demographics in Europe as social \& economic challenge 
-\item Health conditions  \& wellbeing with important employment implications
-\item  Policy recommendation to improve labor force participation of Elderly
-\\
+\item Changing demographics in Europe: Social, health \& economic challenge 
+\begin{itemize}
+\item  Policy \&  employment implications
+\end{itemize}
+\item SHARE panel database of micro data on health, socio-economic status and social and family networks 
+\begin{itemize}
+\item 120,000 individuals (50+), 27 participating countries
+\item easySHARE as simplified data set
+\end{itemize}
 
 \end{itemize}
-\color{isegreen}
-Research question:  \\
-\color{black}
-How is the labor force participation behavior of individuals aged 50-64 in 11 European countries influenced by different health indicators?
+ 
+\begin{figure}[htb]
+		\includegraphics[scale=0.3]{Figures/easySHARE}	
+\end{figure}	
+\begin{center}
+available on \href{http://www.share-project.org/special-data-sets/easyshare.html}{http://www.share-project.org/}
+\end{center}
 
 }
 
@@ -156,48 +164,26 @@ How is the labor force participation behavior of individuals aged 50-64 in 11 Eu
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Background}
+\section{Background \& Methods}
 \frame[containsverbatim]{
-\frametitle{Background}
+\frametitle{Background and Methods for Quantlets}
 Adriaan Kalwij and Frederic Vermeulen (2005), IZA DP No. 1887 \\
 \newblock{\em 
 Labour Force Participation of the Elderly
 in Europe: The Importance of Being Healthy} \\
 \newblock 
 \begin{itemize}
-\item Use of preliminary data set of wave 1 of SHARE data set
-\item Sample of 12,237 individuals from 11 European countries
+\item How is the labor force participation behavior of individuals aged 50-64 in 11 European countries influenced by different health indicators?
 \item Investigate employment potential of healthy elderly Europeans
 \begin{center}
 \begin{tabular}{ll}
-  Multidimensionality of health\\
-  Great variation across countries \\
-  Declining employment related to declining health
-\end{tabular}
+  Cross-sectional probit regression model (ML estimation) \\
+  Marginal effect at means \& Wald tests \\
+  Counterfactual excercise \\
+  Lack of graphical representation
+  \end{tabular}
 \end{center}
 \end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frame[containsverbatim]{
-\frametitle{SHARE - Survey of Health, Ageing and Retirement in Europe}
-
-\begin{columns}
-\begin{column}{1.0\textwidth}
-\begin{itemize}
-\item Panel database of micro data on health, socio-economic status and social and family networks 
-\item Over 120,000 individuals aged 50 or older 
-\item 27 participating countries
-\item easySHARE as simplified data set containing comprised information of all waves,
-\newblock available on \href{http://www.share-project.org/special-data-sets/easyshare.html}{http://www.share-project.org/}
-\begin{figure}[htb]
-	\begin{flushright}
-	\includegraphics[scale=0.2]{Figures/easySHARE}	\end{flushright}
-\end{figure}
-\end{itemize}
-\end{column}
-\end{columns}
-
 
 }
 
@@ -215,7 +201,6 @@ in Europe: The Importance of Being Healthy} \\
 \item         Quantlet 5: Counterfactual exercise
  \item        Quantlet 6: Graphical representation
 \end{itemize} 
-
 }
 
 
@@ -264,12 +249,13 @@ dummify = function(data.frame) {
         model      = ~ 0 + .                       
         new.df     = model.matrix(model, data.frame)
         new.df     = data.frame(new.df)
-        return(new.df)
+        return(new.df) 
     }
     
-df.splits = lapply(df.splits, dummify)
+df.splits = lapply(df.splits, dummify) 
 
 \end{lstlisting}
+\href{https://github.com/phister/SPL_Project/blob/master/Scripts/ReadAndClean.R}{\quantnet}
 \end{column}
 \end{columns}
 }
@@ -287,6 +273,8 @@ df.splits = lapply(df.splits, dummify)
 \item Prints tables into readable html format
 
 \end{itemize} 
+\href{https://github.com/phister/SPL_Project/blob/master/Scripts/SummaryStatistics.R}{\quantnet}
+
 
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -315,6 +303,8 @@ df.splits = lapply(df.splits, dummify)
 \item Wald test using own-built Wald test
 
 \end{itemize} 
+\href{https://github.com/phister/SPL_Project/blob/master/Scripts/ProbitRegression.R}{\quantnet}
+
 
 \begin{columns}
 \begin{column}{0.95\textwidth}
@@ -331,6 +321,7 @@ allSummaries = lapply(allModels, summary)
 
 
 \end{lstlisting}
+\href{https://github.com/phister/SPL_Project/blob/master/Scripts/ProbitRegression.R}{\quantnet}
 \end{column}
 \end{columns}
 
@@ -359,6 +350,7 @@ for(i in 1:length(allSummaries)){
 
 
 \end{lstlisting}
+\href{https://github.com/phister/SPL_Project/blob/master/Scripts/ProbitRegression.R}{\quantnet}
 \end{column}
 \end{columns}
 
@@ -371,7 +363,8 @@ for(i in 1:length(allSummaries)){
 \begin{itemize}
 \item Wald test for joint significance of regression coefficients
 \end{itemize} 
-
+\href{https://github.com/phister/SPL_Project/blob/master/Scripts/LoadWald.R}{\quantnet}
+\vspace{-0.3cm}
 \begin{columns}
 \begin{column}{1.0\textwidth}
 \begin{lstlisting}
@@ -388,10 +381,10 @@ W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
     joint.wald.test[1] = "Chi2 test"
     joint.wald.test[2] = format(   W, digits = 4)
 
-
 \end{lstlisting}
 \end{column}
 \end{columns}
+
 
 
 }
@@ -406,6 +399,7 @@ W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
 \item Calculate decline in participation due to decline in health condition
 
 \end{itemize} 
+\href{https://github.com/phister/SPL_Project/blob/master/Scripts/Counterfactual.R}{\quantnet}
 
 \begin{columns}
 \begin{column}{1.0\textwidth}
@@ -433,6 +427,7 @@ X.cf   = function(model){
 	\includegraphics[scale=0.38]{Figures/health}	\end{center}
 
 \end{figure}
+\href{https://github.com/phister/SPL_Project/blob/master/Scripts/Graphics.R}{\quantnet}
 \end{column}
 \end{columns}
 

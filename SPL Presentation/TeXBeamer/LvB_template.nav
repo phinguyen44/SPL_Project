@@ -12,16 +12,14 @@
 \headcommand {\beamer@subsectionentry {0}{2}{1}{1}{General ideas}}\headcommand {\beamer@subsectionpages {2}{0}}
 \headcommand {\slideentry {2}{1}{1}{1/1}{General ideas}{0}}
 \headcommand {\beamer@framepages {1}{1}}
-\headcommand {\sectionentry {3}{Background}{2}{Background}{0}}
+\headcommand {\sectionentry {3}{Background \& Methods}{2}{Background \& Methods}{0}}
 \headcommand {\beamer@sectionpages {2}{1}}
 \headcommand {\beamer@subsectionpages {1}{1}}
 \headcommand {\slideentry {3}{0}{1}{1/1}{}{0}}
 \headcommand {\beamer@framepages {1}{1}}
-\headcommand {\slideentry {3}{0}{2}{2/2}{}{0}}
-\headcommand {\beamer@framepages {2}{2}}
-\headcommand {\sectionentry {4}{Current project status}{3}{Current project status}{0}}
-\headcommand {\beamer@sectionpages {2}{2}}
-\headcommand {\beamer@subsectionpages {2}{2}}
+\headcommand {\sectionentry {4}{Current project status}{2}{Current project status}{0}}
+\headcommand {\beamer@sectionpages {2}{1}}
+\headcommand {\beamer@subsectionpages {2}{1}}
 \headcommand {\slideentry {4}{0}{1}{1/1}{}{0}}
 \headcommand {\beamer@framepages {1}{1}}
 \headcommand {\slideentry {4}{0}{2}{2/2}{}{0}}
@@ -43,12 +41,12 @@
 \headcommand {\slideentry {4}{0}{10}{10/10}{}{0}}
 \headcommand {\beamer@framepages {10}{10}}
 \headcommand {\sectionentry {5}{Next steps}{11}{Next steps}{0}}
-\headcommand {\beamer@sectionpages {3}{10}}
-\headcommand {\beamer@subsectionpages {3}{10}}
+\headcommand {\beamer@sectionpages {2}{10}}
+\headcommand {\beamer@subsectionpages {2}{10}}
 \headcommand {\slideentry {5}{0}{1}{1/1}{}{0}}
 \headcommand {\beamer@framepages {1}{1}}
 \headcommand {\beamer@partpages {1}{1}}
 \headcommand {\beamer@subsectionpages {11}{1}}
 \headcommand {\beamer@sectionpages {11}{1}}
 \headcommand {\beamer@documentpages {1}}
-\headcommand {\def \inserttotalframenumber {16}}
+\headcommand {\def \inserttotalframenumber {15}}
