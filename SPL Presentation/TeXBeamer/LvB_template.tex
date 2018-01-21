@@ -243,16 +243,16 @@ df.splits = lapply(splits, standardize.df)
 \begin{lstlisting}
 # Create necessary dummary variables for regression
 
-dummify = function(data.frame) {
-        data.frame = data.frame %>%
+ dummify = function(df) {
+        df = df %>%
             dplyr::select(-country, -gender)       
-        model      = ~ 0 + .                       
-        new.df     = model.matrix(model, data.frame)
+        model      = ~ 0 + .                        
+        new.df     = model.matrix(model, df)
         new.df     = data.frame(new.df)
-        return(new.df) 
+        return(new.df)
     }
-    
-df.splits = lapply(df.splits, dummify) 
+
+df.splits = lapply(df.splits, dummify)
 
 \end{lstlisting}
 \href{https://github.com/phister/SPL_Project/blob/master/Scripts/ReadAndClean.R}{\quantnet}
