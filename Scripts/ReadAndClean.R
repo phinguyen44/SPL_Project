@@ -177,11 +177,11 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     df.splits = lapply(splits, standardize.df)
 
     # Create necessary dummary variables for regression
-    dummify = function(data.frame) {
-        data.frame = data.frame %>%
+    dummify = function(df) {
+        df = df %>%
             dplyr::select(-country, -gender)        # remove country/gender
         model      = ~ 0 + .                        # needed to remove intercept
-        new.df     = model.matrix(model, data.frame)# create dummies
+        new.df     = model.matrix(model, df)# create dummies
         new.df     = data.frame(new.df)
         return(new.df)
     }
