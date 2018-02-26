@@ -117,16 +117,13 @@ Berlin, 2018-03-15 \linebreak
 - especially: introduce graphical visualization tools for descriptive statistics -> ease interpretation of variables
 - our aim: write code in a way that allows the user to work with easySHARE data set, even when working on different question
 
-\section{Theory and Design}
-- probit regression
-- marginal effects
-- wald test
-- counterfactual exercise
+\newpage
 
-\section{Implementation}
+\section{Panel data cleaning and subsetting}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
 
-\section{Empirical Results}
-\section{Data cleaning and subsetting}
 
 The easySHARE dataset released in spring 2017 is a panel dataset of 108 variables of more than 100.000 individuals covering data from six survey waves carried out between 2004 and 2005. As we are only concerned with a small subset of observations, an important task was to define appropriate functions for subsetting. In oder to make our subsetting process understandable to readers, we decided on using pipe-operator. This allows us to apply the filter and select option in a clever way, where we can select different criteria at once. 
 
@@ -149,12 +146,39 @@ The resulting dataframe containes XXX observations of YYY variables.
 - create country list with all countries in study (not Israel)
 - defined dummies
 
+\section{Multidisciplinary and crossnational summary statistics}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
 \newpage
 
-\subsection{Summary statistics}
-\subsection{Estimation results}
+\section{Crosssectional probit regression}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
+\newpage
+
 \subsection{Counterfactual exercise}
+\section{Panel data cleaning and subsetting}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
+\newpage
+
 \subsection{Graphical representation}
+\section{Panel data cleaning and subsetting}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
+\newpage
 
 
 \section{Conclusion}
