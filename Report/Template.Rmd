@@ -1,52 +1,133 @@
 ---
 title: "Analysis and Graphical Representation of Health and  
 Labour Force Participation among the Elderly in Europe"
-output: 
-  pdf_document:
-    citation_package: natbib
-  toc: yes
-  toc_depth: 3
-  number_sections: true
-author:
-- "Phi Nguyen"
-- "Julian Winkel"
-- "Claudia Guenther"
-date: "`r format(Sys.time(), '%B %d, %Y')`"
-geometry: margin=1in
-fontfamily: mathpazo
-fontsize: 12pt
-spacing: double
-bibliography: ~/Dropbox/master.bib
-biblio-style: apsr
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{amsmath}
+  - \usepackage{float}
+  - \usepackage{hyperref}
+  - \usepackage{setspace}
+  - \usepackage{booktabs}
+  - \onehalfspacing
+output: pdf_document
+latex_engine: lualatex
+geometry: margin = 2.5cm
+bibliography: references.bib
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, eval = TRUE, echo = FALSE, include = FALSE, cache = TRUE}
+
+wd = paste0(Sys.getenv("USERPROFILE"), "/SPL_Project")
+knitr::opts_knit$set(root.dir = wd)
+
 ```
 
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H')
+
+```
+\pagenumbering{gobble}
 
 
-# Introduction
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+            {-2.5ex\@plus -1ex \@minus -.25ex}%
+            {1.25ex \@plus .25ex}%
+            {\normalfont\normalsize\bfseries}}
+\makeatother
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}    
+
+\bigskip
+
+\begin{center}
+
+
+Humboldt-Universität zu Berlin \linebreak     
+School of Business and Economics  \linebreak
+Ladislaus von Bortkiewicz Chair of Statistics   \linebreak
+\medskip
+
+
+\includegraphics[width=0.2\textwidth]{HU_Logo_small.png}
+
+
+\textbf{Statistical Programming Languages} \linebreak
+Winter 2017/18
+
+\medskip
+
+
+Seminar Paper by  \linebreak  
+
+\textbf{Claudia Günther, Phi Nguyen, Julian Winkel}  \linebreak  
+576419, 526624, 562959 \linebreak
+
+\medskip
+
+\medskip
+
+
+Berlin, 2018-03-15 \linebreak
+
+\end{center}
+
+\medskip
+
+\medskip
+
+\newpage
+
+\listoftables
+
+\newpage
+
+\listoffigures
+
+\newpage
+
+
+\begin{Large}
+\textbf{Abbreviations} \linebreak
+\end{Large}
+
+\begin{tabular}{ll}
+\textbf{XX} & XXXXXXXXXX     \\
+
+\end{tabular}
+
+
+\newpage
+
+\pagenumbering{arabic}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
 - relevance of exploring relationship between health and labour force participation due to changing demographic in Europe
 - cite relevant study about ageing 
-- 1-2 sentences about relevant papers exploring relationship -> use paper from DIW
+- few sentences about relevant papers exploring relationship -> use paper from DIW
+- very short literature overview on relationship between health and labour force participation
 - share data set as rich data set for this purpose: 2 sentences about it
 - introduction of journal article 
 - our approach: replicate results an enrich analysis
 - especially: introduce graphical visualization tools for descriptive statistics -> ease interpretation of variables
 - our aim: write code in a way that allows the user to work with easySHARE data set, even when working on different question
 
+\section{Theory and Design}
+- probit regression
+- marginal effects
+- wald test
+- counterfactual exercise
 
-# Theory and Desgin
-- very short literature overview on relationship between health and labour force participation
-- 
+\section{Implementation}
 
--
-# Implementation
+\section{Empirical Results}
+\section{Data cleaning and subsetting}
 
-# Empirical Study
-
-## Data cleaning and subgrouping
 The easySHARE dataset released in spring 2017 is a panel dataset of 108 variables of more than 100.000 individuals covering data from six survey waves carried out between 2004 and 2005. As we are only concerned with a small subset of observations, an important task was to define appropriate functions for subsetting. In oder to make our subsetting process understandable to readers, we decided on using pipe-operator. This allows us to apply the filter and select option in a clever way, where we can select different criteria at once. 
 
 -> code sniplet here
@@ -63,24 +144,51 @@ Since the study carried out by Kalwij and Vermeulen (2005) is based on the use o
 
 The resulting dataframe containes XXX observations of YYY variables.  
 
-
 - coded countries in more readable manner
 - use packe ddd -> match offical ISO code with country name
 - create country list with all countries in study (not Israel)
 - defined dummies
 
+\newpage
+
+\subsection{Summary statistics}
+\subsection{Estimation results}
+\subsection{Counterfactual exercise}
+\subsection{Graphical representation}
 
 
-```{r cars}
-summary(cars)
-```
+\section{Conclusion}
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+\newpage
+
+\section{References}
+
+
+<div id="refs"></div>
+
+
+\newpage
+
+\begin{Large}
+\textbf{Declaration of Authorship}
+\end{Large}
+
+\bigskip
+\bigskip
+
+We hereby confirm that we have authored this Seminar paper independently and without use
+of others than the indicated sources. All passages which are literally or in general matter taken
+out of publications or other sources are marked as such.
+\bigskip
+
+Berlin, 2018-03-15 
+
+\smallskip
+
+Claudia Günther, Phi Nguyen, Julian Winkel
+\bigskip
+
