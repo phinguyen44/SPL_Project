@@ -1,0 +1,218 @@
+---
+title: "Analysis and Graphical Representation of Health and  
+Labour Force Participation among the Elderly in Europe"
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{amsmath}
+  - \usepackage{float}
+  - \usepackage{hyperref}
+  - \usepackage{setspace}
+  - \usepackage{booktabs}
+  - \onehalfspacing
+output: pdf_document
+latex_engine: lualatex
+geometry: margin = 2.5cm
+bibliography: references.bib
+---
+
+```{r, eval = TRUE, echo = FALSE, include = FALSE, cache = TRUE}
+
+wd = paste0(Sys.getenv("USERPROFILE"), "/SPL_Project")
+knitr::opts_knit$set(root.dir = wd)
+
+```
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H')
+
+```
+\pagenumbering{gobble}
+
+
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+            {-2.5ex\@plus -1ex \@minus -.25ex}%
+            {1.25ex \@plus .25ex}%
+            {\normalfont\normalsize\bfseries}}
+\makeatother
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}    
+
+\bigskip
+
+\begin{center}
+
+
+Humboldt-Universität zu Berlin \linebreak     
+School of Business and Economics  \linebreak
+Ladislaus von Bortkiewicz Chair of Statistics   \linebreak
+\medskip
+
+
+\includegraphics[width=0.2\textwidth]{HU_Logo_small.png}
+
+
+\textbf{Statistical Programming Languages} \linebreak
+Winter 2017/18
+
+\medskip
+
+
+Seminar Paper by  \linebreak  
+
+\textbf{Claudia Günther, Phi Nguyen, Julian Winkel}  \linebreak  
+576419, 526624, 562959 \linebreak
+
+\medskip
+
+\medskip
+
+
+Berlin, 2018-03-15 \linebreak
+
+\end{center}
+
+\medskip
+
+\medskip
+
+\newpage
+
+\listoftables
+
+\newpage
+
+\listoffigures
+
+\newpage
+
+
+\begin{Large}
+\textbf{Abbreviations} \linebreak
+\end{Large}
+
+\begin{tabular}{ll}
+\textbf{XX} & XXXXXXXXXX     \\
+
+\end{tabular}
+
+
+\newpage
+
+\pagenumbering{arabic}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+- relevance of exploring relationship between health and labour force participation due to changing demographic in Europe
+- cite relevant study about ageing 
+- few sentences about relevant papers exploring relationship -> use paper from DIW
+- very short literature overview on relationship between health and labour force participation
+- share data set as rich data set for this purpose: 2 sentences about it
+- introduction of journal article 
+- our approach: replicate results an enrich analysis
+- especially: introduce graphical visualization tools for descriptive statistics -> ease interpretation of variables
+- our aim: write code in a way that allows the user to work with easySHARE data set, even when working on different question
+
+\newpage
+
+\section{Panel data cleaning and subsetting}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
+The easySHARE dataset released in spring 2017 is a panel dataset of 108 variables of more than 100.000 individuals covering data from six survey waves carried out between 2004 and 2005. As we are only concerned with a small subset of observations, an important task was to define appropriate functions for subsetting. In oder to make our subsetting process understandable to readers, we decided on using pipe-operator. This allows us to apply the filter and select option in a clever way, where we can select different criteria at once. 
+
+-> code sniplet here
+
+In this example, we first filter for participation in wave 1 and the age group between 50 and 64 and the select the desired variables as described in Kalwij and Vermeulen (2005).
+
+Although the overall response rate in the SHARE are comparably high, the data set still has numerous missing values. The reason for this is due to the fact that the study was carried out on a crossnational scale, with some national survey institutions deciding not to participate in all survey modules. This means that the majority of missing values are to be found within observations that have missing values for entire survey modules or waves. The reason for the missing values are documented well in the "Guide to easySHARE release 6.0.0" and specifically coded. For example, the numbers -13 and -14 refer to “not asked in this wave” and “not asked in this country”. Since this coding scheme is not useful for the purpose of our analysis, we decided on recoding all of the missing values as "NA". To this end, we defined a function based on the missing codes provided by SHARE that finds the NAs in the data and declares them as such. 
+
+-> code snipet here
+
+Since the study carried out by Kalwij and Vermeulen (2005) is based on the use of mostly binary data, we needed to construct numerous dummies based on the orginal data. 
+
+-> code snipet here
+
+The resulting dataframe containes XXX observations of YYY variables.  
+
+- coded countries in more readable manner
+- use packe ddd -> match offical ISO code with country name
+- create country list with all countries in study (not Israel)
+- defined dummies
+
+\section{Multidisciplinary and crossnational summary statistics}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
+\newpage
+
+\section{Crosssectional probit regression}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
+\newpage
+
+\subsection{Counterfactual exercise}
+\section{Panel data cleaning and subsetting}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
+\newpage
+
+\subsection{Graphical representation}
+\section{Panel data cleaning and subsetting}
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
+\newpage
+
+
+\section{Conclusion}
+
+
+
+
+
+\newpage
+
+\section{References}
+
+
+<div id="refs"></div>
+
+
+\newpage
+
+\begin{Large}
+\textbf{Declaration of Authorship}
+\end{Large}
+
+\bigskip
+\bigskip
+
+We hereby confirm that we have authored this Seminar paper independently and without use
+of others than the indicated sources. All passages which are literally or in general matter taken
+out of publications or other sources are marked as such.
+\bigskip
+
+Berlin, 2018-03-15 
+
+\smallskip
+
+Claudia Günther, Phi Nguyen, Julian Winkel
+\bigskip
+
