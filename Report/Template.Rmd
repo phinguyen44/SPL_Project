@@ -120,6 +120,7 @@ Berlin, 2018-03-15 \linebreak
 \newpage
 
 \section{Panel data cleaning and subsetting}
+PHI
 \subsection{Theory and Design}
 \subsection{Implementation}
 \subsection{Empirical Results}
@@ -147,6 +148,7 @@ The resulting dataframe containes XXX observations of YYY variables.
 - defined dummies
 
 \section{Multidisciplinary and crossnational summary statistics}
+JULIAN
 \subsection{Theory and Design}
 \subsection{Implementation}
 \subsection{Empirical Results}
@@ -155,6 +157,7 @@ The resulting dataframe containes XXX observations of YYY variables.
 \newpage
 
 \section{Crosssectional probit regression}
+JULIAN
 \subsection{Theory and Design}
 \subsection{Implementation}
 \subsection{Empirical Results}
@@ -162,8 +165,15 @@ The resulting dataframe containes XXX observations of YYY variables.
 
 \newpage
 
-\subsection{Counterfactual exercise}
-\section{Panel data cleaning and subsetting}
+\section{Wald Test}
+CLAUDIA
+\subsection{Theory and Design}
+\subsection{Implementation}
+\subsection{Empirical Results}
+
+
+\section{Counterfactual exercise}
+CLAUDIA
 \subsection{Theory and Design}
 \subsection{Implementation}
 \subsection{Empirical Results}
@@ -171,8 +181,8 @@ The resulting dataframe containes XXX observations of YYY variables.
 
 \newpage
 
-\subsection{Graphical representation}
-\section{Panel data cleaning and subsetting}
+\section{Graphical representation}
+PHI
 \subsection{Theory and Design}
 \subsection{Implementation}
 \subsection{Empirical Results}
