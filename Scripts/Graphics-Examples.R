@@ -49,7 +49,10 @@ if(!all(allPackages)) {
 lapply(neededPackages, library, character.only = TRUE)
 
 ################################################################################
-# EXAMPLES
+# EXAMPLE 1
+
+################################################################################
+# EXAMPLE 2
 
 health.distribution('age')
 health.distribution('age', gen = 'FEMALE')
