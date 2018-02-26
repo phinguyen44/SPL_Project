@@ -53,20 +53,18 @@ health.gridmap = function(xvar, facetting) {
         Y = c(1, 4, 6, 6, 3, 3, 3, 5, 7, 8, 9, 5, 6, 1, 4, 9, 7, 4, 7, 7, 5, 3,
               2, 6, 9, 6, 4, 4, 4, 7, 3, 5, 3, 4, 9, 5, 2, 5, 7
               ), 
-        InSet = c("FALSE", "TRUE", "FALSE", "TRUE", "FALSE", "FALSE", 
-                  "FALSE", "FALSE", "TRUE", "FALSE", "FALSE", "TRUE", "TRUE",
-                  "TRUE", "FALSE", "FALSE", "FALSE", "TRUE", "FALSE", "FALSE",
-                  "FALSE", "FALSE", "FALSE", "TRUE", "FALSE", "FALSE", "FALSE",
-                  "FALSE", "FALSE", "FALSE", "FALSE", "FALSE", "FALSE", "TRUE",
-                  "TRUE", "TRUE", "FALSE", "FALSE", "FALSE"
+        InSet = c(FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, 
+                  FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, TRUE,
+                  TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE,
+                  FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE,
+                  FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE,
+                  TRUE, TRUE, FALSE, FALSE, FALSE
                   )
         ), 
         .Names = c("Country", "X", "Y", "InSet"), 
         row.names = c(NA, -39L), 
         class = c("tbl_df", "tbl", "data.frame")
     )
-    
-    coordinates['InSet'] <- ifelse(coordinates$Country %in% as.character(unique(df.out$country)), "TRUE", "FALSE")
 
     
 ###### VIEW DISTRIBUTION OF NUMERIC VARIABLES
