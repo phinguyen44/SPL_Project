@@ -68,16 +68,12 @@ ggsave("Output/gridmap_laborhrs_byage.png", plot=example5, width=12,
 
 health.distribution('age')
 health.distribution('age', gen = 'FEMALE')
-
 health.distribution('h_chronic', gen = 'MALE', remove.outliers = FALSE)
 
 countries = c('Germany', 'Switzerland', 'Austria')
 health.distribution('children', gen = 'FEMALE', countries = countries)
-
 health.distribution('h_maxgrip', gen = 'MALE')
-
 health.distribution('h_depression')
-
 health.distribution('h_perceived', remove.outliers = FALSE)
 
 ggsave("Output/healthdistribution.png", plot = last_plot(), width = 8, 

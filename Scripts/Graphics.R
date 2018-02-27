@@ -415,4 +415,3 @@ health.distribution = function(xvar,
     
     return(plot.bar)
 }
-
