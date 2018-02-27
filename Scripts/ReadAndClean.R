@@ -26,8 +26,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     }
 
     # Load all defined packages
-    lapply(neededPackages, function(x) suppressPackageStartupMessages(
-        library(x, character.only = TRUE)))
+    invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
+        library(x, character.only = TRUE))))
 
     # Load dataset
     cat("Loading data set...", sep = "\n")
@@ -37,6 +37,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     rm(easySHARE_rel6_0_0)
     
     rows.dat.input = nrow(dat.input)
+
+    if (!(wav %in% 1:6)) stop('Out of bounds. Select a value between 1 and 6')
 
     ############################################################################
     # ENCODE MISSING VALUES
