@@ -166,8 +166,24 @@ JULIAN
 \newpage
 
 \section{Wald Test}
-CLAUDIA
-\subsection{Theory and Design}
+
+
+\subsection{Theory and Design} In the context of probit regression, the Wald
+test can be used to test both single and multiple hypothesis on the model
+parameters. For example, it can be used to test whether the fit of the model is improved if a subset of regression coefficients are all set equal to zero. In the context of probit regression, the Wald statistic for testing hypothesis regardinf our $k \times 1$ coefficient $\beta$ is given by
+$$
+W = c(\hat{\beta})'[\nabla_{\beta}c(\hat{\beta})\hat{V}\nabla_{\beta}c(\hat{\beta})]^{-1}c(\hat{\beta})$$
+where $c(\hat{\beta})$ is a $m \times 1$ vector of linear or nonlinear restrictions, $\nabla_{\beta}c(\hat{\beta})$ is the $m \times k$ Jacobian of $c(\hat{\beta})$ evaluated
+at $\hat{\beta}$ and $\hat{V}$ is the estimated covariance matrix [@wooldridge2010econometric, 463]. Under H0, the Wald test statistic is approximately $\chi2_m$ distributed, with m being the number of specified restrictions. We can formulate our hypothesis in accordance with structure of
+$R \hat{\beta} = r$ to facilitate the derivation of our test statistics where XXX. The Wald statistic can then be rewritten as
+$$    W = (R \hat{\beta} - r)'[R \hat{V}R']^{-1}(R \hat{\beta} - r)
+$$
+where R is the Jacobian matrix of size $m \times k$, r is restriction function size $m \times 1$. For the case where we are testing the single hypothesis of the joint significance of a subset of coefficients, the test statistic can be even more simplified: 
+ $$   W = \hat{\beta}_s'[\hat{V}]^{-1}\hat{\beta}_s
+ $$
+The nullhypothesis in this case is that all parameters in the vector $\beta_s$ are jointly equal to zero, where the test statistic is approximately $\chi2_1$. 
+
+
 \subsection{Implementation}
 \subsection{Empirical Results}
 
