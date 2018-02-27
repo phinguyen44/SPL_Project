@@ -7,7 +7,8 @@
 # 
 # health.gridmap(xvar, facetting): generate a tile grid map by a variable in
 # dataset, facetted by either gender or age. if numeric than average is
-# calculated. if logical than % is calculated
+# calculated. if logical than % is calculated. returns a grid object, which
+# can be printed to device with grid.draw() or saved with ggsave()
 # 
 # health.distribution(xvar, gen, countries, remove.outliers): show distribution
 # of numeric variable in dataset, facetted by gender and country.
@@ -24,12 +25,11 @@
 # return error if neither 'gender' or 'age' is inputted
 
 # output side by side grid maps
-
 health.gridmap = function(xvar, facetting) {
     
     # List all packages needed for session
     neededPackages = c("dplyr", "ggplot2", "countrycode", 
-                       "gridExtra", "infuser")
+                       "gridExtra", "grid", "infuser")
     allPackages    = c(neededPackages %in% installed.packages()[ , "Package"]) 
     
     # Install packages (if not already installed) 
@@ -43,10 +43,12 @@ health.gridmap = function(xvar, facetting) {
     invisible(lapply(neededPackages, library, character.only = TRUE))
     
     # first convert age to numeric, not factor variable
-    df.out$age = as.numeric(levels(df.out$age)[df.out$age])
+    if (is.factor(df.out$age)) {
+        df.out$age = as.numeric(levels(df.out$age)[df.out$age])
+    }
     
     # STOPPING CONDITIONS
-    if (!is.numeric(df.out[[xvar]]) | !is.logical(df.out[[xvar]])) {
+    if (!is.numeric(df.out[[xvar]]) & !is.logical(df.out[[xvar]])) {
         stop("'xvar' must be numeric or logical")
     }
     if (!(facetting %in% c('gender', 'age'))) {
@@ -91,16 +93,14 @@ health.gridmap = function(xvar, facetting) {
         dplyr::select(Country, iso3c, X, Y) 
     
     # plot function to be used later
-    # TODO:FIX GRAPH RANGE and COLORS
     plot_function = function(df) {
+        
         p = ggplot(data = df, aes(x = X, y = Y)) +
             geom_tile(aes(fill = get(xvar), color = ""), 
                       color = "white", size = 0.6) +
             geom_text(aes(label = iso3c), color = "white") +
             geom_text(aes(label = round(get(xvar), 2)), vjust = 2, 
-                      color = "white", size = 3.5, na.rm = TRUE) +
-            scale_fill_continuous(low = "#fdd49e", high = "#b30000", 
-                                  na.value = "#CCCCCC", limits = c(0,1)) + 
+                      color = "white", size = 3, na.rm = TRUE) +
             coord_fixed(ratio = 1) +
             theme_minimal() +
             theme(axis.line        = element_blank(),
@@ -116,10 +116,12 @@ health.gridmap = function(xvar, facetting) {
     }
     
     # IF GENDER SELECTED:
-    if (facetting = 'gender') {
+    if (facetting == 'gender') {
         
         # if logical than calculate percentage
         if (is.logical(df.out[[xvar]])) {
+            
+            var.type = '% with'
             
             df.graph = df.out %>% 
                 dplyr::select(country, gender, `xvar`) %>% 
@@ -127,15 +129,13 @@ health.gridmap = function(xvar, facetting) {
                 summarize(value = sum(get(xvar))/length(get(xvar)))
             names(df.graph)[3] = xvar
             
-            groupings = split(df.graph, df.graph$gender, drop = TRUE)
-            
             # split by gender
             df.m = df.graph %>% 
                 filter(gender == "MALE")
             df.f = df.graph %>% 
                 filter(gender == "FEMALE")
             df.m = suppressWarnings(
-                full_join(df.codes, df.m, c('Country' = 'country'))) %>%
+                left_join(df.codes, df.m, c('Country' = 'country'))) %>%
                 dplyr::select(iso3c, X, Y, `xvar`)
             df.f = suppressWarnings(
                 left_join(df.codes, df.f, c('Country' = 'country'))) %>%
@@ -145,6 +145,8 @@ health.gridmap = function(xvar, facetting) {
         # if numeric than calculate average
         if (is.numeric(df.out[[xvar]])) {
             
+            var.type = 'Avg.'
+            
             df.graph = df.out %>% 
                 dplyr::select(country, gender, `xvar`) %>% 
                 group_by(country, gender) %>% 
@@ -152,34 +154,148 @@ health.gridmap = function(xvar, facetting) {
             names(df.graph)[3] = xvar
             
             # split by gender
-            groupings = split(df.graph, df.graph$gender, drop = TRUE)
+            df.m = df.graph %>% 
+                filter(gender == "MALE")
+            df.f = df.graph %>% 
+                filter(gender == "FEMALE")
+            df.m = suppressWarnings(
+                left_join(df.codes, df.m, c('Country' = 'country'))) %>%
+                dplyr::select(iso3c, X, Y, `xvar`)
+            df.f = suppressWarnings(
+                left_join(df.codes, df.f, c('Country' = 'country'))) %>%
+                dplyr::select(iso3c, X, Y, `xvar`)
         }
+        
+        # set equal range for color scales
+        minval = min(df.f[[xvar]], df.m[[xvar]], na.rm = TRUE)
+        maxval = max(df.f[[xvar]], df.m[[xvar]], na.rm = TRUE)
         
         # PLOT
         output = lapply(list(df.m, df.f), plot_function)
         output[[1]] = output[[1]] + 
-            labs(title    = infuse("Percentage of {{metric}} for {{split}}", 
-                                   metric = xvar, split = 'male'),
-                 fill     = xvar)
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}", 
+                                   intro = var.type, metric = xvar, 
+                                   split = 'male'),
+                 fill     = xvar) + 
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04", 
+                                  na.value = "#CCCCCC", 
+                                  limits = c(minval, maxval))
         output[[2]] = output[[2]] + 
-            labs(title    = infuse("Percentage of {{metric}} for {{split}}", 
-                                   metric = xvar, split = 'female'),
-                 fill     = xvar)
-        output
-        
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}", 
+                                   intro = var.type, metric = xvar, 
+                                   split = 'female'),
+                 fill     = xvar) + 
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04", 
+                                  na.value = "#CCCCCC", 
+                                  limits = c(minval, maxval))
+        return(arrangeGrob(output[[1]], output[[2]], ncol = 2))
     }
     
     # IF AGE SELECTED:
-    if (facetting = 'age') {
+    if (facetting == 'age') {
+        
+        # if logical than calculate percentage
+        if (is.logical(df.out[[xvar]])) {
+            
+            var.type = '% with'
+            
+            # split by age group
+            df50 = df.out %>% 
+                filter(age50_54 == TRUE) %>% 
+                group_by(country) %>% 
+                summarize(value = sum(get(xvar))/length(get(xvar)))
+            df50 = suppressWarnings(
+                right_join(df50, df.codes, c('country' = 'Country'))) %>% 
+                dplyr::select(iso3c, X, Y, value)
+            names(df50)[4] = xvar
+            
+            df55 = df.out %>% 
+                filter(age55_59 == TRUE) %>% 
+                group_by(country) %>% 
+                summarize(value = sum(get(xvar))/length(get(xvar)))
+            df55 = suppressWarnings(
+                right_join(df55, df.codes, c('country' = 'Country'))) %>% 
+                dplyr::select(iso3c, X, Y, value)
+            names(df55)[4] = xvar
+            
+            df60 = df.out %>% 
+                filter(age60_64 == TRUE) %>% 
+                group_by(country) %>% 
+                summarize(value = sum(get(xvar))/length(get(xvar)))
+            df60 = suppressWarnings(
+                right_join(df60, df.codes, c('country' = 'Country'))) %>% 
+                dplyr::select(iso3c, X, Y, value)
+            names(df60)[4] = xvar
+        }
+        
+        # if numeric than calculate average
+        if (is.numeric(df.out[[xvar]])) {
+            
+            var.type = 'Avg.'
+            
+            # split by age group
+            df50 = df.out %>% 
+                filter(age50_54 == TRUE) %>% 
+                group_by(country) %>% 
+                summarize(value = mean(get(xvar)))
+            df50 = suppressWarnings(
+                right_join(df50, df.codes, c('country' = 'Country'))) %>% 
+                dplyr::select(iso3c, X, Y, value)
+            names(df50)[4] = xvar
+            
+            df55 = df.out %>% 
+                filter(age55_59 == TRUE) %>% 
+                group_by(country) %>% 
+                summarize(value = mean(get(xvar)))
+            df55 = suppressWarnings(
+                right_join(df55, df.codes, c('country' = 'Country'))) %>% 
+                dplyr::select(iso3c, X, Y, value)
+            names(df55)[4] = xvar
+            
+            df60 = df.out %>% 
+                filter(age60_64 == TRUE) %>% 
+                group_by(country) %>% 
+                summarize(value = mean(get(xvar)))
+            df60 = suppressWarnings(
+                right_join(df60, df.codes, c('country' = 'Country'))) %>% 
+                dplyr::select(iso3c, X, Y, value)
+            names(df60)[4] = xvar
+        }
+        
+        # set equal range for color scales
+        minval = min(df50[[xvar]], df55[[xvar]], df60[[xvar]], na.rm = TRUE)
+        maxval = max(df50[[xvar]], df55[[xvar]], df60[[xvar]], na.rm = TRUE)
+        
+        # PLOT
+        output = lapply(list(df50, df55, df60), plot_function)
+        output[[1]] = output[[1]] + 
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}", 
+                                   intro = var.type, metric = xvar, 
+                                   split = 'age50_54'),
+                 fill     = xvar) +
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04", 
+                                  na.value = "#CCCCCC", 
+                                  limits = c(minval, maxval))
+        output[[2]] = output[[2]] + 
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}", 
+                                   intro = var.type, metric = xvar, 
+                                   split = 'age55_59'),
+                 fill     = xvar) +
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04", 
+                                  na.value = "#CCCCCC", 
+                                  limits = c(minval, maxval))
+        output[[3]] = output[[3]] + 
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}", 
+                                   intro = var.type, metric = xvar, 
+                                   split = 'age60_64'),
+                 fill     = xvar) + 
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04", 
+                                  na.value = "#CCCCCC", 
+                                  limits = c(minval, maxval))
+       
+        return(arrangeGrob(output[[1]], output[[2]], output[[3]], ncol = 3))
         
     }
-
-    
-    
-
-    
-    
-    
 }
 
     
@@ -211,7 +327,9 @@ health.distribution = function(xvar,
     suppressMessages(lapply(neededPackages, library, character.only = TRUE))
     
     # first convert age to numeric, not factor variable
-    df.out$age = as.numeric(levels(df.out$age)[df.out$age])
+    if (is.factor(df.out$age)) {
+        df.out$age = as.numeric(levels(df.out$age)[df.out$age])
+    }
     
     # STOPPING CONDITIONS
     if (!is.numeric(df.out[[xvar]])) stop("'xvar' must be numeric")
@@ -297,3 +415,4 @@ health.distribution = function(xvar,
     
     return(plot.bar)
 }
+

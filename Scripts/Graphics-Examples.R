@@ -51,6 +51,18 @@ lapply(neededPackages, library, character.only = TRUE)
 ################################################################################
 # EXAMPLE 1
 
+example1 <- health.gridmap('h_obese', 'gender')
+example2 <- health.gridmap('h_goodsp', 'age')
+example3 <- health.gridmap('h_depression', 'age')
+example4 <- health.gridmap('h_chronic', 'gender')
+example5 <- health.gridmap('labor_hrs', 'age')
+
+grid.draw(example3)
+dev.off()
+grid.draw(example5)
+ggsave("Output/gridmap_laborhrs_byage.png", plot=example5, width=12, 
+       height=8, units="in")
+
 ################################################################################
 # EXAMPLE 2
 
@@ -68,4 +80,5 @@ health.distribution('h_depression')
 
 health.distribution('h_perceived', remove.outliers = FALSE)
 
-ggsave("Output/healthdistribution.png", plot = last_plot(), width = 8, height = 5, units = "in")
+ggsave("Output/healthdistribution.png", plot = last_plot(), width = 8, 
+       height = 5, units = "in")
