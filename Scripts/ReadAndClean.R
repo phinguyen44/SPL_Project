@@ -14,8 +14,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
 
     # LOAD NECESSARY PACKAGES & DATA
     # List all packages needed for session
-    neededPackages = c("dplyr", "tidyr", 
-                       "magrittr", "infuser", "countrycode")
+    neededPackages = c("dplyr", "magrittr", "infuser", "countrycode")
     allPackages    = c(neededPackages %in% installed.packages()[,"Package"])
 
     # Install packages (if not already installed)
@@ -44,7 +43,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     # ENCODE MISSING VALUES
 
     # Organize data.frame by selecting relevant variables
-    cat(infuse("Selecting values only from Wave {{wav}} and between ages 50 and     64.", wav = wav), sep = "\n")
+    cat(infuse("Selecting values only from Wave {{wav}} and between ages 50 and 64.", wav = wav), sep = "\n")
     
     dat = dat.input %>%
         dplyr::filter(wave == wav & (age <= 64 & age >= 50)) %>% 
