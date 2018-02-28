@@ -14,8 +14,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
 
     # LOAD NECESSARY PACKAGES & DATA
     # List all packages needed for session
-    neededPackages = c("dplyr", "tidyr", "ggplot2", 
-                       "magrittr","infuser", "countrycode")
+    neededPackages = c("dplyr", "tidyr", 
+                       "magrittr", "infuser", "countrycode")
     allPackages    = c(neededPackages %in% installed.packages()[,"Package"])
 
     # Install packages (if not already installed)
@@ -44,7 +44,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     # ENCODE MISSING VALUES
 
     # Organize data.frame by selecting relevant variables
-    cat(infuse("Selecting values only from Wave {{wav}} and between ages 50 and 64.", wav = wav), sep = "\n")
+    cat(infuse("Selecting values only from Wave {{wav}} and between ages 50 and     64.", wav = wav), sep = "\n")
     
     dat = dat.input %>%
         dplyr::filter(wave == wav & (age <= 64 & age >= 50)) %>% 
@@ -130,9 +130,6 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
         na.omit() %>%                               # remove missing values
         set_rownames(NULL)                          # reset row numbering
 
-    # TODO: determine threshold for "severe" and "mild" conditions (currently we
-    # just set it as numeric
-
     rows.df.out    = nrow(df.out)
     rows.remove    = rows.dat.input - rows.df.out
     
@@ -157,7 +154,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
         idx = seq(1:length(idx))[idx]
         
         # Creating separate data set with standardized numeric variables for 
-        # regression, then reselect variables as described in paper (e.g. self-           # reported health is removed)
+        # regression, then reselect variables as described in paper (e.g. self-           
+        # reported health is removed)
         df.reg = df %>%
             mutate_at(.vars = vars(idx),
                       .funs = standardize) %>%

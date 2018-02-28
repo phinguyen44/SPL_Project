@@ -17,14 +17,13 @@ bibliography: references.bib
 
 ```{r, eval = TRUE, echo = FALSE, include = FALSE, cache = TRUE}
 
-wd = paste0(Sys.getenv("USERPROFILE"), "/SPL_Project")
+wd = paste0(Sys.getenv("HOME"), "/Documents/Projects/SPL_Project")
 knitr::opts_knit$set(root.dir = wd)
 
 ```
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(fig.pos = 'H')
-
 ```
 \pagenumbering{gobble}
 
@@ -119,33 +118,40 @@ Berlin, 2018-03-15 \linebreak
 
 \newpage
 
-\section{Panel data cleaning and subsetting}
-PHI
+\section{Panel Data Cleaning and Subsetting}
+
+The original SHARE dataset used by Kalwij and Vermeulen (2005), released in spring 2005, contains data on the life circumstances of eligible members from approximately 18,000 households. In order to be eligible for participation in SHARE, at least one household member must have been born in or before 1954. The SHARE survey contains a variety of different health, social, and socioeconomic indicators such as labor force participation or household composition. SHARE contains data from eleven countries: Austria, Belgium, Denmark, France, Germany, Greece, Italy, the Netherlands, Spain, Sweden and Switzerland. This cross-national, multidisciplinary, and longitudinal nature of the SHARE data set provide an abundance of unique and useful opportunities for analysis.
+
 \subsection{Theory and Design}
+
+The easySHARE dataset, released in spring 2017, is the data set for which we will be focusing on in this paper. It is a panel dataset of 108 variables of more than 108 variables of more than 100,000 individuals covering data from six survey waves carried out between 2004 and 2015. As can be derived from its name, it is designed to be a simplified version of the broader SHARE data set. As a result, the data set includes slightly different observations and does not provide the same level of granularity in variables broader SHARE data set, which we shall show below. Additionally, since we are only concerned with a smaller subset of observations (from the initial wave of data), we will remove observations that are no longer relevant for our study.
+
+The rest of this section describes our process of subsetting and data cleaning, not only to match as closely as possible the initial SHARE data set, but also to enable us to easily conduct future analyses. 
+
 \subsection{Implementation}
-\subsection{Empirical Results}
 
+The `read.and.clean()` function is designed to take the raw easySHARE dataset file, which is provided in an `.rda` file format, and convert that into a list of data frames. We split the data set into list items because future analyses involve either summary statistics on the entire data set or regressions conducted on a subset of the data set. The function additionally accepts a wave number as an argument. Although we are only concerned with the initial wave for our study, this additional parameter allows us to conduct supplentary panel studies if we choose to do so later. The function only runs specifically with the raw easySHARE dataset (`easySHARE_rel6_0_0.rda`), which is the default `dataset` argument. The `dataset` argument may alternatively be specified to point to the directory where that data set is located. Otherwise it is assumed that it is located in the root directory.
 
-The easySHARE dataset released in spring 2017 is a panel dataset of 108 variables of more than 100.000 individuals covering data from six survey waves carried out between 2004 and 2005. As we are only concerned with a small subset of observations, an important task was to define appropriate functions for subsetting. In oder to make our subsetting process understandable to readers, we decided on using pipe-operator. This allows us to apply the filter and select option in a clever way, where we can select different criteria at once. 
-
--> code sniplet here
-
-In this example, we first filter for participation in wave 1 and the age group between 50 and 64 and the select the desired variables as described in Kalwij and Vermeulen (2005).
 
 Although the overall response rate in the SHARE are comparably high, the data set still has numerous missing values. The reason for this is due to the fact that the study was carried out on a crossnational scale, with some national survey institutions deciding not to participate in all survey modules. This means that the majority of missing values are to be found within observations that have missing values for entire survey modules or waves. The reason for the missing values are documented well in the "Guide to easySHARE release 6.0.0" and specifically coded. For example, the numbers -13 and -14 refer to “not asked in this wave” and “not asked in this country”. Since this coding scheme is not useful for the purpose of our analysis, we decided on recoding all of the missing values as "NA". To this end, we defined a function based on the missing codes provided by SHARE that finds the NAs in the data and declares them as such. 
 
--> code snipet here
 
-Since the study carried out by Kalwij and Vermeulen (2005) is based on the use of mostly binary data, we needed to construct numerous dummies based on the orginal data. 
+1. What packages to initialize
+2. Filter then select required variables (primarily makes use of the tidyverse family of functions)
+  - Why? useful ways to chain commands together with pipe operator, simple reader-friendly functions to interact with data frames, magrittr for aliases, select different criteria at once in single function call
+3. Remove NA values based on data set
+4. Country code package converts code into country names
+5. Make assumptions on variables! (see phi-projectideas.md) data transformations
+6. Split data sets
+7. Standardize
+8. Store as a list of data frames
 
--> code snipet here
+\subsection{Empirical Results}
 
-The resulting dataframe containes XXX observations of YYY variables.  
+The validity of our `read.and.clean()` can be verified by comparing the overall results when running the `read.and.clean()` function with the ones presented in the original paper, both in total number of observations and at the country level. As the function is called, messages are printed to the console to show the status of the data reading process.
 
-- coded countries in more readable manner
-- use packe ddd -> match offical ISO code with country name
-- create country list with all countries in study (not Israel)
-- defined dummies
+```{r echo=FALSE}
+```
 
 \section{Multidisciplinary and crossnational summary statistics}
 JULIAN
@@ -181,12 +187,73 @@ CLAUDIA
 
 \newpage
 
-\section{Graphical representation}
-PHI
+\section{Graphical Representation}
+
+In this section, we want to introduce novel graphical elements not present in the paper to augment the summary statistic tables. We find that the original paper lacked graphics designed either for exploratory data analysis or to enhance the ease of understanding on behalf of the reader. Tables, although useful for organizing and displaying many data points, can be difficult for a reader to quickly notice trends, similarities, or differences. Furthermore, tables provide decent summary statistics but give no visibility into distributions inherent to the data. We believe that a necessary and important enhancement to the paper would be to include graphs that allow readers to view distributions, analyze trends, and compare data points across groups or geographies. The following section presents functions designed to generate reader-friendly graphs to aid in reader comprehension.
+
 \subsection{Theory and Design}
+
+
+Another commonly used method for representing country-level data graphically is with choropleth maps.
+
+What are cholopleth maps?
+-coloring scheme inside defined areas of a map in order to show value levels
+-Great for identifying values that are associated with a given geographic location
+-great packages in R with shapes files easily downloadable
+
+
+What are tile grid maps?
+-countries are reduced to a uniform shape and size (equal visual weight)
+-great since we don't care about the relative population sizes but percentages or averages
+
+However, we opt to using grid-based maps because they offer a few distinct advantages:
+Avoid visual imbalances inherent to traditional choropleths
+size of a country can distort our perception of the data and give the impression that (for example) Sweden has a more notable effect
+Larger countries carry a more visible weight, influencing a reader's perspective on the relative importance of such country
+Sparsely populated areas have larger visual emphasis
+
+One major disadvantage is size dysmorphia (each country appears the same size) 
+Also Europe is notoriously difficult to break into evenly sized borders or stack on top of one another
+Nevertheless the general shape of Europe 
+Also no clearly defined 'rule' of what consitutes Europe
+Unlike the US
+Often used in the US for voting data
+Works well when groups are equally sized
+
+However in our case we are working primarily with numeric data / percentages so that's OK
+-not count data
+-all on same scale
+
+
+THEN look at distributions
+Why? we need to know the spread, not just the average
+
 \subsection{Implementation}
+
+First step: create a grid map using Excel
+use dput to get structure (not shown) (reproducible format without having to explicitly call an excel file)
+
+deciding the correct # of data classes is difficult (too many and you create too many classes) (too little and you mix groups together)
+strike the right balance between too much detail and not enough detail
+
+generated by creating a 'base' plotting function then adding the right plotting parameters based on the variable selected
+using colors designed to be color-blind safe
+
+Can distinguish differences between countries and within countries based on the selection split
+
 \subsection{Empirical Results}
 
+Improvements:
+1. Resize size of squares by population
+
+Straight up, the graphical possibilities of this data set are endless
+Would love to try more intresting stuff:
+
+Namely:
+We have waves, can do panel data analysis
+Can show deciles to show inequalities in health outcomes
+
+From the graphs we can't see much, but shows how little we know!
 
 \newpage
 
