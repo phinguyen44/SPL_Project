@@ -132,9 +132,25 @@ The rest of this section describes our process of subsetting and data cleaning, 
 
 The `read.and.clean()` function is designed to take the raw easySHARE dataset file, which is provided in an `.rda` file format, and convert that into a list of data frames. We split the data set into list items because future analyses involve either summary statistics on the entire data set or regressions conducted on a subset of the data set. The function additionally accepts a wave number as an argument. Although we are only concerned with the initial wave for our study, this additional parameter allows us to conduct supplentary panel studies if we choose to do so later. The function only runs specifically with the raw easySHARE dataset (`easySHARE_rel6_0_0.rda`), which is the default `dataset` argument. The `dataset` argument may alternatively be specified to point to the directory where that data set is located. Otherwise it is assumed that it is located in the root directory.
 
+We begin by initializing and downloading the packages (if necessary) required for this function. Much of the funciton utilizes the functions in the `tidyverse` family of functions developed by Hadley Wickham, namely `tidyr`, `dplyr`, and `magrittr`. We do this because these 
 
-Although the overall response rate in the SHARE are comparably high, the data set still has numerous missing values. The reason for this is due to the fact that the study was carried out on a crossnational scale, with some national survey institutions deciding not to participate in all survey modules. This means that the majority of missing values are to be found within observations that have missing values for entire survey modules or waves. The reason for the missing values are documented well in the "Guide to easySHARE release 6.0.0" and specifically coded. For example, the numbers -13 and -14 refer to “not asked in this wave” and “not asked in this country”. Since this coding scheme is not useful for the purpose of our analysis, we decided on recoding all of the missing values as "NA". To this end, we defined a function based on the missing codes provided by SHARE that finds the NAs in the data and declares them as such. 
+```{r eval=FALSE}
+# List all packages needed for session
+  neededPackages = c("dplyr", "tidyr", 
+                      "magrittr", "infuser", "countrycode")
+  allPackages    = c(neededPackages %in% installed.packages()[,"Package"])
 
+  # Install packages (if not already installed)
+  if (!all(allPackages)) {
+    missingIDX = which(allPackages == FALSE)
+    needed     = neededPackages[missingIDX]
+    lapply(needed, install.packages)
+  }
+
+  # Load all defined packages
+  invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
+    library(x, character.only = TRUE))))
+```
 
 1. What packages to initialize
 2. Filter then select required variables (primarily makes use of the tidyverse family of functions)
@@ -152,6 +168,9 @@ The validity of our `read.and.clean()` can be verified by comparing the overall 
 
 ```{r echo=FALSE}
 ```
+
+Although the overall response rate in the SHARE are comparably high, the data set still has numerous missing values. The reason for this is due to the fact that the study was carried out on a crossnational scale, with some national survey institutions deciding not to participate in all survey modules. This means that the majority of missing values are to be found within observations that have missing values for entire survey modules or waves. The reason for the missing values are documented well in the "Guide to easySHARE release 6.0.0" and specifically coded. For example, the numbers -13 and -14 refer to “not asked in this wave” and “not asked in this country”. Since this coding scheme is not useful for the purpose of our analysis, we decided on recoding all of the missing values as "NA". To this end, we defined a function based on the missing codes provided by SHARE that finds the NAs in the data and declares them as such. 
+
 
 \section{Multidisciplinary and crossnational summary statistics}
 JULIAN
