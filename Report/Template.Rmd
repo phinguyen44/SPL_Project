@@ -166,9 +166,7 @@ JULIAN
 \newpage
 
 \section{Wald Test}
-In the context of probit regression, the Wald
-test can be used to test multiple hypothesis regarding the model
-specifications and significance of coefficients. For example, it can be used to test whether the fit of the model is improved if a subset of regression coefficients are all set equal to zero, an exclusion restriction. @kalwij2005labour conduct a Wald test to check the null hypothesis that none of the included health variables has an impact on labour participation in order to investigate the joint impact of health on participation.
+In the context of probit regression, the Wald test can be used to test multiple hypothesis regarding the model specifications and significance of coefficients. For example, it can be used to test whether the fit of the model is improved if a subset of regression coefficients are all set equal to zero, an exclusion restriction. @kalwij2005labour conduct a Wald test to check the null hypothesis that none of the included health variables has an impact on labour participation in order to investigate the joint impact of health on participation.
 
 \subsection{Theory and Design}
 Depending on the estimation method and distributional assumptions, the Wald statistic can be formulated in different ways. The general form of the Wald statistic after MLE for testing hypothesis regarding our $k \times 1$ parameter vector $\theta$ is given by
@@ -212,7 +210,7 @@ This means that ``` joint.wald.test``` function will conduct a joint significanc
     W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
     
 ```
-As can be seen in line XXX the proper format of the specification vector ```spec``` is crucial as it is used to extract the needed estimates from the model coeffictient vector and covariance matrix.   In line XXX, the term ```Var_beta_est[spec,spec]``` extracts all covariance matrix elements corresponding to the joint significance hypothesis of the particular specification. Therefore, ```spec``` must be either a vector of integers of length $0< m \leq k$ or a non-zero logical vector of length k. Since the determination of the degrees of freedom in line XXX is based on the  length of the specification vector, the usage of a logical vector for ```spec```  is not recommendable as the test would be based on too many degrees of freedom.
+As can be seen in line XXX the proper format of the specification vector ```spec``` is crucial as it is used to extract the needed estimates from the model coeffictient vector and covariance matrix.   In line XXX, the term ```Var_beta_est[spec,spec]``` extracts all covariance matrix elements corresponding to the joint significance hypothesis of the particular specification. To assure the proper extraction of the covariance elements and determination of degrees of freedom in line XXX,  ```spec``` must be a vector of integers of length $0< m \leq k$.
 ```  
     chi2               = qchisq(signf.level, df = length(spec))
     pval               = 1-pchisq(W,length(spec))
