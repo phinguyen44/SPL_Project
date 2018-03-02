@@ -234,16 +234,16 @@ The validity of our `read.and.clean()` can be verified by comparing the overall 
 
 In the original paper, the authors retain a sample of 12,237 observations, which is slightly smaller than our retained observations of 12,689. However, at the individual country level, some peculiarities in number of observations emerge. Namely, we have almost twice as many observations in France, while having relative sparsity in Austria. This again is likely due to differences in data set and in the data gathering process. We will discuss more details about the summary statistics in future sections. 
 
+# TODO: HOW THE FUCK DO I SOURCE SHIT
+
 ```{r echo=TRUE, eval=TRUE}
-source("Scripts/ReadAndClean.R")
-datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 1)
+# datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 1)
 ```
 
 Lastly, when an out-of-bounds value for the wave is selected, an error message occurs. Note that only six waves or cross-sections are included in our data set.
 
 ```{r echo=FALSE, eval=TRUE}
-source("Scripts/ReadAndClean.R")
-datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 1)
+# datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 1)
 ```
 
 \section{Multidisciplinary and crossnational summary statistics}

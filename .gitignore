@@ -8,3 +8,12 @@
 
 # Session Data files:
 .RData
+
+# Template files
+Report/Template_cache
+Report/Template_cache
+Report/Template.pdf
+Template.pdf
+
+# Other
+.vscode
