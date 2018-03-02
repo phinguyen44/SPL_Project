@@ -90,7 +90,8 @@ X.cf   = function(model){
     # Calculate predicted counterfactual employment rate
     #empl.rate           = sum(empl.probability)  / length(empl.probability)
 
-    model$data = X_cf
+    model$data   = X_cf
+    
     return(model)
 }
 
@@ -198,6 +199,7 @@ health.decline = function(X){
     measure   =  (dif.60.64 - dif.50.54) / dif.abs 
    
      return(measure)
+    
     }
 
 participation.health = data.frame(health.decline(employment.age))
