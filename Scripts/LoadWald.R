@@ -8,26 +8,19 @@
 # Spec is vector of integers of length 0 < m ≤ k specifying the subset of coefficients
 # to be jointly tested
 
-joint.wald.test = function(model.summary, signf.level = NULL, spec = NULL){
+joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     
     # Define test elements
     joint.wald.test        = numeric(6)
     names(joint.wald.test) = c("Test","W","p-value", "df", "H0" , "Decision")
     beta                   = model.summary$coefficients[,1]
     Var_beta_est           = vcov(model.summary)
-    
-    # Set up significance level
-    signf.level  = if (is.null(signf.level)){
-        signf.level = 0.95 # 95% significance level as default
-    } else {
-        signf.level = signf.level}
-    
+  
     # Set up test restrictions
     spec   = if (is.null(spec)){
         spec = 1: length(beta) # default joint is significance test
     } else {
         spec = spec}
-    
     
     # Wald test statistic
     W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
@@ -59,20 +52,14 @@ joint.wald.test = function(model.summary, signf.level = NULL, spec = NULL){
 #ToDo: incorporate error/warnings if R and r are not specified correctly (i.e. wrong dimensions)
 
 
-general.wald.test = function(model.summary, signf.level = NULL, R = NULL, r = NULL){
+general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NULL){
     
     # Define test elements
     general.wald.test        = numeric(6)
     names(general.wald.test) = c("Test","W","p-value", "df", "H0" , "Decision")
     beta                     = model.summary$coefficients[, 1]
     Var_beta_est             = vcov(model.summary)
-    
-    # Set up significance level
-    signf.level  = if (is.null(signf.level)){
-        signf.level = 0.95 # 95% significance level as default
-    } else {
-        signf.level = signf.level}
-    
+ 
     # Set up restriction matrix/vector for linear hypothesis
     # default option is joint significants of all coefficients
     R  = if (is.null(R)){
