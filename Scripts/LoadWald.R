@@ -96,7 +96,7 @@ C = c(0,0)
 b = allSummaries$AUT.FEMALE$coefficients[,1]
 
 general.wald.test(allSummaries$AUT.FEMALE, 0.95, B, C)
-joint.wald.test(allSummaries$AUT.FEMALE, signf.level = 0.95, spec = 4:5)
+joint.wald.test(model.summary =  allSummaries$Austria.FEMALE, signf.level = 0.99)
 
 ################################################################################
 
