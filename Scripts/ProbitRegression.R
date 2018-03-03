@@ -78,7 +78,7 @@ for(i in 1:length(allSummaries)){
   
   
   # Test only the joint significance of health variables
-  testOutput = try(joint.wald.test(allSummaries[[i]], health, 0.95))
+  testOutput = try(joint.wald.test(allSummaries[[i]], 0.95, health))
   
   if(class(testOutput) == "try-error"){
    
