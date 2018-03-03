@@ -328,12 +328,43 @@ X.cf   = function(model){
 
 As can be seen in line XXX, the function creates a duplicate version of orginal data `X`, whose values will be replaced later on. In line XXX, we calculate the minimum value for each variable in `X`, which corresponds to the perfect health conditions of the variables `h_chronic`, `h_adlaTRUE`, and `h_obeseTRUE` since we are dealing with standarized varaibles. We obtain these values with making use of the apply function and store them in the vector `X_min`. We also calculate the mean average grip strength of 50- to 51-years old in the sample `X`. As can be seen in line XXX, we derive this mean with the `tapply` command because it allows us to specify an age group index and returns a vector whose elements we can access. To obtain the counterfactual covariates, the values in `X_cf` are replaced with perfect health values. In line XXX we replace the original model data with `X_cf`. This allows us to access both the model estimates and counterfactual covariates in one object. By running our ```empl.rate``` function on the returned model, we diretly optain the counterfactual employment rate for a given country.
 
-Since we are also interested in the current and counterfactual employment rates of different age groups, we create a more advanced function ```empl.rate.age```.
+Since we are also interested in the current and counterfactual employment rates of different age groups, we create a more advanced function ```empl.rate.age```. The function in line XXX requires the estimation model as mandatory argument and has two optional arguments that allow to change the age group and group sizes. Given the specified arguments, the function than calculate the current and counterfactual employment rate for each age group.
+
+``` 
+empl.rate.age       = function(model, group.size = 5, group.low = c(50,55,60)){
+
+```
+The proper value assignment of the numerical vector `group.low` is essential since the dynamic creation of age groups is based on it. As can be seen in line XXX, we use a small for loop to determine the upper bound and label of each age group. 
+
+```
+# Define vector of relevant age groups by youngest age
+        for (i in group.low){
+            
+                    # Define upper bound k of age group
+                    k = i + group.size -1
+                    
+                    # Create labels and contents of each age group
+                    vec.label = paste("names.vec.age", i, sep=".") 
+                    
+                    # Assign ages to the age groups
+                    z = assign(vec.label, paste0("age",i:k))
+                    
+                      if (length(z) == 1){
+            
+              IND_row_vec[[i]] = X[, z]
+        
+        # For all age groups greater than size 1      
+         } else {
+                    
+          # Sum over rows to find individuals belonging to age group i
+          IND_row_vec[[i]] = apply(X[, z], 1, sum)
+             }
+        }
+    
+
+```
 
 
-
-
-making us of the apply function
 \subsection{Empirical Results}
 
 

@@ -126,13 +126,11 @@ empl.rate.age       = function(model, group.size = 5, group.low = c(50,55,60)){
     # Predict probability of being employed of all individuals
     empl.probability = predict(object = model, newdata =  X, type = "response")
     
-    
   # Create age group Index vectors
     #Initialize result list containing age group index vectors
     IND_row_vec = list()
     
     # Define vector of relevant age groups by youngest age
-
         for (i in group.low){
             
                     # Define upper bound k of age group
