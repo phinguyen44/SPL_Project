@@ -233,10 +233,7 @@ We therefore incorporate ...
 We use our designed wald test functions to carry out several hypothesis test on our model coefficients from probit estimation. Speficically, we check the null hypothesis that none of the four included health variables has an impact on labour participation for each country and for both men an women. The results for men can be seen in table XXX 
 
 
-Our results our in line with the findings of @kalwij2005labour. As expected, the null hypothesis of no impact of health on labour participation is rejected at a 95% level for most countries. A particularity is the high p-value of France, leading to the inability to reject H0, which stands in contrast to the findings of @kalwij2005labour. We explain this with our differing sample, which is almost 50% larger and the lower overall employmen rate of our sample. Regarding the Wald tests for women, our results are very similar to those @kalwij2005labour. As for men, The majority of null hypothesis can be rejected for women, with the null for German women being barely not rejected. 
-
-TEXT: 1 - 2 SENTENCES ABOUT WHY FAIL TO REJECT
-
+Our results our in line with the findings of @kalwij2005labour. As expected, the null hypothesis of no impact of health on labour participation is rejected at a 95% level for most countries. A particularity is the high p-value of France, leading to the inability to reject H0, which stands in contrast to the findings of @kalwij2005labour. We explain this with our differing sample, which is almost 50% larger and the lower overall employmen rate of our sample. Regarding the Wald tests for women, our results are very similar to those @kalwij2005labour. As for men, The majority of null hypothesis can be rejected for women, with the null for German women being barely not rejected. The inability to reject the null for some countries is due to relatively low health-related probit coefficients (in absolute terms), which implies that these health indicators are not strongly related with the labor particpation decision.
 The results of our ``` joint.wald.test``` function are comparable those of our packages, like the ``` wald.test``` from the aod packages. To check our function this we can conduct both test on all subsets. For example, for German women the aod packages gives the following output
 
 ```
@@ -298,9 +295,45 @@ Obtaining the counterfactual probabilities $\hat{y}_{cf}$ requires a two-step pr
 
 $$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) =  \Phi(xi_{cf}'{\beta}) $$
 
-We can then assess counterfactual health-related effects by comparing the actual and counterfactual empoyment rates $\Pi_{ac}$ and $\Pi_{cf}$.
+We can then assess counterfactual health-related effects by comparing the actual and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$. We can gain closer insights into the nonlinear relation between health effects and particpation by calculating $\Pi_{ac}$ and $\Pi_{cf}$ for different age groups. This also allows obtaining a measure of the proportion of decline in participation that is due to decline in health condition according to our model estimates. @kalwij2005labour define this measure $\delta_{decline}$ as
+
+$$ \delta_{decline} =  \frac{\Pi_{cf}[age60.64]- \Pi_{ac}[age60.64] -   \Pi_{cf}[age50.54]- \Pi_{ac}[age50.54]}{\Pi_{ac}[age50.54] - \Pi_{ac}[age60.64]}$$
+where $\Pi_{cf}[age60.64]$ and $\Pi_{ac}[age60.64]$ refer to the counterfactual and actual employment rates of 60 to 64 year old individuals. Though this measure is  oversimplified since XXXXXXXXX,
+It nevertheless gives us a first hint towards the size of participation decline among elderly that is associated with declinning health conditions.
 
 \subsection{Implementation}
+Our counterfactual effects are based on the manipulation of explanatory variables according to some specified criteria. We design this counterfactual exercise in a way that allows us to directly use the output from our probit estimation. As a first step, we create a simple function ```empl.rate``` that takes an estimation model object as input and predicts the employment rate, i.e. the mean of fitted values, as an output. In order to calculate the both current and counterfactual employment rates  $\Pi_{ac}$ and $\Pi_{cf}$ conveniently, we need to manipulate the original covariates contained in our model objects. For this purpose we design the function ```X.cf```, whose only input the model object, allowing us to treat each country separately later on.
+
+```
+X.cf   = function(model){
+    
+    X                   = model$data     #Select data from model
+
+    X_cf                = X     #Create counterfactual data set with ideal health condition
+    
+    X_min               = data.frame(t(apply(X, 2, min)))     # Find ideal health conditions 
+
+    names.vec          = c("h_chronic", "h_adlaTRUE", "h_obeseTRUE") # Replace with perfect values 
+    
+    X_cf[, names.vec]  = X_min[names.vec]
+    
+    age_50_51          = ifelse(X$age50 == 1 | X$age51 == 1, 1,0) # Index for 50 and 51 year olds
+
+  # Calculate max grip mean of individuals age 50-51 and replace
+    X_cf[, c("h_maxgrip")] =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
+    
+    model$data   = X_cf
+    
+```
+
+As can be seen in line XXX, the function creates a duplicate version of orginal data `X`, whose values will be replaced later on. In line XXX, we calculate the minimum value for each variable in `X`, which corresponds to the perfect health conditions of the variables `h_chronic`, `h_adlaTRUE`, and `h_obeseTRUE` since we are dealing with standarized varaibles. We obtain these values with making use of the apply function and store them in the vector `X_min`. We also calculate the mean average grip strength of 50- to 51-years old in the sample `X`. As can be seen in line XXX, we derive this mean with the `tapply` command because it allows us to specify an age group index and returns a vector whose elements we can access. To obtain the counterfactual covariates, the values in `X_cf` are replaced with perfect health values. In line XXX we replace the original model data with `X_cf`. This allows us to access both the model estimates and counterfactual covariates in one object. By running our ```empl.rate``` function on the returned model, we diretly optain the counterfactual employment rate for a given country.
+
+Since we are also interested in the current and counterfactual employment rates of different age groups, we create a more advanced function ```empl.rate.age```.
+
+
+
+
+making us of the apply function
 \subsection{Empirical Results}
 
 
