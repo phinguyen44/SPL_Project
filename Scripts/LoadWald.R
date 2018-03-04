@@ -8,6 +8,8 @@
 # Spec is vector of integers of length 0 < m ≤ k specifying the subset of coefficients
 # to be jointly tested
 
+library("rankMatrix")
+
 joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     
     # Define test elements
@@ -49,13 +51,18 @@ joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
 # Example: H0: b1 + b2 = 1 and 2*b1 = 0  (2 restrictions, m = 2)
 # R = 1 1 0 0 ...0      and r = 1
 #     2 0 0 0 ...0              0 
-#ToDo: incorporate error/warnings if R and r are not specified correctly (i.e. wrong dimensions)
 
+# For Debug
+# model.summary = allSummaries[[1]] 
 
 general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NULL){
     
+    # Check input
+    if(class(model.summary) != "summary.glm") stop("model.summary must be a glm summary!")
+    if(sign.level > 1 | sign.level < 0) stop("sign.level out of bounds!")
+  
     # Define test elements
-    general.wald.test        = numeric(6)
+    general.wald.test        = numeric(6) 
     names(general.wald.test) = c("Test","W","p-value", "df", "H0" , "Decision")
     beta                     = model.summary$coefficients[, 1]
     Var_beta_est             = vcov(model.summary)
@@ -71,6 +78,27 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
         r = rep(0, length(beta)) # default for r is null vector
     } else {
         r = r}
+    
+    # Now R and rdefinitely exist, check dimensions
+    # R must be a matrix/dataframe/vector of size m x k, where m is the number of restrictions and k the number of all coefficients in the model summary.
+    
+    ## Testing R
+    dim_R = dim(R)
+    
+    # Columns
+    k = length(beta) # nrow(model.summary$coefficients)
+    
+    # Rows; Testing joint significance, therefore m = k
+    m = k
+    
+    ##  Apply test
+    if(dim_R[1] != m | dim_R[2] != k) stop("R has wrong dimension!")
+    
+    # r must be a vector of size m x 1, m is the number of tested restrictions.
+    if(length(r) != m | !is.vector(r)) stop("r has wrong dimension!")
+    
+    # Check rank of R
+    if(rankMatrix(R)[1] != m) stop("R has wrong rank!")
     
     # Wald test statistic
     W = t(R%*%beta - r) %*% solve(R%*% Var_beta_est %*% t(R)) %*% (R%*%beta - r)
