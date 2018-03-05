@@ -370,7 +370,7 @@ Finally, the employment rate for each age group is calculate in line XXX. For th
 Running the ```empl.rate.age``` function on a given model object will return a numerical vector containing the employment rate of the specified age groups.
 
 \subsection{Empirical Results}
-
+Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table XXX display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (certeris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage point higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obeseness in absolute terms, combined with above average prevalence of chronic disease and obeseness among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obeseness in absolute terms. Our results are in line with @kalwij2005labour general, though the estimated participations rates differ for some countries, as a result of differing samples. It must be stressed, however, that the counterfactual estimates should be interpreted with caution. 
 
 \newpage
 

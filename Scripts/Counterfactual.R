@@ -98,8 +98,6 @@ empl.counterfact = lapply(allModels.cf, empl.rate)
 
 (employment= data.frame(cbind(empl.current, empl.counterfact)))
 
-# Note: the expected value of probability converges to true population mean
-
 # Question: Should both functions be combined? How does this work with lapply
 
 ################################################################################
