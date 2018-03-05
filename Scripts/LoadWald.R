@@ -11,9 +11,15 @@
 library("Matrix")
 
 joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
+  
+    if(!is.integer(spec)){
+      spec.len = length(spec)
+      spec = as.integer(spec, length = spec.len)
+      warning("Converting spec to integer and proceeding")
+    } 
     
     # Check Input
-    if(!is.vector(spec) | !any(sapply(spec, is.numeric))) stop("spec is not a numeric vector")
+    # if(!is.vector(spec) | !any(sapply(spec, is.integer))) stop("spec is not a vector consisting of integers")
     if(!all(sapply(spec, function(z) z == 1))) warning("Not testing joint signifance")
     if(class(model.summary) != "summary.glm") stop("model.summary must be a glm summary!")
     if(signf.level > 1 | signf.level < 0) stop("signf.level out of bounds!")
