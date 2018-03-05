@@ -334,16 +334,22 @@ health.distribution = function(xvar,
     }
     
     # STOPPING CONDITIONS
-    if (!is.numeric(df.out[[xvar]])) stop("'xvar' must be numeric")
+    if (!is.numeric(df.out[[xvar]])) stop("'xvar' 
+                                          must be numeric")
     if (length(gen) > 1 | !all(gen %in% c("all", "MALE", "FEMALE"))) {
-        stop("'gender' must be one of 'all', 'MALE', or 'FEMALE'")
+        stop("'gender' must be one of 
+             'all', 'MALE', or 'FEMALE'")
     }
     if (length(countries) > 1 & !all(countries %in% levels(df.out$country))) {
-        stop("'countries' must be 'all' or a character vector containing countries in the `df.out` data frame")
+        stop("'countries' 
+             must be 'all' or a character vector containing countries 
+             in the `df.out` data frame")
     }
     if (length(countries) == 1) {
         if (!(countries %in% c('all', levels(df.out$country)))) {
-            stop("'countries' must be 'all' or a character vector containing countries in the `df.out` data frame")
+            stop("'countries' 
+                 must be 'all' or a character vector containing countries
+                 in the `df.out` data frame")
         }
     }
     

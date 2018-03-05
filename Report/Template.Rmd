@@ -15,16 +15,17 @@ geometry: margin = 2.5cm
 bibliography: references.bib
 ---
 
-```{r, eval = TRUE, echo = FALSE, include = FALSE, cache = TRUE}
+```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
 
 wd = paste0(Sys.getenv("HOME"), "/Documents/Projects/SPL_Project")
-knitr::opts_knit$set(root.dir = wd)
+knitr::opts_knit$set(root.dir = normalizePath(wd))
 
 ```
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(fig.pos = 'H')
 ```
+
 \pagenumbering{gobble}
 
 
@@ -134,7 +135,7 @@ The `read.and.clean()` function is designed to take the raw easySHARE data set f
 
 We begin by initializing and downloading the packages (if necessary) required for this function. Much of the funciton utilizes the functions in the `tidyverse` family of functions developed by Hadley Wickham, namely  `dplyr` and `magrittr`. The `dplyr` package is designed for accessible and uncomplicated data manipulation, and it works specifically with data frames. The package provides a consistent set of verbs that do a small thing very well, such as aggregation, selection, filtering, or creation of new variables. The `magrittr` package expands upon this further with the pipe operator `%>%`, which enables the chaining of smaller functions to create something more complex. Furthermore, the pipe operator dramatically improves readability by reading chains left to right as opposed to inside-out. This is especially useful when working with nested functions, which can be deconstructed into a series of chained commands.
 
-```{r eval=FALSE}
+```{r eval=TRUE, echo=TRUE}
 neededPackages = c("dplyr", "magrittr", "infuser", "countrycode")
 allPackages    = c(neededPackages %in% installed.packages()[,"Package"])
 
@@ -234,16 +235,16 @@ The validity of our `read.and.clean()` can be verified by comparing the overall 
 
 In the original paper, the authors retain a sample of 12,237 observations, which is slightly smaller than our retained observations of 12,689. However, at the individual country level, some peculiarities in number of observations emerge. Namely, we have almost twice as many observations in France, while having relative sparsity in Austria. This again is likely due to differences in data set and in the data gathering process. We will discuss more details about the summary statistics in future sections. 
 
-# TODO: HOW THE FUCK DO I SOURCE SHIT
-
 ```{r echo=TRUE, eval=TRUE}
-# datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 1)
+source('Scripts/ReadAndClean.R')
+datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 1)
 ```
 
 Lastly, when an out-of-bounds value for the wave is selected, an error message occurs. Note that only six waves or cross-sections are included in our data set.
 
-```{r echo=FALSE, eval=TRUE}
-# datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 1)
+```{r eval=TRUE, echo=TRUE, error=TRUE}
+source('Scripts/ReadAndClean.R')
+datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 99)
 ```
 
 \section{Multidisciplinary and crossnational summary statistics}
@@ -282,71 +283,159 @@ CLAUDIA
 
 \section{Graphical Representation}
 
-In this section, we want to introduce novel graphical elements not present in the paper to augment the summary statistic tables. We find that the original paper lacked graphics designed either for exploratory data analysis or to enhance the ease of understanding on behalf of the reader. Tables, although useful for organizing and displaying many data points, can be difficult for a reader to quickly notice trends, similarities, or differences. Furthermore, tables provide decent summary statistics but give no visibility into distributions inherent to the data. We believe that a necessary and important enhancement to the paper would be to include graphs that allow readers to view distributions, analyze trends, and compare data points across groups or geographies. The following section presents functions designed to generate reader-friendly graphs to aid in reader comprehension.
+In this section, we want to introduce novel graphical elements not present in the paper to augment the existing summary statistic tables. We believe that the original paper's lack of any graphical details, either for summarizing valuable data points or for exploratory analysis, hampers a reader's ease of understanding. Tables, although useful for organizing and displaying many discrete data points, lack both detail and decipherability. Furthermore, tables offer no visibility into distributions inherent to the data. We believe that a necessary and important enhancement to the paper would be to include graphs that allow readers to view distributions, analyze trends, and compare data points across groups or geographies. 
 
 \subsection{Theory and Design}
 
+An increasingly commonly used method for representing country-level data graphically is with choropleth maps. Choropleth maps shade or pattern areas within a defined geographic region (such as a country, state, or city) in relation to a data variable. A coloring progression or gradient is used to show value levels within each region. They are useful for identifying values that are associated with a given geographic location and quickly comparing those values across different regions. There are a multitude of great packages in R, along with open source shape files that contain the geographic coordinates to draw these maps, to aid in building choropleth maps.
 
-Another commonly used method for representing country-level data graphically is with choropleth maps.
+However, we opt not to use choropleths, instead focusing on a novel approach called tile grid maps. Rather than using actual geographic borders, countries are reduced to a uniform shape and size (in our case, a simple square) in order to ensure equal visual weight. This is done to avoid visual imbalances inherent to choropleth maps: larger geographic regions appear to have more value, influencing a reader's perception on the relative importance of such a region. Additionally, sparsely populated areas may also have a larger visual emphasis. We use tile grid maps since relative population sizes are of little importance to us, but we want to focus rather on comparing country data on variables that are either percentages or have been normalized or fit on the same scale.
 
-What are cholopleth maps?
--coloring scheme inside defined areas of a map in order to show value levels
--Great for identifying values that are associated with a given geographic location
--great packages in R with shapes files easily downloadable
+Tile grid maps are not without fault, however. Europe does not contain smooth borders like those found in the United States, hence it can be difficult to draw a comparable representation of Europe with grids alone. Nevertheless, the general shape of Europe can be quickly perceived by the reader, which will be shown in the empirical results section.
 
-
-What are tile grid maps?
--countries are reduced to a uniform shape and size (equal visual weight)
--great since we don't care about the relative population sizes but percentages or averages
-
-However, we opt to using grid-based maps because they offer a few distinct advantages:
-Avoid visual imbalances inherent to traditional choropleths
-size of a country can distort our perception of the data and give the impression that (for example) Sweden has a more notable effect
-Larger countries carry a more visible weight, influencing a reader's perspective on the relative importance of such country
-Sparsely populated areas have larger visual emphasis
-
-One major disadvantage is size dysmorphia (each country appears the same size) 
-Also Europe is notoriously difficult to break into evenly sized borders or stack on top of one another
-Nevertheless the general shape of Europe 
-Also no clearly defined 'rule' of what consitutes Europe
-Unlike the US
-Often used in the US for voting data
-Works well when groups are equally sized
-
-However in our case we are working primarily with numeric data / percentages so that's OK
--not count data
--all on same scale
-
-
-THEN look at distributions
-Why? we need to know the spread, not just the average
+Additionally, we choose to look at distributions of certain variables, rather than just looking at the mean or median values. By looking at the overall spread of each numeric data variable, we are able to gather a more holistic picture of the nature of the data variable.  
 
 \subsection{Implementation}
 
-First step: create a grid map using Excel
-use dput to get structure (not shown) (reproducible format without having to explicitly call an excel file)
+We develop two new graphics-oriented functions to generate both graphs listed above. The first is the tile grid maps, defined in the function `health.gridmap()`. Instead of just generating a single tile grid map, we create facets of tile grid maps, where the facetting is determined by the user. Either they can choose to split by gender (in which two grid maps will be displayed side-by-side) or by age group (in which three graphs will be shown). This facetting method allows readers to distinguish differences between countries as well as within countries. For example, in the same view, we can see how the hours worked per week differ between Germany and Spain, while also seeing how labor hours generally decrease for all countries as groups age over time.
 
-deciding the correct # of data classes is difficult (too many and you create too many classes) (too little and you mix groups together)
-strike the right balance between too much detail and not enough detail
+In order to draw the grid map, we must first draw the coordinates. This is done in a simple Excel spreadsheet to align each country with a specific point on a two-dimensional grid. Rather than sourcing this Excel file each time, we load the file once, then use the `dput` function to replicate the structure of the table (this is not shown in the script). This structure is then defined explicitly within the function. 
 
-generated by creating a 'base' plotting function then adding the right plotting parameters based on the variable selected
-using colors designed to be color-blind safe
+We define a "base" plotting function that draws the initial outline of the tile grid, using the `ggplot2` package. Additional plotting parameters are added later based on the function parameters passed. This is an advantage of using `ggplot2`: we can define the initial plot, then `layer` on additional graphical elements as needed, such as dynamic titles or flexible scales.
 
-Can distinguish differences between countries and within countries based on the selection split
+```{r eval=FALSE}
+plot_function = function(df) {
+    
+    p = ggplot(data = df, aes(x = X, y = Y)) +
+        geom_tile(aes(fill = get(xvar), color = ""), 
+                    color = "white", size = 0.6) +
+        geom_text(aes(label = iso3c), color = "white") +
+        geom_text(aes(label = round(get(xvar), 2)), vjust = 2, 
+                    color = "white", size = 3, na.rm = TRUE) +
+        coord_fixed(ratio = 1) +
+        theme_minimal() +
+        theme(axis.line        = element_blank(),
+                axis.text        = element_blank(),
+                axis.title       = element_blank(),
+                panel.background = element_blank(),
+                panel.grid       = element_blank(),
+                legend.position  = "bottom") +
+        theme(plot.title    = element_text(size=16),
+                plot.subtitle = element_text(size=10, 
+                                            color = "#7F7F7F"))
+    return(p)
+}
+```
+
+We opt for color-blind safe colors, using a sequential gradient color scheme, to enable maximal readability. The range of these color scales is always set to range from the minimum to maximum values between all facets of data. This is done to ensure that there are no values that fall out of bounds, as well as to apply the same color scale for all graphs in view.
+
+```{r eval=FALSE}
+minval = min(df.f[[xvar]], df.m[[xvar]], na.rm = TRUE)
+maxval = max(df.f[[xvar]], df.m[[xvar]], na.rm = TRUE)
+```
+
+If a logical variable is selected, we display the percentage of survey respondents for which that value is true. If a numeric variable is selected, we display the average value within survey respondents. The final output is stored as a `grob`, an element from the `gridExtra` package, which allows us to organize mutliple graphs side-by-side in a single window. We can either draw the final output using the `grid.draw()` function or we can save to disk using the `ggsave()` function.
+
+```{r eval=FALSE}
+example5 = health.gridmap('labor_hrs', 'age')
+grid.draw(example5)
+ggsave("Output/gridmap_laborhrs_byage.png", plot=example5, width=12, 
+       height=8, units="in")
+```
+
+The second function creates a series of individual bar charts, split by a collection of selected genders and countries, for a selected numeric variable. A vector of countries and/or genders can be passed as arguments to the function, in the event a user only cares about a subset of the overall data set. In the event no vector of countries and/or genders are supplied, the entire data set is used.
+
+In some cases, outliers in the data set may skew the view of the graphic. Therefore there is an additional default parameter to remove outliers. 
+
+```{r eval=FALSE}
+# Remove outliers (outside 1.5 IQR of 25% and 75% percentiles)
+rm.outliers = function(x, na.rm = TRUE) {
+    qnt = quantile(df.out[[x]], probs = c(0.25, 0.75), na.rm = na.rm)
+    out = 1.5*IQR(df.out[[x]], na.rm = na.rm)
+    
+    new.out = df.out
+    new.out[(df.out[[x]] < qnt[1] - out), ] = NA
+    new.out[(df.out[[x]] > qnt[2] + out), ] = NA
+
+    new.out = new.out[complete.cases(new.out), ]
+    return(new.out)
+}
+
+if (remove.outliers) df.out = rm.outliers(x = xvar)
+```
+
+In addition, bars indicating the average over the entire data set are overlaid on top of each bar chart. This is to enable readers to see how similar or different one distribution is compared to the average. We do this by calculating the distribution of the entire data set, then creating a dummy data frame with all possible combinations of gender and country. We then use this dummy data frame as an additional geometric argument in `ggplot`.
+
+```{r eval=FALSE}
+total.dist = table(df.out[[xvar]])/nrow(df.out)
+    
+total        = expand.grid(countries, gen, sort(unique(df.out[[xvar]])))
+names(total) = c("country", "gender", xvar)
+total        = arrange(total, country, gender, get(xvar))
+total$value  = rep(total.dist, times = length(countries)*length(gen))
+```
+
+Finally, to prevent overcrowding in the view, we decide on the optimal way to arrange the graphs. If only a single gender is selected, we organize the graphs so that only four columns are shown. If all genders are selected, the graphs are organized so that gender is along the y-axis and countries are along the x-axis.
+
+```{r eval=FALSE}
+if (length(gen) == 1) {
+    plot.bar = plot.bar + 
+        labs(subtitle = paste0("Faceted by country. Gender selected is ", gen, 
+        ". Distribution of the entire data set shown is overlaid on each graph.")) + 
+        facet_wrap(~ country, ncol = 4)
+} else {
+    plot.bar = plot.bar + 
+        facet_grid(gender ~ country)
+}
+```
 
 \subsection{Empirical Results}
 
-Improvements:
-1. Resize size of squares by population
+We can test the validity of each of the graphics by generating a few sample outputs. For the tile grid maps, we include some stopping conditions to ensure correct facetting and/or to ensure that only a numeric or logical variable is supplied. A similar sequence of error messages is shown for the health distribution maps when the variable is not numeric, the countries supplied are not contained within the data set, or the correct genders are not supplied.
 
-Straight up, the graphical possibilities of this data set are endless
-Would love to try more intresting stuff:
 
-Namely:
-We have waves, can do panel data analysis
-Can show deciles to show inequalities in health outcomes
+```{r eval=TRUE, results='hide', echo=TRUE, error=TRUE, message=FALSE}
+source("Scripts/ReadAndClean.R")
+source("Scripts/Graphics.R")
+datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
 
-From the graphs we can't see much, but shows how little we know!
+#Only keep relevant data sets
+df.out = datasets$df.out
+
+health.gridmap(xvar = 'country', facetting = 'gender')
+health.gridmap(xvar = 'h_obese', facetting = 'country')
+
+health.distribution(xvar = 'age', gen = 'MALEEEEEEE')
+health.distribution(xvar = 'labor_pt', gen = 'FEMALE', countries = 'all')
+health.distribution(xvar = 'age', gen = 'FEMALE', countries = 'China')
+
+```
+
+We show an examples of correct output below. Here, we want to examine average labor hours per week, facetted by age group. As we can see in this example, the percentage of the population that works full time generally decreases for all countries as age increases. However, in countries like Sweden and Switzerland, a higher percentage continue to work even in old age.
+
+```{r eval=FALSE}
+health.gridmap(xvar = 'h_obese', facetting = 'country')
+```
+
+```{r fig.width=8, fig.height=5.33, echo=FALSE}
+library(png)
+library(grid)
+img = readPNG("Output/gridmap_laborft_byage.png")
+grid.raster(img)
+```
+
+Finally, we display an example of the health distribution map. Here, we seek to evaluate the spread of self-perceived health among survey respondents after removing outliers. The black line indicates the overall distribution for the entire data set. As we can see, there are not too many differences between male and female distributions within countries. However, countries like Spain tend to believe they are healthier than average, whereas the opposite effect is true in Switzerland.   
+
+```{r eval=FALSE}
+health.distribution(xvar = 'h_perceived', remove.outliers = FALSE)
+```
+
+```{r fig.width=8, fig.height=5, echo=FALSE}
+library(png)
+library(grid)
+img = readPNG("Output/healthdistribution.png")
+grid.raster(img)
+```
 
 \newpage
 

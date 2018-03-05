@@ -25,7 +25,7 @@ setwd(wd)
 
 source("Scripts/ReadAndClean.R")
 source("Scripts/Graphics.R")
-datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
+datasets = sink(read.and.clean(dataset = "easySHARE_rel6_0_0.rda"))
 
 #Only keep relevant data sets
 df.out = datasets$df.out
@@ -56,11 +56,13 @@ example2 = health.gridmap('h_goodsp', 'age')
 example3 = health.gridmap('h_depression', 'age')
 example4 = health.gridmap('h_chronic', 'gender')
 example5 = health.gridmap('labor_hrs', 'age')
+example6 = health.gridmap('labor_ft', 'age')
 
+grid.draw(example6)
 grid.draw(example3)
 dev.off()
 grid.draw(example5)
-ggsave("Output/gridmap_laborhrs_byage.png", plot=example5, width=12, 
+ggsave("Output/gridmap_laborft_byage.png", plot=example6, width=12, 
        height=8, units="in")
 
 ################################################################################
