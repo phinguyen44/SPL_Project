@@ -18,7 +18,7 @@
 rm(list = ls())
 
 # Adjust your working directory to where your local repository is located
-wd = file.path("~/Documents/Projects/SPL_Project")
+wd = paste0(Sys.getenv("USERPROFILE"), "/splrepo/SPL_Project")
 setwd(wd)
   
 ################################################################################
@@ -103,11 +103,11 @@ labor.part.share.df = spread(labor.part.share, Var3, output.v) %>%
 labor.part.m = labor.part.share.df %>% 
     filter(Gender == "MALE") %>% 
     set_rownames(levels(df.out$country)) %>% 
-    select(-Gender, -Country)
+    dplyr::select(-Gender, -Country)
 labor.part.f = labor.part.share.df %>% 
     filter(Gender == "FEMALE") %>% 
     set_rownames(levels(df.out$country)) %>% 
-    select(-Gender, -Country)
+    dplyr::select(-Gender, -Country)
 
 # Labor supply choice tables
 df.female = df.out %>% filter(gender == "FEMALE")
@@ -175,11 +175,11 @@ total.labor.part.df = spread(total.labor.part, Var2, output.v.tot) %>%
 labor.part.m.tot = total.labor.part.df %>% 
     filter(Gender == "MALE") %>% 
     set_rownames("TOTAL") %>% 
-    select(-Gender)
+    dplyr::select(-Gender)
 labor.part.f.tot = total.labor.part.df %>% 
     filter(Gender == "FEMALE") %>% 
     set_rownames("TOTAL") %>% 
-    select(-Gender)
+    dplyr::select(-Gender)
 
 ## TOTAL Labor supply choice tables
 tot.supply.f    = lapply(vars, function(x) group.share(df.female, x, 0))
