@@ -37,7 +37,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     
     rows.dat.input = nrow(dat.input)
 
-    if (!(wav %in% 1:6)) stop('Out of bounds. Select a value between 1 and 6')
+    if (!(wav %in% 1:6)) stop('Out of bounds. 
+                              Select a value between 1 and 6.')
 
     ############################################################################
     # ENCODE MISSING VALUES
@@ -191,7 +192,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     cat("Final output is a list containing 3 data.frames:", sep = "\n")
     cat("`df.out` is a data.frame containing variables for calculating summary statistics.", sep = "\n")
     cat("`df.reg` is a data.frame containing standardized variables for regression.", sep = "\n")
-    cat("`df.splits` splits the regression data.frame into individual data.frames for each country/gender split. 22 data.frames are contained in this list.", sep = "\n")
+    cat("`df.splits` splits the regression data.frame into individual data.frames for each country/
+        gender split. 22 data.frames are contained in this list.", sep = "\n")
 
     return(all.output)
 }

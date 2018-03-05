@@ -51,11 +51,11 @@ lapply(neededPackages, library, character.only = TRUE)
 ################################################################################
 # EXAMPLE 1
 
-example1 <- health.gridmap('h_obese', 'gender')
-example2 <- health.gridmap('h_goodsp', 'age')
-example3 <- health.gridmap('h_depression', 'age')
-example4 <- health.gridmap('h_chronic', 'gender')
-example5 <- health.gridmap('labor_hrs', 'age')
+example1 = health.gridmap('h_obese', 'gender')
+example2 = health.gridmap('h_goodsp', 'age')
+example3 = health.gridmap('h_depression', 'age')
+example4 = health.gridmap('h_chronic', 'gender')
+example5 = health.gridmap('labor_hrs', 'age')
 
 grid.draw(example3)
 dev.off()
