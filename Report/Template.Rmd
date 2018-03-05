@@ -186,17 +186,12 @@ We limit our attention to testing a set of general linear restrictions since the
 $$    W = (R \hat{\beta} - r)'[R \hat{V}R']^{-1}(R \hat{\beta} - r)
 \tag{***}
 $$
-which facilitates our calculations [@greene2012econometric, 527-529; @wooldridge2010econometric, 362]. When we are interested in the joint significance of a subset of s coefficients, the nullhypothesis is that each of the s coefficients in the vector $\beta_s$ is equal to zero. The Wald test statistic can then be even more simplified: 
+which facilitates our calculations [@greene2012econometric, 527-529; @wooldridge2010econometric, 362]. When we are interested in the joint significance of a subset of s coefficients, the nullhypothesis is that each of the s coefficients in the vector $\beta_s$ is equal to zero. The Wald test statistic $W \stackrel{a}{\sim}\chi2_s$ can then be even more simplified [@wooldridge2010econometric, 362]:
  $$   W = \hat{\beta}_s'[R\hat{V}R']^{-1}\hat{\beta}_s = \hat{\beta}_s'[\hat{V}_s]^{-1}\hat{\beta}_s
  \tag{***}
  $$
- where the test statistic is distributed as $W \stackrel{a}{\sim}\chi2_s$ [@wooldridge2010econometric, 362]. 
- 
- 
 \subsection{Implementation}
-In order to test linear hypothesis regarding the model specifications and significance of coefficients we design two versions of a Wald test. The function ```joint.wald.test ``` is a simplied version to test the joint significance of a subset of model coefficients, whereas ```general.wald.test ``` allows checking any linear hypothesis. The two tests are constructed in a way so they align well with the general glm estimation output, especially relevant for probit regression. An advantage over alternative Wald test functions from other packages (e.g. aod) is that it allows for empty class membership, as discussed in detail below.
-
-We designed the joint significance test that makes it both easy to use, understand and modify to special needs. The only required input is the model summary from glm estimation, whereas the significance level and test specifications are optional. 
+In order to test linear hypothesis regarding the model specifications and significance of coefficients we design two versions of a Wald test. The function `joint.wald.test` is a simplied version to test the joint significance of a subset of model coefficients, whereas `general.wald.test` allows checking any linear hypothesis. The two tests are constructed in a way so they align well with the general glm estimation output, especially relevant for probit regression. The specific design of the joint significance test `joint.wald.test` is makes the function easy to use, understand and modify to special needs. The only required input is the model summary from glm estimation, whereas the significance level and test specifications are optional. 
 ```{r eval=FALSE}
 joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     
@@ -209,10 +204,9 @@ joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
 In order to set up default values for the hypothesis specification, we make use of a local if-else statement inside the ``` joint.wald.test``` function. By declaring the model specification to be null in line XXX we set the foundation for the default specification in line XXX - XXX. Here, we re-asign a sequence vector to the ```spec``` that includes the number of all model coefficients in increasing order, unless ```spec``` is specified differently by the user. In that case, the if-else statement will use the user specification assured by line XXX.
 
 ```{r eval=FALSE}
-    spec   = if (is.null(spec)){
+        spec = if (is.null(spec)){
         spec = 1: length(beta) # default is joint significance test
-    } else {
-        spec = spec}
+    }
 ```
 This means that ``` joint.wald.test``` function will conduct a joint significance test on all model coefficients by default. We setup a default significance level of 95% in the same manner. The Wald test statistic is calculated via simple matrix algebra based on the provided input by the model summary. This formula is equivalent to equation YYY. 
 
@@ -234,10 +228,20 @@ As can be seen in line XXX the proper format of the specification vector ```spec
 ```  
 As a last step we set up the test ouput by assigning values to the empty vector elements of ``` joint.wald.test```. This vector will be the function output that is returned. We determine the critical value and p-value in lines XXX-XXX based on the inbuilt ``` qchisq``` and display four significant decimal places. As can be seen in lines XX, we do not only list the test statistic and p-value but also the degrees of freedom, nullhypothesis and test decision as output to assure comprehensibility and correctness of the test.
 
-The general Wald test is designed in a similar manner, except that it allows for the general formulation of linear hypothesis of the form $R \hat{\beta} = r$. The test statistic in this case is giving by equation YYY. As in the ``` joint.wald.test``` function, we use local local if-else statements to setup a default settings. If only the model summary is given as an input, the ``` general.wald.test``` conducts a joint significance test at a 95% significance level. The crucial part to the proper usage of this function are the correctly specified Jacobian matrix R and restriction vector r, which must be of size $m \times k$ and $m \times 1$ respectively. To assure the proper asymptotic distribution of the test statistic we additional need to assures that R is of rank m.
+The general Wald test is designed in a similar manner, except that it allows for the general formulation of linear hypothesis of the form $R \hat{\beta} = r$. The test statistic in this case is giving by equation YYY. As in the `joint.wald.test` function, we use local local if-else statements to setup a default settings. If only the model summary is given as an input, the `general.wald.test` conducts a joint significance test at a 95% significance level. 
+The crucial part to the proper usage of this function are the correctly specified Jacobian matrix R and restriction vector r, which must be of size $m \times k$ and $m \times 1$ respectively. To assure the proper asymptotic distribution of the test statistic, we additional need to assure that R is of rank m.
+We therefore incorporate stops and warning messages in both wald test functions. For the case of the `general.wald.test`, we first check in line XXX whether the `model.summary` has the right class and whether the significance level lies between one and zero. Otherwise, the function's executions will be stopped. In the second step, we make sure the matrix `R`and the restriction vector `r` have matching dimension. We first extract the matrix dimensions `dim_R` in line XXX and check them via indexing in line XXX-XXX.
 
-We therefore incorporate ...
+```{r eval=FALSE}  
+    if(class(model.summary) != "summary.glm") stop("model.summary must be a glm summary!")
+    if(signf.level > 1 | signf.level < 0) stop("signf.level out of bounds!")
 
+    dim_R = dim(R)
+        m = length(r)
+   
+    if(dim_R[1] != m | dim_R[2] != k) stop("R has wrong dimension!")
+    if(rankMatrix(R)[1] != m) stop("R has wrong rank!")
+```
 
 \subsection{Empirical Results}
 We use our designed wald test functions to carry out several hypothesis test on our model coefficients from probit estimation. Speficically, we check the null hypothesis that none of the four included health variables has an impact on labour participation for each country and for both men an women. The results for men can be seen in table XXX 
@@ -273,7 +277,7 @@ wald.test(Sigma = vcov(allModels$Switzerland.MALE),
           b = allModels$Switzerland.MALE$coefficients, Terms = 16:19 )
 [1] Error in L %*% V : non-conformable arguments
 ``` 
-Our wald test function is robust against the presence of empty classes since we work with model summaries, meaning that the coefficients of empty classes have been dropped instead of being a missing value. Thus, our ```joint.wald.test``` function can conduct the test for Swiss men without errors: 
+Our wald test function is robust against the presence of empty classes since we work with model summaries, meaning that the coefficients of empty classes have been dropped instead of being a missing value. Thus, our `joint.wald.test` function can conduct the test for Swiss men without errors: 
 
 ```{r eval=FALSE}
 joint.wald.test(allSummaries$Switzerland.MALE, spec = 16:19)
@@ -286,25 +290,16 @@ invisible(source("Scripts/LoadWald.R"))
 joint.wald.test(allSummaries$Switzerland.MALE, spec = 16:19)
 ``` 
 
-Both our wald test functions are sensitive to the improper formulation of tested model restrictions. For example, the ```spec``` vector must be a numerical vector specifying the coefficients to be included given their ordering in the model summary. The test also works when ```spec``` is specified as a logical vector but will return an inappropriate test distribution: 
+Both our wald test functions are sensitive to the improper formulation of tested model restrictions. For example, the `general.wald.test` function stop from execution if the Jacobian matrix `R` and the restriction vector `r` have non-matching dimensions. In this example, 
 ```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
-
-specification = c(rep(FALSE,15), rep(TRUE, 4), rep(FALSE,3))
-joint.wald.test(allSummaries$Switzerland.MALE, spec = specification)
-
-``` 
-```{r echo=FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
-invisible(capture.output(source("Scripts/ReadAndClean.R")))
-invisible(source("Scripts/LoadWald.R"))
-invisible(capture.output(source("Scripts/ProbitRegression.R")))
-
-specification = c(rep(FALSE,15), rep(TRUE, 4), rep(FALSE,3))
-invisible(source("Scripts/LoadWald.R"))
-joint.wald.test(allSummaries$Switzerland.MALE, spec = specification)
-
+matrix.R     = diag(1, 23)
+vector.wrong = rep(1,22)
+vector.right = rep(1,23)
+general.wald.test(allSummaries$Switzerland.MALE, R = matrix.R, r = vector.wrong)
+general.wald.test(allSummaries$Switzerland.MALE, R = matrix.R, r = vector.right)
 
 ``` 
-As in line XXX, our specification and Wald statistic are similar. However, the function fasely assigns 22 degrees of freedoms since this is the length of our specification vector.
+In this example, `R`is an identity matrix of size $23 \times 23$, whereas `vector.wrong` is $22 \times 1$. As soon as we add another element to the `r` vector, the function works properly.
 
 \newpage
 \section{Counterfactual exercise}
