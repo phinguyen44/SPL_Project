@@ -12,6 +12,12 @@ library("Matrix")
 
 joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     
+    # Check Input
+    if(!is.vector(spec) | !any(sapply(spec, is.numeric))) stop("spec is not a numeric vector")
+    if(!all(sapply(spec, function(z) z == 1))) warning("Not testing joint signifance")
+    if(class(model.summary) != "summary.glm") stop("model.summary must be a glm summary!")
+    if(signf.level > 1 | signf.level < 0) stop("signf.level out of bounds!")
+    
     # Define test elements
     joint.wald.test        = numeric(6)
     names(joint.wald.test) = c("Test","W","p-value", "df", "H0" , "Decision")
@@ -21,8 +27,7 @@ joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     # Set up test restrictions
     spec   = if (is.null(spec)){
         spec = 1: length(beta) # default joint is significance test
-    } else {
-        spec = spec}
+    } 
     
     # Wald test statistic
     W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
@@ -95,7 +100,7 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
     if(dim_R[1] != m | dim_R[2] != k) stop("R has wrong dimension!")
     
     # Check rank of R
-    #if(rankMatrix(R)[1] != m) stop("R has wrong rank!")
+    if(rankMatrix(R)[1] != m) stop("R has wrong rank!")
     
     # Wald test statistic
     W = t(R%*%beta - r) %*% solve(R%*% Var_beta_est %*% t(R)) %*% (R%*%beta - r)
