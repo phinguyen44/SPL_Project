@@ -84,12 +84,6 @@ X.cf   = function(model){
     # Calculate max grip mean of individuals age 50-51 and replace
     X_cf[, c("h_maxgrip")] =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
     
-    # Predict probability of being employed of all individuals
-    #empl.probability    = predict(object = model, newdata =  X_cf, type = "response")
-    
-    # Calculate predicted counterfactual employment rate
-    #empl.rate           = sum(empl.probability)  / length(empl.probability)
-
     model$data   = X_cf
     
     return(model)
@@ -162,9 +156,9 @@ empl.rate.age       = function(model, group.size = 5, group.low = c(50,55,60)){
  # Calculate predicted current employment rate for age groups
     
     # loop over age group list
-    for (i in 1: length(IND_row_vec)){
+    for (k in 1: length(IND_row_vec)){
         
-        empl.rate[i] = empl.probability %*% IND_row_vec[[i]] / sum(IND_row_vec[[i]])
+        empl.rate[k] = empl.probability %*% IND_row_vec[[k]] / sum(IND_row_vec[[k]])
     }
     
     return(empl.rate)
