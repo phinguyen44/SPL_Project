@@ -8,7 +8,7 @@
 # Spec is vector of integers of length 0 < m ≤ k specifying the subset of coefficients
 # to be jointly tested
 
-library("rankMatrix")
+library("Matrix")
 
 joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     
@@ -59,7 +59,7 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
     
     # Check input
     if(class(model.summary) != "summary.glm") stop("model.summary must be a glm summary!")
-    if(sign.level > 1 | sign.level < 0) stop("sign.level out of bounds!")
+    if(signf.level > 1 | signf.level < 0) stop("signf.level out of bounds!")
   
     # Define test elements
     general.wald.test        = numeric(6) 
@@ -88,17 +88,14 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
     # Columns
     k = length(beta) # nrow(model.summary$coefficients)
     
-    # Rows; Testing joint significance, therefore m = k
-    m = k
+    # Rows; general hypothesis testing, therefore m = length(r)
+    m = length(r)
     
     ##  Apply test
     if(dim_R[1] != m | dim_R[2] != k) stop("R has wrong dimension!")
     
-    # r must be a vector of size m x 1, m is the number of tested restrictions.
-    if(length(r) != m | !is.vector(r)) stop("r has wrong dimension!")
-    
     # Check rank of R
-    if(rankMatrix(R)[1] != m) stop("R has wrong rank!")
+    #if(rankMatrix(R)[1] != m) stop("R has wrong rank!")
     
     # Wald test statistic
     W = t(R%*%beta - r) %*% solve(R%*% Var_beta_est %*% t(R)) %*% (R%*%beta - r)
@@ -118,12 +115,18 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
 
 # Test whether it works
 B = matrix(0, nrow=2, ncol= 23)
+B1 = matrix(0, nrow=2, ncol= 21)
 B[1, 4] = 1
 B[2, 5] = 2
 C = c(0,0)
-b = allSummaries$AUT.FEMALE$coefficients[,1]
+b = allSummaries$Austria.FEMALE$coefficients[,1]
 
-general.wald.test(allSummaries$AUT.FEMALE, 0.95, B, C)
+# Wrong input test
+general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, B1, C)
+
+# Correct input test
+general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, B, C)
+general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95)
 joint.wald.test(model.summary =  allSummaries$Austria.FEMALE, signf.level = 0.99)
 
 ################################################################################
