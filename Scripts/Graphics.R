@@ -49,10 +49,12 @@ health.gridmap = function(xvar, facetting) {
     
     # STOPPING CONDITIONS
     if (!is.numeric(df.out[[xvar]]) & !is.logical(df.out[[xvar]])) {
-        stop("'xvar' must be numeric or logical")
+        stop("'xvar' must be numeric 
+        or logical")
     }
     if (!(facetting %in% c('gender', 'age'))) {
-        stop("'facetting' variable must be either 'gender' or 'age'")
+        stop("'facetting' variable 
+        must be either 'gender' or 'age'")
     }
     # ADD TILE GRID LAYOUT
     coordinates = structure(list(
