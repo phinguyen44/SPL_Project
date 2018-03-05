@@ -15,15 +15,19 @@ geometry: margin = 2.5cm
 bibliography: references.bib
 ---
 
-```{r, eval = TRUE, echo = FALSE, include = FALSE, cache = TRUE}
-
-wd = paste0(Sys.getenv("USERPROFILE"), "/SPL_Project")
+```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
+wd = paste0(Sys.getenv("HOME"), "/Documents/SPL_Project")
 knitr::opts_knit$set(root.dir = wd)
 
 ```
 
-```{r global_options, include=FALSE}
+```{r global_options, include=FALSE, echo=TRUE}
 knitr::opts_chunk$set(fig.pos = 'H')
+getwd()
+
+
+
+
 
 ```
 \pagenumbering{gobble}
@@ -267,24 +271,37 @@ A weakness of the aod package is, that its wald test cannot deal with empty clas
 ```{r eval=FALSE}
 wald.test(Sigma = vcov(allModels$Switzerland.MALE), 
           b = allModels$Switzerland.MALE$coefficients, Terms = 16:19 )
-> Error in L %*% V : non-conformable arguments
+[1] Error in L %*% V : non-conformable arguments
 ``` 
 Our wald test function is robust against the presence of empty classes since we work with model summaries, meaning that the coefficients of empty classes have been dropped instead of being a missing value. Thus, our ```joint.wald.test``` function can conduct the test for Swiss men without errors: 
 
 ```{r eval=FALSE}
 joint.wald.test(allSummaries$Switzerland.MALE, spec = 16:19)
-  Test        W        p-value       df   H0                Decision 
- "Wald"     "9.91"     "0.042"      "4"  "b equal to 0"    "Reject H0" 
+``` 
+```{r echo=FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
+invisible(capture.output(source("Scripts/ReadAndClean.R")))
+invisible(source("Scripts/LoadWald.R"))
+invisible(capture.output(source("Scripts/ProbitRegression.R")))
+invisible(source("Scripts/LoadWald.R"))
+joint.wald.test(allSummaries$Switzerland.MALE, spec = 16:19)
 ``` 
 
 Both our wald test functions are sensitive to the improper formulation of tested model restrictions. For example, the ```spec``` vector must be a numerical vector specifying the coefficients to be included given their ordering in the model summary. The test also works when ```spec``` is specified as a logical vector but will return an inappropriate test distribution: 
+```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
 
-```{r eval=FALSE} 
 specification = c(rep(FALSE,15), rep(TRUE, 4), rep(FALSE,3))
-
 joint.wald.test(allSummaries$Switzerland.MALE, spec = specification)
-   Test      W            p-value       df                 H0    Decision
-  "Wald"     "9.91"      "0.987"       "22"     "b equal to 0"   "Cannot reject H0" 
+
+``` 
+```{r echo=FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
+invisible(capture.output(source("Scripts/ReadAndClean.R")))
+invisible(source("Scripts/LoadWald.R"))
+invisible(capture.output(source("Scripts/ProbitRegression.R")))
+
+specification = c(rep(FALSE,15), rep(TRUE, 4), rep(FALSE,3))
+invisible(source("Scripts/LoadWald.R"))
+joint.wald.test(allSummaries$Switzerland.MALE, spec = specification)
+
 
 ``` 
 As in line XXX, our specification and Wald statistic are similar. However, the function fasely assigns 22 degrees of freedoms since this is the length of our specification vector.
@@ -321,7 +338,7 @@ conditions of the variables `h_chronic`, `h_adlaTRUE`, and `h_obeseTRUE` since w
 
 
 
-```{r eval = FALSE}
+```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
 
     X                   = model$data
     X_cf                = X
@@ -345,32 +362,78 @@ To obtain the counterfactual covariates, the values in `X_cf` are replaced with 
 
 Since we are also interested in the current and counterfactual employment rates of different age groups, we create a more advanced function ```empl.rate.age```. This function  displayed in line XXX requires the estimation model as mandatory argument and has two optional arguments (`group.size` and `group.low`) that allow to change the age group and group sizes. Given the specified arguments, the function then calculates the current and counterfactual employment rate for each age group.
 
-```{#numCode .R .numberLines}
-empl.rate.age       = function(model, group.size = 5, group.low = c(50,55,60)){
+```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
+empl.rate.age        = function(model, group.size = 5, group.low = c(50,55,60)){
+
+    X                = model$data
+    
+    empl.probability = predict(object = model, newdata =  X, type = "response")
 
 ```
 The proper value assignment of the numerical vector `group.low` is essential since the dynamic creation of age groups is based on it. As can be seen in line XXX, we use a small for loop to determine the upper age group bound and create a label of each age group. Furthermore, we assign all of the corresponding age values (e.g. `age50`, `age51`) to the vector `z`, which correspond to the age variable names in `X`.
 
-```{r eval=FALSE}
+```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
         for (i in group.low){
-46                              k = i + group.size -1
+                                k = i + group.size -1
                         vec.label = paste("names.vec.age", i, sep=".") 
                                 z = assign(vec.label, paste0("age",i:k))
 ```
 We need to assign the age values to `z` in order to locate the right individuals in our data frame `X`. We find the individuals belonging to a given age group by summing over rows of `X` and storing this vector inside the list `IND_row_vec` displayed in line XXX. We can take the sum because the age values assigned to `z` correspond to the column names of the data frame `X`. Thus, for a given individual, the row sum of `X[, z]` is either zero or one, dependong on wether the individual belongs to the age group or not. Following this step, we filter out only the relevant age groups via indexing.
-```{r eval=FALSE}
+```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
                  IND_row_vec[[i]] = apply(X[, z], 1, sum)
                  IND_row_vec      = IND_row_vec[group.low]
+                 
+     empl.rate[k] = empl.probability %*% IND_row_vec[[k]] / sum(IND_row_vec[[k]])
+
 ```
 Finally, the employment rate for each age group is calculate in line XXX. For this, we first sum the predicted employment probability for all individuals in age group k via vector multiplication. Next, we devide this sum by the overall number of individuals in that age group, corresponding to the vector length `IND_row_vec[[k]]`.
 
-```{r eval=FALSE}
-        empl.rate[k] = empl.probability %*% IND_row_vec[[k]] / sum(IND_row_vec[[k]])
-```
 Running the ```empl.rate.age``` function on a given model object will return a numerical vector containing the employment rate of the specified age groups.
 
 \subsection{Empirical Results}
-Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table XXX display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (certeris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage point higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obeseness in absolute terms, combined with above average prevalence of chronic disease and obeseness among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obeseness in absolute terms. Our results are in line with @kalwij2005labour general, though the estimated participations rates differ for some countries, as a result of differing samples. It must be stressed, however, that the counterfactual estimates should be interpreted with caution. 
+Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table XXX display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (certeris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage point higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obeseness in absolute terms, combined with above average prevalence of chronic disease and obeseness among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obeseness in absolute terms. As expected, our results are in line with @kalwij2005labour general, though the estimated participations rates differ for some countries, as a result of differing samples. 
+
+```{r echo=FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
+
+# SOURCE DATA
+
+invisible(capture.output(source("Scripts/Counterfactual.R")))
+
+# Store results and display them
+employment            = data.frame(cbind(unlist(empl.current), unlist(empl.counterfact)))
+colnames(employment)  = c("Employment Current" , "Employment Counterfactual.") 
+library(stringr)
+rownames(employment)  = str_sub(rownames(employment), end= -8)
+knitr::kable(employment[1:11,], caption = "Women's current and counterfactual labor share",
+            digits = 2, align = "c")
+```
+
+It must be stressed, however, that the counterfactual estimates presented by @kalwij2005labour should be interpreted with caution. First of all, the transformation of the status quo populations with perfectly health individuals is articial and represents a state that could not realistically be reached with any policy. Second, some of the high counterfactual rates are driven by relatively high model coefficients that are not statistically significant, indicating non-robust results. Third, the aggregate country estimates do not properly display the variation of health effects among different age groups. In order to address this, we also analyze the results of the counterfactual exercise with help of our ```empl.rate.age``` function. The output of this for men is displayed in table XXX. As expected, both the current and counterfactual labor shares decrease at higher age. The difference between current and counterfactual shares is also increasing in age, though some exceptions (Austria, Italy and Greece) exist. This increasing difference points towards the negative health effects on labor associated with increasing age. Again, our results are in line with those obtained by @kalwij2005labour. 
+
+
+```{r echo = FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
+
+# SOURCE DATA
+
+invisible(capture.output(source("Scripts/Counterfactual.R")))
+
+# Store results and display them
+
+empl.current.age     = t(data.frame(lapply(allModels, empl.rate.age)))
+empl.counterfact.age = t(data.frame(lapply(allModels.cf, empl.rate.age)))
+employment.age           = data.frame(cbind(empl.current.age, empl.counterfact.age))
+colnames(employment.age) = paste(c(rep("Current", 3) , rep( "CF", 3)), 
+                                  c("50-54","55-59", "60-64"))
+#Reorder colums
+new.order = c(1,4,2,5,3,6)
+employment.age    = employment.age[,new.order]
+
+library(stringr)
+rownames(employment.age)  = str_sub(rownames(employment.age), end= -6)
+knitr::kable(employment.age[12:22,], caption = "Men's current and counterfactual (CF) labor share for different age groups", digits = 2, align = "l")
+
+```
+
 
 \newpage
 

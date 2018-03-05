@@ -22,8 +22,6 @@ df.splits = datasets$df.splits
 rm(datasets)
 
 
-
-
 ################################################################################
 
 # Probit for each country and gender 
@@ -93,12 +91,12 @@ X.cf   = function(model){
 allModels.cf = lapply(allModels, X.cf)
 
 # Calculate current and counterfactual employment rates
-empl.current = lapply(allModels, empl.rate)
+empl.current     = lapply(allModels, empl.rate)
 empl.counterfact = lapply(allModels.cf, empl.rate)
 
-(employment= data.frame(cbind(empl.current, empl.counterfact)))
-
-# Question: Should both functions be combined? How does this work with lapply
+# Store results and display them
+employment            = data.frame(cbind(unlist(empl.current), unlist(empl.counterfact)))
+colnames(employment)  = c("Employment Current" , "Employment Counterf.") 
 
 ################################################################################
 # Counterfactual exercise for each age group
@@ -166,13 +164,13 @@ empl.rate.age       = function(model, group.size = 5, group.low = c(50,55,60)){
 empl.current.age     = t(data.frame(lapply(allModels, empl.rate.age)))
 empl.counterfact.age = t(data.frame(lapply(allModels.cf, empl.rate.age)))
 
-employment.age           = cbind(empl.current.age, empl.counterfact.age)
+employment.age           = data.frame(cbind(empl.current.age, empl.counterfact.age))
 colnames(employment.age) = paste0(c(rep("empl.current", 3) , rep( "empl.counterfact", 3)), 
                                   c("50.54","55.59", "60.64"))
 
 # Test for other age groups: Example of employment for each age group
-empl.rate.age(allModels$Austria.FEMALE, group.size = 1, group.low = c(50:63))  
-
+empl.rate.age(allModels$Germany.MALE, group.size = 1, group.low = c(50:63))  
+empl.rate.age(allModels.cf$Germany.MALE, group.size = 1, group.low = c(50:63))
 ################################################################################
 
 # Decline in participation due to decline in health condition
@@ -198,13 +196,8 @@ participation.health = data.frame(health.decline(employment.age))
 ################################################################################
 # Some Remarks
 
-# Remark: Should we use a list or numeric values to store results?
-# Remark: we use paste0 instead of paste becaue it leaves no space in between
 # Define outout formate of counterfactual estimates: list, numeric, etc? 
-# Should be the same in each estimation
 
-# Idea: Use empl.rate.age function to calculate age group employment for each
-# age and visualize with graphics
 
 empl.each.age = list()
 
