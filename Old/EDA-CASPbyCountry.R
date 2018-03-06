@@ -18,7 +18,7 @@ wd = file.path(Sys.getenv("HOME"),"/Documents/Projects/SPL_Project")
 setwd(wd)
 
 # Source necessary packages and data
-source("Scripts/EDA.R")
+source("Old/EDA.R")
 rm(list = ls()[which(!(ls() %in% "df.loc"))])
 needs(ggplot2, countrycode, viridis, geofacet, ggridges)
 

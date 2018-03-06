@@ -33,7 +33,7 @@ rm(datasets)
 # LOAD NECESSARY PACKAGES & DATA
 
 # List all packages needed for session
-neededPackages = c("dplyr", "magrittr", "purrr",
+neededPackages = c("dplyr", "tidyr", "magrittr", "purrr",
                    "formattable", "webshot", "htmltools", "webshot")
 allPackages    = c(neededPackages %in% installed.packages()[ , "Package"]) 
 
