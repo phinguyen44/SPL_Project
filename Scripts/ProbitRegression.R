@@ -13,12 +13,12 @@
 # Specify with data must be loaded? 
 
 
-rm(list= ls())
+#rm(list= ls())
 
 ################################################################################
 # SOURCE DATA
 
-source("Scripts/ReadAndClean.R")
+#source("Scripts/ReadAndClean.R")
 datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
 
 #Only keep relevant data sets
@@ -26,7 +26,7 @@ df.splits = datasets$df.splits
 rm(datasets)
 
 # Load own-built Wald tests
-source("Scripts/LoadWald.R")
+#source("Scripts/LoadWald.R")
 
 ################################################################################
 # LOAD NECESSARY PACKAGES & DATA

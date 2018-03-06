@@ -14,13 +14,7 @@
 ################################################################################
 # SET WORKING DIRECTORY
 
-# Note: Only this part must be changed for the rest of the script to run.
-rm(list = ls())
 
-# Adjust your working directory to where your local repository is located
-wd = file.path("~/Documents/Projects/SPL_Project")
-setwd(wd)
-  
 ################################################################################
 # SOURCE DATA
     

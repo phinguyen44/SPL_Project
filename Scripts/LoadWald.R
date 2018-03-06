@@ -88,15 +88,6 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
 }
 
 
-# Test whether it works
-B = matrix(0, nrow=2, ncol= 23)
-B[1, 4] = 1
-B[2, 5] = 2
-C = c(0,0)
-b = allSummaries$AUT.FEMALE$coefficients[,1]
-
-general.wald.test(allSummaries$AUT.FEMALE, 0.95, B, C)
-joint.wald.test(model.summary =  allSummaries$Austria.FEMALE, signf.level = 0.99)
 
 ################################################################################
 
