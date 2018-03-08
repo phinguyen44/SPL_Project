@@ -12,12 +12,15 @@ library("Matrix")
 
 joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
   
-    if(!is.integer(spec)){
+  # Set up test restrictions
+  if(is.null(spec)){
+    spec = 1:length(beta) # default joint is significance test
+  } else if(!is.integer(spec)){
       spec.len = length(spec)
       spec = as.integer(spec, length = spec.len)
       warning("Converting spec to integer and proceeding")
-    } 
-    
+    }
+  
     # Check Input
     # if(!is.vector(spec) | !any(sapply(spec, is.integer))) stop("spec is not a vector consisting of integers")
     if(!all(sapply(spec, function(z) z == 1))) warning("Not testing joint signifance")
@@ -30,10 +33,7 @@ joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     beta                   = model.summary$coefficients[,1]
     Var_beta_est           = vcov(model.summary)
   
-    # Set up test restrictions
-    if(is.null(spec)){
-        spec = 1:length(beta) # default joint is significance test
-    } 
+
     
     # Wald test statistic
     W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
