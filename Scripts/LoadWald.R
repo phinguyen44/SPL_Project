@@ -129,9 +129,9 @@ B[1, 4] = 1
 B[2, 5] = 2
 C = c(0,0)
 b = allSummaries$Austria.FEMALE$coefficients[,1]
-
+ 
 # Wrong input test
-general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, R = B1, r = C)
+general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, R = B, r = C)
 
 # Correct input test
 general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, B, C)
