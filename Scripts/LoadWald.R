@@ -15,6 +15,8 @@ joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
   # Set up test restrictions
   if(is.null(spec)){
     spec = 1:length(beta) # default joint is significance test
+  } else if(is.logical(spec)){ stop("spec cannot be a logical vector, tranform to interger vector!")
+  } else if(any(spec == 0)){ stop("spec cannot contain zero values!")
   } else if(!is.integer(spec)){
       spec.len = length(spec)
       spec = as.integer(spec, length = spec.len)
@@ -22,8 +24,6 @@ joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     }
   
     # Check Input
-    # if(!is.vector(spec) | !any(sapply(spec, is.integer))) stop("spec is not a vector consisting of integers")
-    if(!all(sapply(spec, function(z) z == 1))) warning("Not testing joint signifance")
     if(class(model.summary) != "summary.glm") stop("model.summary must be a glm summary!")
     if(signf.level > 1 | signf.level < 0) stop("signf.level out of bounds!")
     
@@ -32,8 +32,6 @@ joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     names(joint.wald.test) = c("Test","W","p-value", "df", "H0" , "Decision")
     beta                   = model.summary$coefficients[,1]
     Var_beta_est           = vcov(model.summary)
-  
-
     
     # Wald test statistic
     W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
@@ -120,23 +118,5 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
     general.wald.test[6] = ifelse(pval <= 1- signf.level, "Reject H0", "Cannot reject H0")
     general.wald.test
 }
-
-
-# Test whether it works
-B = matrix(0, nrow=2, ncol= 23)
-B1 = matrix(0, nrow=2, ncol= 21)
-B[1, 4] = 1
-B[2, 5] = 2
-C = c(0,0)
-b = allSummaries$Austria.FEMALE$coefficients[,1]
- 
-# Wrong input test
-general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, R = B, r = C)
-
-# Correct input test
-general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, B, C)
-general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95)
-joint.wald.test(model.summary =  allSummaries$Austria.FEMALE, signf.level = 0.99)
-
 ################################################################################
 
