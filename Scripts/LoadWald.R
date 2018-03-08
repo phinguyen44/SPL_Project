@@ -82,13 +82,11 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
     # default option is joint significants of all coefficients
     if (is.null(R)){
         R = diag(1, length(beta)) # default of R is identity matrix 
-    } else {
-        R = R}
+    } 
     
     if (is.null(r)){
         r = rep(0, length(beta)) # default for r is null vector
-    } else {
-        r = r}
+    } 
     
     # Now R and rdefinitely exist, check dimensions
     # R must be a matrix/dataframe/vector of size m x k, where m is the number of restrictions and k the number of all coefficients in the model summary.
@@ -133,7 +131,7 @@ C = c(0,0)
 b = allSummaries$Austria.FEMALE$coefficients[,1]
 
 # Wrong input test
-general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, B1, C)
+general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, R = B1, r = C)
 
 # Correct input test
 general.wald.test(model.summary = allSummaries$Austria.FEMALE, 0.95, B, C)
