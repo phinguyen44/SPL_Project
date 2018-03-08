@@ -80,12 +80,12 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
  
     # Set up restriction matrix/vector for linear hypothesis
     # default option is joint significants of all coefficients
-    R  = if (is.null(R)){
+    if (is.null(R)){
         R = diag(1, length(beta)) # default of R is identity matrix 
     } else {
         R = R}
     
-    r   = if (is.null(r)){
+    if (is.null(r)){
         r = rep(0, length(beta)) # default for r is null vector
     } else {
         r = r}
