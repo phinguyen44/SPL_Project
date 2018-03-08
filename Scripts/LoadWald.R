@@ -31,8 +31,8 @@ joint.wald.test = function(model.summary, signf.level = 0.95, spec = NULL){
     Var_beta_est           = vcov(model.summary)
   
     # Set up test restrictions
-    spec   = if (is.null(spec)){
-        spec = 1: length(beta) # default joint is significance test
+    if(is.null(spec)){
+        spec = 1:length(beta) # default joint is significance test
     } 
     
     # Wald test statistic
