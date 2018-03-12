@@ -1,0 +1,32 @@
+
+Name of Quantlet:   SPL_EuroLaborParticipation_SummaryStatistics
+
+Published in:       'Statistical Programming Languages - Student Project on 
+                    "EuroLaborParticipation"'
+
+Description:        'Generates summary statistics on health and labor force 
+                    participation across countries in Europe'
+
+Keywords:           'descriptive-statistics, descriptive methods, summary,
+                    analysis, statistics, mean, probability, population'
+
+Author:             Claudia Günther, Phi Nguyen, Julian Winkel
+
+See also:           'SPL_EuroLaborParticipation_ReadAndClean, 
+                    SPL_EuroLaborParticipation_ProbitRegression,
+                    SPL_EuroLaborParticipation_LoadWald,
+                    SPL_EuroLaborParticipation_Counterfactual,
+                    SPL_EuroLaborParticipation_Graphics'
+
+Submitted:          Fri, March 16 2018
+
+Datafile:           easySHARE_clean.RData
+
+Output:             
+- DF1.csv : Sample statistics and age classes
+- DF2.csv : Health indicators part 1
+- DF3.csv : Health indicators part 2
+- DF4.csv : Labor force participation men
+- DF5.csv : Labor force participation women
+- DF6.csv : Labor supply choice men
+- DF7.csv : Labor supply choice women

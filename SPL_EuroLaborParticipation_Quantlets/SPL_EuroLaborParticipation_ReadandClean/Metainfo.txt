@@ -1,0 +1,25 @@
+
+Name of Quantlet:   SPL_EuroLaborParticipation_ReadAndClean
+
+Published in:       'Statistical Programming Languages - Student Project on 
+                    "EuroLaborParticipation"'
+
+Description:        'Reads, cleans, and processes the raw easySHARE data set and
+                    generates a list of data frames to be used in summary
+                    statistics and regression'
+
+Keywords:           'descriptive-statistics, scaling, transformation, 
+                    normalization, variable selection, descriptive methods, 
+                    preprocessing'
+
+Author:             Claudia Günther, Phi Nguyen, Julian Winkel
+
+See also:           'SPL_EuroLaborParticipation_SummaryStatistics, 
+                    SPL_EuroLaborParticipation_ProbitRegression,
+                    SPL_EuroLaborParticipation_LoadWald,
+                    SPL_EuroLaborParticipation_Counterfactual,
+                    SPL_EuroLaborParticipation_Graphics'
+
+Submitted:          Fri, March 16 2018 
+
+Datafile:           easySHARE_rel6_0_0.rda
