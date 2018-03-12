@@ -384,7 +384,7 @@ joint.wald.test(allSummaries$Germany.FEMALE, spec = 16:19)
 
 ```
 
-```{r echo = FALSE, eval = TRUE, error = FALSE, warning = FALSE, message = FALSE, comment= FALSE}
+```{r echo = FALSE, eval = TRUE, error = FALSE, warning = FALSE, message = FALSE}
 # SOURCE DATA
 invisible(capture.output(source("Scripts/ReadAndClean.R")))
 invisible(capture.output(source("Scripts/ProbitRegression.R")))
@@ -403,7 +403,7 @@ A weakness of the aod package is, that its wald test cannot deal with empty clas
 wald.test(Sigma = vcov(allModels$Switzerland.MALE), 
               b = allModels$Switzerland.MALE$coefficients, Terms = 16:19 )
 ``` 
-```{r echo = FALSE, eval = TRUE, error=TRUE, warning = FALSE,message = FALSE, comment= FALSE}
+```{r echo = FALSE, eval = TRUE, error=TRUE, warning = FALSE,message = FALSE}
 # SOURCE DATA
 invisible(capture.output(source("Scripts/ReadAndClean.R")))
 invisible(capture.output(source("Scripts/LoadWald.R")))
@@ -418,7 +418,7 @@ Our wald test function is robust against the presence of empty classes since we 
 ```{r eval=FALSE}
 joint.wald.test(allSummaries$Switzerland.MALE, spec = 16:19)
 ``` 
-```{r echo=FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE, comment= FALSE}
+```{r echo=FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
 invisible(capture.output(source("Scripts/ReadAndClean.R")))
 invisible(source("Scripts/LoadWald.R"))
 invisible(capture.output(source("Scripts/ProbitRegression.R")))
@@ -426,7 +426,7 @@ invisible(source("Scripts/LoadWald.R"))
 joint.wald.test(allSummaries$Switzerland.MALE, spec = 16:19)
 ``` 
 
-Both our wald test functions are sensitive to the improper formulation of tested model restrictions. For example, the `general.wald.test` function stop from execution if the Jacobian matrix `R` and the restriction vector `r` have non-matching dimensions. In this example, 
+Both our wald test functions are sensitive to the improper formulation of tested model restrictions. For example, the `general.wald.test` function stop from execution if the Jacobian matrix `R` and the restriction vector `r` have non-matching dimensions.
 ```{r echo=TRUE, eval = FALSE}
 matrix.R     = diag(1, 23)
 vector.wrong = rep(1,22)
@@ -453,17 +453,16 @@ In this example, `R`is an identity matrix of size $22 \times 22$, whereas `vecto
 \newpage
 \section{Counterfactual exercise}
 
-Counterfactual exercises are a common tool in economic policy analysis that allow assessing and quantifying possible effects of policies. In order to evaluate the quantitative importance of a healthy population on labour participation, @kalwij2005labour conduct a counterfactual exercise. They compare the current national employment rate to the predicted counterfactual rate. This counterfactual employment rate is obtained by asuming that all individuals are in perfect health. According to their definition, a perfectly healthy individual has never had a severe or mild medical 
-condition, suffers from no restrictions in activities of daily living, is not obese and has a grip strength of an average 50-51 year-old (fe)male individual.
+Counterfactual exercises are a common tool in economic policy analysis that allow assessing and quantifying possible effects of policies. In order to evaluate the quantitative importance of a healthy population on labour participation, @kalwij2005labour conduct a simple counterfactual exercise. They compare the current national employment rate to the predicted counterfactual rate. This counterfactual employment rate is obtained by asuming that all individuals are in perfect health. According to their definition, a perfectly healthy individual has never had a severe or mild medical condition, suffers from no restrictions in activities of daily living, is not obese and has a grip strength of an average 50-51 year-old (fe)male individual.
 
 \subsection{Theory and Design}
-Counterfactual exercises based on regression methods that can be carried out in different ways (see Chernozhukov et al 2013).
-The simplest method to is to replace the existing covariates values $X$ with counterfactual values $X_{cf}$. For the case of probit regression with a binary response variable $y$ for employment, we can interpret the fitted values $\hat{y}$ and $\hat{y}_{cf}$ as current and counterfactual employment probabilities for each individual. Based on these calculated individual employment probabilities, we can calculate the current and counterfactual population employment rates ($\Pi_{ac}$, $\Pi_{cf}$) by taking the mean, making use of the Law of Large Numbers. 
+Counterfactual exercises based on regression methods that can be carried out in numerous ways.
+The simplest method to is to replace the existing covariates values $X$ with counterfactual values $X_{cf}$ [@chernozhukov2013inference]. For the case of probit regression with a binary response variable $y$ for employment, we can interpret the fitted values $\hat{y}$ and $\hat{y}_{cf}$ as current and counterfactual employment probabilities for each individual. Based on these calculated individual employment probabilities, we can calculate the current and counterfactual population employment rates ($\Pi_{ac}$, $\Pi_{cf}$) by taking the mean, making use of the Law of Large Numbers. 
 Obtaining the counterfactual probabilities $\hat{y}_{cf}$ requires a two-step procedure. First, the regular probit regression of $y$ on $X$ is tun to obtain the estimated coefficients $\hat{\beta}$. Second, the counterfactual probabilities for each individuals $\Pi_i$ are calculated by predicting y based on $X_{cf}$ and the estimated coefficients.  
 
 $$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) =  \Phi(xi_{cf}'{\beta}\tag{***}) $$
 
-We can then assess counterfactual health-related effects by comparing the actual and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$. We can gain closer insights into the nonlinear relation between health effects and particpation by calculating $\Pi_{ac}$ and $\Pi_{cf}$ for different age groups. This also allows assessing the proportion of decline in participation that is due to decline in health condition according to our model estimates. 
+We can assess counterfactual health-related effects by comparing the actual and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$. We can gain closer insights into the nonlinear relation between health effects and particpation by calculating $\Pi_{ac}$ and $\Pi_{cf}$ for different age groups. This also allows assessing the proportion of decline in participation that is due to decline in health condition according to our model estimates. 
 <!--\1
 Optional text: Not that important
 @kalwij2005labour define this measure $\delta_{decline}$ as
@@ -475,11 +474,8 @@ It nevertheless gives us a first hint towards the size of participation decline 
 \subsection{Implementation}
 Our counterfactual effects are based on the manipulation of explanatory variables according to some specified criteria. We design this counterfactual exercise in a way that allows us to directly use the output from our probit estimation. As a first step, we create a simple function ```empl.rate``` that takes an estimation model object as input and predicts the employment rate, i.e. the mean of fitted values, as an output. In order to calculate the both current and counterfactual employment rates  $\Pi_{ac}$ and $\Pi_{cf}$ conveniently, we need to manipulate the original covariates contained in our model objects. For this purpose we design the function ```X.cf```, whose only input the model object, allowing us to treat each country separately later on. As can be seen in line XXX, the function creates a duplicate version of orginal data `X`, whose values will be replaced later on.
 
-
 In line XXX, we calculate the minimum value for each variable in `X`, which corresponds to the perfect health 
 conditions of the variables `h_chronic`, `h_adlaTRUE`, and `h_obeseTRUE` since we are dealing with standarized varaibles. We obtain these values with making use of the apply function and store them in the vector `X_min`. We also calculate the mean average grip strength of 50- to 51-years old in the sample `X`. As can be seen in line XXX, we derive this mean with the `tapply` command because it allows us to specify an age group index and returns a vector whose elements we can access.
-
-
 
 
 ```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
@@ -499,8 +495,6 @@ conditions of the variables `h_chronic`, `h_adlaTRUE`, and `h_obeseTRUE` since w
               model$data   = X_cf
 
 ```
-Quantlet 4[![Quantlet 4](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/LoadWald.R){width=25px}
-   
 
 To obtain the counterfactual covariates, the values in `X_cf` are replaced with perfect health values. As a final step, we replace the original model data in `X_cf`. This allows us to access both the model estimates and counterfactual covariates in one object. By running our ```empl.rate``` function on the returned model, we directly optain the counterfactual employment rate for a given country.
 
@@ -524,7 +518,7 @@ The proper value assignment of the numerical vector `group.low` is essential sin
 ```
 We need to assign the age values to `z` in order to locate the right individuals in our data frame `X`. We find the individuals belonging to a given age group by summing over rows of `X` and storing this vector inside the list `IND_row_vec` displayed in line XXX. We can take the sum because the age values assigned to `z` correspond to the column names of the data frame `X`. Thus, for a given individual, the row sum of `X[, z]` is either zero or one, dependong on wether the individual belongs to the age group or not. Following this step, we filter out only the relevant age groups via indexing.
 ```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
-                 IND_row_vec[[i]] = apply(X[, z], 1, sum)
+45                 IND_row_vec[[i]] = apply(X[, z], 1, sum)
                  IND_row_vec      = IND_row_vec[group.low]
                  
      empl.rate[k] = empl.probability %*% IND_row_vec[[k]] / sum(IND_row_vec[[k]])
@@ -741,7 +735,8 @@ grid.raster(img)
 
 
 \section{Conclusion}
-
+Quantlet 4[![Quantlet 4](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/LoadWald.R){width=25px}
+   
 
 
 
