@@ -14,13 +14,6 @@
 ################################################################################
 # SET WORKING DIRECTORY
 
-# Note: Only this part must be changed for the rest of the script to run.
-rm(list = ls())
-
-# Adjust your working directory to where your local repository is located
-wd = paste0(Sys.getenv("USERPROFILE"), "/splrepo/SPL_Project")
-setwd(wd)
-  
 ################################################################################
 # SOURCE DATA
     
@@ -39,7 +32,7 @@ rm(datasets)
 # LOAD NECESSARY PACKAGES & DATA
 
 # List all packages needed for session
-neededPackages = c("dplyr", "magrittr", "purrr",
+neededPackages = c("dplyr", "tidyr", "magrittr", "purrr",
                    "formattable", "webshot", "htmltools", "webshot")
 allPackages    = c(neededPackages %in% installed.packages()[ , "Package"]) 
 

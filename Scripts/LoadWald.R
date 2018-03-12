@@ -118,5 +118,6 @@ general.wald.test = function(model.summary, signf.level = 0.95, R = NULL, r = NU
     general.wald.test[6] = ifelse(pval <= 1- signf.level, "Reject H0", "Cannot reject H0")
     general.wald.test
 }
+
 ################################################################################
 

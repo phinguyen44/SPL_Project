@@ -8,16 +8,13 @@
 # not the correct easySHARE data set and relevant statistics printed (e.g. num
 # rows dropped, variables retained, data type)
 #
-# TODO: Add other health metrics. Like self-reported health. As quantitative.
-#
 ################################################################################
 
 read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
 
     # LOAD NECESSARY PACKAGES & DATA
     # List all packages needed for session
-    neededPackages = c("dplyr", "tidyr", "ggplot2", 
-                       "magrittr","infuser", "countrycode")
+    neededPackages = c("dplyr", "magrittr", "infuser", "countrycode")
     allPackages    = c(neededPackages %in% installed.packages()[,"Package"])
 
     # Install packages (if not already installed)
@@ -28,8 +25,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     }
 
     # Load all defined packages
-    lapply(neededPackages, function(x) suppressPackageStartupMessages(
-        library(x, character.only = TRUE)))
+    invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
+        library(x, character.only = TRUE))))
 
     # Load dataset
     cat("Loading data set...", sep = "\n")
@@ -39,6 +36,9 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     rm(easySHARE_rel6_0_0)
     
     rows.dat.input = nrow(dat.input)
+
+    if (!(wav %in% 1:6)) stop('Out of bounds. 
+                              Select a value between 1 and 6.')
 
     ############################################################################
     # ENCODE MISSING VALUES
@@ -130,9 +130,6 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
         na.omit() %>%                               # remove missing values
         set_rownames(NULL)                          # reset row numbering
 
-    # TODO: determine threshold for "severe" and "mild" conditions (currently we
-    # just set it as numeric
-
     rows.df.out    = nrow(df.out)
     rows.remove    = rows.dat.input - rows.df.out
     
@@ -157,7 +154,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
         idx = seq(1:length(idx))[idx]
         
         # Creating separate data set with standardized numeric variables for 
-        # regression, then reselect variables as described in paper (e.g. self-           # reported health is removed)
+        # regression, then reselect variables as described in paper (e.g. self-           
+        # reported health is removed)
         df.reg = df %>%
             mutate_at(.vars = vars(idx),
                       .funs = standardize) %>%
@@ -194,7 +192,8 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
     cat("Final output is a list containing 3 data.frames:", sep = "\n")
     cat("`df.out` is a data.frame containing variables for calculating summary statistics.", sep = "\n")
     cat("`df.reg` is a data.frame containing standardized variables for regression.", sep = "\n")
-    cat("`df.splits` splits the regression data.frame into individual data.frames for each country/gender split. 22 data.frames are contained in this list.", sep = "\n")
+    cat("`df.splits` splits the regression data.frame into individual data.frames for each country/
+        gender split. 22 data.frames are contained in this list.", sep = "\n")
 
     return(all.output)
 }
