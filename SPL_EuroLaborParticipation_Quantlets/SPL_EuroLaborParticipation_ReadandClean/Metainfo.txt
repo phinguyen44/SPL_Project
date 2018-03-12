@@ -9,7 +9,8 @@ Description:        'Reads, cleans, and processes the raw easySHARE data set and
                     statistics and regression'
 
 Keywords:           'descriptive-statistics, scaling, transformation, 
-                    normalization, variable selection, descriptive methods'
+                    normalization, variable selection, descriptive methods, 
+                    preprocessing'
 
 Author:             Claudia Günther, Phi Nguyen, Julian Winkel
 
