@@ -20,7 +20,7 @@ See also:           'SPL_EuroLaborParticipation_ReadAndClean,
                     SPL_EuroLaborParticipation_LoadWald,
                     SPL_EuroLaborParticipation_Counterfactual'
 
-Submitted:          Fri, March 16, 2018
+Submitted:          Fri, March 16 2018
 
 Datafile:           easySHARE_clean.RData
 
