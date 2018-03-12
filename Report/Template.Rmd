@@ -16,14 +16,22 @@ bibliography: references.bib
 ---
 
 ```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
-wd = paste0(Sys.getenv("HOME"), "/Documents/SPL_Project")
+wd = paste0(Sys.getenv("USERPROFILE"), "/splrepo/SPL_Project")
 knitr::opts_knit$set(root.dir = wd)
 
 ```
 
 ```{r global_options, include=FALSE, echo=TRUE}
 knitr::opts_chunk$set(fig.pos = 'H')
+options(xtable.comment = FALSE,
+        xtable.table.placement="H")
 ```
+
+```{r, eval = TRUE, echo = FALSE, cache = TRUE, include = FALSE}
+source("Scripts/SummaryStatistics.R")
+source("Scripts/ProbitRegression.R")
+```
+
 
 \pagenumbering{gobble}
 
@@ -243,17 +251,267 @@ datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 99)
 ```
 
 \section{Multidisciplinary and crossnational summary statistics}
-JULIAN
-\subsection{Theory and Design}
-\subsection{Implementation}
-\subsection{Empirical Results}
+
+## Basics
+
+We use various variables on objective and subjective health related variables. The effects of older people generally having worse health conditions than younger one remain uncompensated. Sample size and variance differ among countries. Data may be affected by different national pension schemes, that incentivize workers to extend or restrict working depending on age. 
+
+
+## Implementation
+
+An efficient way of seperating the SHARE dataset into country, gender and age is explained in the following. In order to minimize hard-coding and possibly related errors, a grid is expanded between named variables.
+Functions that calculate group shares per country and labor participation rates can subsequently be applied onto the defined grid. 
+
+Besides the target data frame, `group.share` takes a boolean variable as an input that specifies whether aggregation on a national level is intended. The share of males or females (per country) is calculated by finding the sum of occurences and dividing by their total, represented by the length of the vector. A similar procedure that allows for multiple subsets and based upon `dplyr` is used in `labor`.
+
+```{r, eval = FALSE}
+# Function for calculation group shares per country
+group.share = function(df, y, agg.country = TRUE) {
+    if (agg.country) {
+        final = tapply(df[[y]], df$country, function(x) {
+            val = sum(x)/length(x)
+            return(val)
+        })
+    } else { # return total if country-level aggregation not specified
+        final = sum(df[[y]])/length(df[[y]])
+    }
+    return(final)
+}
+
+# Function for calculating labor participation rate per country / gender / age
+labor = function(df, .country, .gender, .age) {
+    dataset = df %>% 
+        filter(country == .country & gender == .gender & get(.age) == TRUE)
+    denom = nrow(dataset)
+    numer = with(dataset, sum(labor_ft | labor_pt))
+    perc  = round(numer/denom, 4)
+    
+    return(perc)
+}
+
+```
+
+args.list contains three sub-lists divided in countries (`c`), gender (`g`) and age (`a`). The list is passed as an argument to `labor`, which are simulatenously iterated over the sub-lists in parallel using `pmap`.
+Including `with` to specify the data frame on which we expand the grid upon, modifies the data frame in a new environment. This simplifies name assignment. 
+
+```{r, eval = FALSE}
+
+# use expand.grid to get all combinations of country / gender / age
+agegroups = names(df.out[, 4:6])
+args      = with(df.out, 
+                 expand.grid(levels(country), levels(gender), agegroups, 
+                             stringsAsFactors = FALSE))
+args.list = list(c = as.vector(t(args[1])), 
+                 g = as.vector(t(args[2])), 
+                 a = as.vector(t(args[3])))
+
+# Map over multiple arguments
+output   = pmap(args.list, function(c, g, a) labor(df.out, c, g, a))
+output.v = do.call("c", output)
+
+labor.part.share    = cbind(args, output.v)
+labor.part.share.df = spread(labor.part.share, Var3, output.v) %>% 
+    arrange(desc(Var2)) %>% 
+    set_colnames(c("Country", "Gender", 
+                   paste0("Age ", rep(c("50-54", "55-59", "60-64")))))
+```
+
+The results can be easily bound into a data frame and arranged using `dplyr`. The same package is used to subset by gender. Using the pipe operator `%>%` keeps our code compact and avoids unnecessary variable assignment and inefficient memory requirements.
+
+`vars` is actually a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the names that contain 'labor'. 
+
+```{r, eval = FALSE}
+
+# Get gender specific tables
+labor.part.f = labor.part.share.df %>% 
+    filter(Gender == "FEMALE") %>% 
+    set_rownames(levels(df.out$country)) %>% 
+    dplyr::select(-Gender, -Country)
+
+# Labor supply choice tables
+df.female = df.out %>% filter(gender == "FEMALE")
+vars      = names(df.out)[grep("labor", names(df.out))][3:1] # invert
+
+labor.supply.f    = lapply(vars, function(x) group.share(df.female, x, 1))
+labor.supply.f.df = do.call(cbind.data.frame, labor.supply.f) %>% 
+    set_colnames(c("Nonparticipation", "Half time", "Full time"))
+
+
+```
+
+
+
+
+## Empirical Results
+
+```{r, eval = TRUE, results = 'asis', warning = FALSE, comment = FALSE, message = FALSE, echo = FALSE}
+
+library("knitr")
+knitr::kable(t(round(sum.stats.tot, 2)), caption = "Summary Statistics over all groups")
+
+
+knitr::kable(labor.part.m, caption = "Men: Labor Force Participation Rate by age")
+knitr::kable(labor.part.f, caption = "Women: Labor Force Participation Rate by age")
+
+```
+
+
+Having obtained the share of labor force participation grouped by gender, country and age as well as the according health variables, striking values can be presented.
+
+Among the selected countries, France, Greece and Belgium have the fewest people among the oldest age group, which is ranging from 60 to 64 years. In the middle age group, ranging from 54-59, the German population is sparsely represented. Within the youngest age group, including people from 50 to 54 years old, Italy and Austria have the lowest share.  
+Instead, Austria represents by far the largest share in the oldest age group. Belgium, Italy, the Netherlands and Sweden dominate the highest ranks in the group ranging from 54 to 59 years. Additionally, Greece solely leads the share in the youngest age group. 
+
+Concerning health statistics, Switzerland and the Scandinavian countries stand out positively. Together, they from a group that has an overall low percentage of obese people while achieving high shares of self-reported good health. Among all other countries, the Swiss have the least number of chronic diseases and fewest overweight. Only the Greek have lower share of ADL's. 
+
+Switzerland and the Nordic countries additionally present the least non-participation rates and the highest full-time working rates. 
+Summary Statistics show that those countries, which strive in health topics are related to high labor force participation rates in all categories. Despite this, the only candidate for multicollinearity is the age dummy in the age group 50, which is omitted before model calculation. 
+
+Generally, labor force participation is higher for males than for females. This applies to part-time work, too.
+
+The overall results of the descriptive statistics align well with @kalwij2005labour
+
+\newpage
+
 
 
 \section{Crosssectional probit regression}
-JULIAN
-\subsection{Theory and Design}
-\subsection{Implementation}
-\subsection{Empirical Results}
+
+## Theory and Design 
+
+Probit models allow for the estimation of binary, random response variables.  
+Probit and Logit models mitigate problems that would occur in case a (linear) regression would be used for a similar task. In this case, the range of the response variable would not be restricted to the interval (0,1). Consequently, as probabilities are commonly defined on this space, non-interpretable probability estimations would be delivered.
+The estimated coefficients are subject to a Wald Test on joint significance. 
+
+The model formula holds under the assumption that $\epsilon \sim N(0,1)$
+
+
+$$
+P(Y = 1 | X = x) = \Phi (x \beta)'
+$$
+
+Using this model, it is investigated how the probability of labor participation is influenced by health and age variables. 
+
+We are especially focussing on the calculation and evaluation of marginal effects.
+The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a ceteris paribus change of $x_j$ on the conditional probability that the response variable Y is realized as one.
+In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is dependent on x.
+
+
+## Implementation
+
+As stated in the 'Read and Clean' section, `df.splits` is obtained using the `split` function. A list is returned, that seperates the cleaned data frame by country and gender.
+This structure is helpful throughout the following sections, as it enables us to build a series of concatenated `lapply` functions. This function invokes a c-loop that iterates over each list element. As `lapply` takes a list as an input and returns a list, too; it preserves the initial structure. First, it is used to create a probit model for each subset within the list. One variable, namely the age 50 dummy variable, which is highly correlated with other regressors, is excluded due to multicollinearity. 
+
+```{r, eval = FALSE}
+
+# Probit for each country and gender 
+allModels = lapply(df.splits, function(z){
+  
+  z     = z[-z$age50] # Multicollinearity
+  model = glm(z$labor_participationTRUE ~., family = binomial(link = "probit"), data = z)
+  
+  return(model)
+})
+
+# Return summaries
+allSummaries = lapply(allModels, summary)
+```
+
+
+
+The loop below is a robust way to apply the Wald Test for the dataset subsetted by country and gender and utilises only health-related variables. A list intended to log is created, which tracks failure of applying the Wald Test on joint significance of the selected variables. `Try` ensures continuation of the loop despite possible errors. In case an error occurs, the class of `testOutput` will be `try-error` and consequently logged into named list. Since it preserves the structure as specified before, results can be easily transformed and named. This setup has proven to be useful for debugging our test as well as finding out that some health variables are empty for certain subgroups, leading to selective failure of the test. 
+
+
+```{r, eval = FALSE}
+
+# Wald Test for all models
+wald.log = list() # Save Wald Test Output
+
+for(i in 1:length(allSummaries)){
+  
+  # Get Element
+  SummaryElement = allSummaries[[i]]
+  
+  # Specify the of coefficients to be tested: only health variables
+  health = c(16:19)
+  
+  # Test only the joint significance of health variables
+  testOutput = try(joint.wald.test(allSummaries[[i]], 0.95, health))
+  
+  if(class(testOutput) == "try-error"){
+    msg = paste0("Wald Test failed for Model Element ", i)
+    warning(msg)
+    wald.log[[i]] = "Error"
+  } else{
+    wald.log[[i]] = testOutput
+  }
+  rm(SummaryElement) # clean up
+}
+
+wald.bound = as.data.frame(wald.log)
+colnames(wald.bound) = names(allModels)
+
+```
+
+
+Furthermore, the application of the Wald Test can easily be substitued. We use a different Wald Test to validate our results. 
+
+```{r, eval = FALSE}
+    testOutput = try(wald.test(b = coef(ModelElement), 
+                               Sigma = vcov(ModelElement), Terms = health)$result)
+```
+
+In line with the proposed concatenated `lapply` structure, the probability of employment can be predicted for each subset. Marginal effects are calculated using `probitmfx`, which firstly recalculates a probit model. 
+
+```{r, eval = FALSE, warning = FALSE}
+# Calculate marginal effects and standard errors
+
+# Same structure as before, but must calculate model again. 
+mfx.Models = lapply(df.splits, function(z){
+    
+    z   = z[-z$age50] # Multicollinearity
+    res = probitmfx(z$labor_participationTRUE ~.,atmean = TRUE,  data = z)
+    
+    return(res)
+})
+
+```
+
+
+## Empirical Results
+
+By means of the presented model, it is evaluated how labor force participation behavior of individuals aged 50-64 is influenced by different health indicators across 11 European countries.
+The underlying data enables us to mitigate justification bias and measurement error that occur when assessing health subjectively [@kalwij2005labour]. 
+
+@kalwij2005labour summarize the results as follows:   
+
+- The influence of health (as captured by the indicators) on labor force participation differs among individuals and across countries
+- Health improvements are associated with higher labor force participation rates
+- Decreasing health explains decreasing labor force participation of the elderly in Europe
+
+These main results are validated by the analysis. As shown on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases negatively related to employment. Analysis of the marginal effects show, that the negative influence of age on the dependent variable is growing with increasing age. Conversely, high education positively predicts labor force participation for the specified group. Having children does not significantly influence the independent variable. These results are stable across different groups. 
+
+Comparing the marginal effects between our results and the paper by @kalwij2005labour shows similar results. Usually, significant coefficient estimates as well as their significance level are close to each other. However, as the data sets differ, there are deviations in the majority of models. This rarely affects the sign of the coefficients. 
+
+
+```{r, eval = TRUE, results = 'asis', echo = FALSE, message = FALSE, warning = FALSE}
+
+library("xtable", quietly = TRUE)
+xtable::xtable( allSummaries[[1]], caption = "Probability of Austrian women participating in the labor market")
+
+# xtable::xtable(mfx.Models[[1]]$fit)
+
+```
+
+
+```{r, eval = TRUE, results = 'asis', echo = FALSE, message = FALSE, warning = FALSE}
+
+library("xtable", quietly = TRUE)
+xtable::xtable(mfx.Models[[1]]$fit, caption = "Marginal effects of health and age related variables on the probability of labor market participation of Austrian women")
+
+```
+
+\pagebreak
+\newpage
 
 
 \section{Wald Test}
