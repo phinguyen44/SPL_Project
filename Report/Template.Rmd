@@ -132,7 +132,7 @@ The rest of this section describes our process of data transformation, aggregati
 
 The `read.and.clean()` function is designed to take the raw easySHARE data set file, which is provided in an `.rda` file format, and convert that into a list of data frames. We split the data set into list items because future analyses involve either summary statistics on the entire data set or regressions conducted on a subset of the data set. The function additionally accepts a wave number as an argument. Although we are only concerned with the initial wave for our study, this additional parameter allows us to conduct supplementary panel studies if we choose to do so later. The function only runs specifically with the raw easySHARE data set (`easySHARE_rel6_0_0.rda`), which is the default `dataset` argument. The `dataset` argument may alternatively be specified to point to the directory where that data set is located. Otherwise it is assumed that it is located in the root directory.
 
-We begin by initializing and downloading the packages (if necessary) required for this function. Much of the funciton utilizes the functions in the `tidyverse` family of functions developed by Hadley Wickham, namely  `dplyr` and `magrittr`. The `dplyr` package is designed for accessible and uncomplicated data manipulation, and it works specifically with data frames. The package provides a consistent set of verbs that do a small thing very well, such as aggregation, selection, filtering, or creation of new variables. The `magrittr` package expands upon this further with the pipe operator `%>%`, which enables the chaining of smaller functions to create something more complex. Furthermore, the pipe operator dramatically improves readability by reading chains left to right as opposed to inside-out. This is especially useful when working with nested functions, which can be deconstructed into a series of chained commands.
+We begin by initializing and downloading the packages (if necessary) required for this function. Much of the function utilizes the functions in the `tidyverse` family of functions developed by Hadley Wickham, namely  `dplyr` and `magrittr`. The `dplyr` package is designed for accessible and uncomplicated data manipulation, and it works specifically with data frames. The package provides a consistent set of verbs that do a small thing very well, such as aggregation, selection, filtering, or creation of new variables. The `magrittr` package expands upon this further with the pipe operator `%>%`, which enables the chaining of smaller functions to create something more complex. Furthermore, the pipe operator dramatically improves readability by reading chains left to right as opposed to inside-out. This is especially useful when working with nested functions, which can be deconstructed into a series of chained commands.
 
 ```{r eval=TRUE, echo=TRUE}
 neededPackages = c("dplyr", "magrittr", "infuser", "countrycode")
@@ -246,7 +246,7 @@ source('Scripts/ReadAndClean.R')
 datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 99)
 ```
 
-\section{Multidisciplinary and crossnational summary statistics}
+\section{Multidisciplinary and Cross-National Summary Statistics}
 JULIAN
 \subsection{Theory and Design}
 \subsection{Implementation}
@@ -255,7 +255,7 @@ JULIAN
 
 \newpage
 
-\section{Crosssectional probit regression}
+\section{Cross-Sectional Probit Regression}
 JULIAN
 \subsection{Theory and Design}
 \subsection{Implementation}
@@ -265,7 +265,7 @@ JULIAN
 \newpage
 
 \section{Wald Test}
-In the context of probit regression, the Wald test can be used to test multiple hypothesis regarding the model specifications. For example, We can test whether the fit of the model is improved if a subset of regression coefficients are all set equal to zero, an exclusion restriction. @kalwij2005labour conduct a Wald test to check the null hypothesis that none of the included health variables has an impact on labour participation in order to investigate the joint impact of health on participation.
+In the context of probit regression, the Wald test can be used to test multiple hypotheses regarding the model specifications. For example, We can test whether the fit of the model is improved if a subset of regression coefficients are all set equal to zero, an exclusion restriction. @kalwij2005labour conduct a Wald test to check the null hypothesis that none of the included health variables has an impact on labour participation in order to investigate the joint impact of health on participation.
 
 \subsection{Theory and Design}
 Depending on the estimation method and distributional assumptions, the Wald statistic can be formulated in different ways. The general form of the Wald statistic after MLE for testing hypothesis regarding our $k \times 1$ parameter vector $\theta$ is given by
@@ -276,17 +276,19 @@ $$
 
 
 where $c(\hat{\theta})$ is a $m \times 1$ vector of linear or nonlinear restrictions, $\nabla_{\theta}c(\hat{\theta})$ is the $m \times k$ Jacobian of $c(\hat{\theta})$ evaluated
-at $\hat{\theta}$ and $\hat{V}$ is the estimated asymtotic covariance matrix [@wooldridge2010econometric, 463]. Under H0, the Wald test statistic is asymptotically $\chi2_m$ distributed, with m being the number of specified restrictions. In order to assure the test statistic W has the assumed limiting distribution, we need to impose some restrictions: Under H0, $\theta$ must lie within parameter space and R must be of rank m [@wooldridge2010econometric, 362].
-We limit our attention to testing a set of general linear restrictions since the Wald test is not invariant to the re-formulation of non-linear hypothesis. We thus formulate our nullhypothesis in accordance with the common linear restriction structure of H0: $R \hat{\beta} = r$ againsts the alternative H1:  $R \hat{\beta} \neq r$ to facilitate the derivation of our test statistics where R is a $m \times k$ matrix of rank m (equivalent to the Jacobian), whereas the restriction function r is a $m \times 1$ vector. Given the conditions mentioned above, the Wald statistic can then be rewritten as
+at $\hat{\theta}$ and $\hat{V}$ is the estimated asymptotic covariance matrix [@wooldridge2010econometric, 463]. Under H0, the Wald test statistic is asymptotically $\chi2_m$ distributed, with m being the number of specified restrictions. In order to assure the test statistic W has the assumed limiting distribution, we need to impose some restrictions: Under H0, $\theta$ must lie within parameter space and R must be of rank m [@wooldridge2010econometric, 362].
+We limit our attention to testing a set of general linear restrictions since the Wald test is not invariant to the re-formulation of non-linear hypothesis. We thus formulate our null hypothesis in accordance with the common linear restriction structure of H0: $R \hat{\beta} = r$ against the alternative H1:  $R \hat{\beta} \neq r$ to facilitate the derivation of our test statistics, where R is a $m \times k$ matrix of rank m (equivalent to the Jacobian), whereas the restriction function r is a $m \times 1$ vector. Given the conditions mentioned above, the Wald statistic can then be rewritten as
 $$    W = (R \hat{\beta} - r)'[R \hat{V}R']^{-1}(R \hat{\beta} - r)
 \tag{***}
 $$
-which facilitates our calculations [@greene2012econometric, 527-529; @wooldridge2010econometric, 362]. When we are interested in the joint significance of a subset of $s$ coefficients, the Wald test statistic $W \stackrel{a}{\sim}\chi2_s$ can be even more simplified [@wooldridge2010econometric, 362]:
+which facilitates our calculations [@greene2012econometric, 527-529; @wooldridge2010econometric, 362]. When we are interested in the joint significance of a subset of $s$ coefficients, the Wald test statistic $W \stackrel{a}{\sim}\chi2_s$ can be simplified further [@wooldridge2010econometric, 362]:
  $$   W = \hat{\beta}_s'[R\hat{V}R']^{-1}\hat{\beta}_s = \hat{\beta}_s'[\hat{V}_s]^{-1}\hat{\beta}_s
  \tag{***}
  $$
+
 \subsection{Implementation}
-In order to test linear hypothesis regarding the model specifications we design two Wald test versions. The function `joint.wald.test` can be used to test the joint significance of a subset of model coefficients, whereas `general.wald.test` allows checking any linear hypothesis. The two tests are designed in a way that they align well with the glm estimation output. The specific design of the joint significance test `joint.wald.test` is makes the function easy to use, understand and modify to special needs. The only required input is the model summary from glm estimation, whereas the significance level and test specifications are optional. 
+In order to test the linear hypothesis regarding the model specifications, we design two Wald test versions. The function `joint.wald.test` can be used to test the joint significance of a subset of model coefficients, whereas `general.wald.test` allows for us to check any linear hypothesis. The two tests are designed in a way that they align well with the `glm` estimation output. The specific design of the joint significance test `joint.wald.test` makes the function easy to use, understand, and modify to specialized requirements. The only required input is the model summary from glm estimation, whereas the significance level and test specifications are optional. 
+
 ```{r eval=FALSE}
 joint.wald.test = function(model.summary, confidence.level = 0.95, spec = NULL){
     
@@ -294,9 +296,10 @@ joint.wald.test = function(model.summary, confidence.level = 0.95, spec = NULL){
     names(joint.wald.test) = c("Name","W","p-value", "df", "H0" , "Decision")
     beta                   = model.summary$coefficients[,1]
     Var_beta_est           = vcov(model.summary)
-    
+
 ```
-In order to set up default values for the hypothesis specification, we make use of a local if-else statement inside the ``` joint.wald.test``` function. By declaring the model specification to be null in line XXX we set the foundation for the default specification in line XXX - XXX. Here, we re-asign a sequence vector to `spec` that includes the number of all model coefficients in increasing order, unless ```spec``` is specified differently.
+
+In order to set up default values for the hypothesis specification, we make use of a local if-else statement inside the `joint.wald.test` function. By declaring the model specification to be null in line XXX we set the foundation for the default specification in line XXX - XXX. Here, we re-assign a sequence vector to `spec` that includes the number of all model coefficients in increasing order, unless `spec` is specified differently.
 
 ```{r eval=FALSE}
    if(is.null(spec)){
@@ -451,9 +454,9 @@ general.wald.test(allSummaries$Switzerland.MALE, R = matrix.R, r = vector.right)
 In this example, `R`is an identity matrix of size $22 \times 22$, whereas `vector.wrong` is $21 \times 1$. As soon as we add another element to the `r` vector, the function works properly due to dimension matching.
 
 \newpage
-\section{Counterfactual exercise}
+\section{Counterfactual Exercise}
 
-Counterfactual exercises are a common tool in economic policy analysis that allow assessing and quantifying possible effects of policies. In order to evaluate the quantitative importance of a healthy population on labour participation, @kalwij2005labour conduct a simple counterfactual exercise. They compare the current national employment rate to the predicted counterfactual rate. This counterfactual employment rate is obtained by asuming that all individuals are in perfect health. According to their definition, a perfectly healthy individual has never had a severe or mild medical condition, suffers from no restrictions in activities of daily living, is not obese and has a grip strength of an average 50-51 year-old (fe)male individual.
+Counterfactual exercises are a common tool in economic policy analysis that allow assessing and quantifying possible effects of policies. In order to evaluate the quantitative importance of a healthy population on labour participation, @kalwij2005labour conduct a simple counterfactual exercise. They compare the current national employment rate to the predicted counterfactual rate. This counterfactual employment rate is obtained by assuming that all individuals are in perfect health. According to their definition, a perfectly healthy individual has never had a severe or mild medical condition, suffers from no restrictions in activities of daily living, is not obese, and has a grip strength of an average 50-51 year-old (fe)male individual.
 
 \subsection{Theory and Design}
 Counterfactual exercises based on regression methods that can be carried out in numerous ways.
@@ -462,20 +465,20 @@ Obtaining the counterfactual probabilities $\hat{y}_{cf}$ requires a two-step pr
 
 $$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) =  \Phi(xi_{cf}'{\beta}\tag{***}) $$
 
-We can assess counterfactual health-related effects by comparing the actual and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$. We can gain closer insights into the nonlinear relation between health effects and particpation by calculating $\Pi_{ac}$ and $\Pi_{cf}$ for different age groups. This also allows assessing the proportion of decline in participation that is due to decline in health condition according to our model estimates. 
+We can assess counterfactual health-related effects by comparing the actual and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$. We can gain closer insights into the nonlinear relation between health effects and participation by calculating $\Pi_{ac}$ and $\Pi_{cf}$ for different age groups. This also allows assessing the proportion of decline in participation that is due to decline in health condition according to our model estimates. 
 <!--\1
 Optional text: Not that important
 @kalwij2005labour define this measure $\delta_{decline}$ as
 $$ \delta_{decline} =  \frac{\Pi_{cf}[age60.64]- \Pi_{ac}[age60.64] -   \Pi_{cf}[age50.54]- \Pi_{ac}[age50.54]}{\Pi_{ac}[age50.54] - \Pi_{ac}[age60.64]} \tag{***}$$
 where $\Pi_{cf}[age60.64]$ and $\Pi_{ac}[age60.64]$ refer to the counterfactual and actual employment rates of 60 to 64 year old individuals. Though this measure is  oversimplified since XXXXXXXXX,
-It nevertheless gives us a first hint towards the size of participation decline among elderly that is associated with declinning health conditions.
+It nevertheless gives us a first hint towards the size of participation decline among elderly that is associated with declining health conditions.
 \1-->
 
 \subsection{Implementation}
-Our counterfactual effects are based on the manipulation of explanatory variables according to some specified criteria. We design this counterfactual exercise in a way that allows us to directly use the output from our probit estimation. As a first step, we create a simple function ```empl.rate``` that takes an estimation model object as input and predicts the employment rate, i.e. the mean of fitted values, as an output. In order to calculate the both current and counterfactual employment rates  $\Pi_{ac}$ and $\Pi_{cf}$ conveniently, we need to manipulate the original covariates contained in our model objects. For this purpose we design the function ```X.cf```, whose only input the model object, allowing us to treat each country separately later on. As can be seen in line XXX, the function creates a duplicate version of orginal data `X`, whose values will be replaced later on.
+Our counterfactual effects are based on the manipulation of explanatory variables according to some specified criteria. We design this counterfactual exercise in a way that allows us to directly use the output from our probit estimation. As a first step, we create a simple function ```empl.rate``` that takes an estimation model object as input and predicts the employment rate, i.e. the mean of fitted values, as an output. In order to calculate the both current and counterfactual employment rates  $\Pi_{ac}$ and $\Pi_{cf}$ conveniently, we need to manipulate the original covariates contained in our model objects. For this purpose we design the function ```X.cf```, whose only input the model object, allowing us to treat each country separately later on. As can be seen in line XXX, the function creates a duplicate version of original data `X`, whose values will be replaced later on.
 
 In line XXX, we calculate the minimum value for each variable in `X`, which corresponds to the perfect health 
-conditions of the variables `h_chronic`, `h_adlaTRUE`, and `h_obeseTRUE` since we are dealing with standarized varaibles. We obtain these values with making use of the apply function and store them in the vector `X_min`. We also calculate the mean average grip strength of 50- to 51-years old in the sample `X`. As can be seen in line XXX, we derive this mean with the `tapply` command because it allows us to specify an age group index and returns a vector whose elements we can access.
+conditions of the variables `h_chronic`, `h_adlaTRUE`, and `h_obeseTRUE` since we are dealing with standardized variables. We obtain these values with making use of the apply function and store them in the vector `X_min`. We also calculate the mean average grip strength of 50- to 51-years old in the sample `X`. As can be seen in line XXX, we derive this mean with the `tapply` command because it allows us to specify an age group index and returns a vector whose elements we can access.
 
 
 ```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
@@ -496,7 +499,7 @@ conditions of the variables `h_chronic`, `h_adlaTRUE`, and `h_obeseTRUE` since w
 
 ```
 
-To obtain the counterfactual covariates, the values in `X_cf` are replaced with perfect health values. As a final step, we replace the original model data in `X_cf`. This allows us to access both the model estimates and counterfactual covariates in one object. By running our ```empl.rate``` function on the returned model, we directly optain the counterfactual employment rate for a given country.
+To obtain the counterfactual covariates, the values in `X_cf` are replaced with perfect health values. As a final step, we replace the original model data in `X_cf`. This allows us to access both the model estimates and counterfactual covariates in one object. By running our ```empl.rate``` function on the returned model, we directly obtain the counterfactual employment rate for a given country.
 
 Since we are also interested in the current and counterfactual employment rates of different age groups, we create a more advanced function ```empl.rate.age```. This function  displayed in line XXX requires the estimation model as mandatory argument and has two optional arguments (`group.size` and `group.low`) that allow to change the age group and group sizes. Given the specified arguments, the function then calculates the current and counterfactual employment rate for each age group.
 
@@ -516,7 +519,7 @@ The proper value assignment of the numerical vector `group.low` is essential sin
                         vec.label = paste("names.vec.age", i, sep=".") 
                                 z = assign(vec.label, paste0("age",i:k))
 ```
-We need to assign the age values to `z` in order to locate the right individuals in our data frame `X`. We find the individuals belonging to a given age group by summing over rows of `X` and storing this vector inside the list `IND_row_vec` displayed in line XXX. We can take the sum because the age values assigned to `z` correspond to the column names of the data frame `X`. Thus, for a given individual, the row sum of `X[, z]` is either zero or one, dependong on wether the individual belongs to the age group or not. Following this step, we filter out only the relevant age groups via indexing.
+We need to assign the age values to `z` in order to locate the right individuals in our data frame `X`. We find the individuals belonging to a given age group by summing over rows of `X` and storing this vector inside the list `IND_row_vec` displayed in line XXX. We can take the sum because the age values assigned to `z` correspond to the column names of the data frame `X`. Thus, for a given individual, the row sum of `X[, z]` is either zero or one, depending on wether the individual belongs to the age group or not. Following this step, we filter out only the relevant age groups via indexing.
 ```{r echo=TRUE, eval = FALSE, results = "asis", warning = FALSE, message = FALSE}
 45                 IND_row_vec[[i]] = apply(X[, z], 1, sum)
                  IND_row_vec      = IND_row_vec[group.low]
@@ -524,12 +527,12 @@ We need to assign the age values to `z` in order to locate the right individuals
      empl.rate[k] = empl.probability %*% IND_row_vec[[k]] / sum(IND_row_vec[[k]])
 
 ```
-Finally, the employment rate for each age group is calculate in line XXX. For this, we first sum the predicted employment probability for all individuals in age group k via vector multiplication. Next, we devide this sum by the overall number of individuals in that age group, corresponding to the vector length `IND_row_vec[[k]]`.
+Finally, the employment rate for each age group is calculate in line XXX. For this, we first sum the predicted employment probability for all individuals in age group k via vector multiplication. Next, we divide this sum by the overall number of individuals in that age group, corresponding to the vector length `IND_row_vec[[k]]`.
 
 Running the ```empl.rate.age``` function on a given model object will return a numerical vector containing the employment rate of the specified age groups.
 
 \subsection{Empirical Results}
-Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table XXX display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (certeris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage point higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obeseness in absolute terms, combined with above average prevalence of chronic disease and obeseness among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obeseness in absolute terms. As expected, our results are in line with @kalwij2005labour general, though the estimated participations rates differ for some countries, as a result of differing samples. 
+Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table XXX display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (ceteris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage point higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obesity in absolute terms, combined with above average prevalence of chronic disease and obesity among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obesity in absolute terms. As expected, our results are in line with @kalwij2005labour general, though the estimated participation rates differ for some countries, as a result of differing samples. 
 
 ```{r echo=FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
 
@@ -546,7 +549,7 @@ knitr::kable(employment[1:11,], caption = "Women's current and counterfactual la
             digits = 2, align = "c")
 ```
 
-It must be stressed, however, that the counterfactual estimates presented by @kalwij2005labour should be interpreted with caution. First of all, the transformation of the status quo populations with perfectly health individuals is articial and represents a state that could not realistically be reached with any policy. Second, some of the high counterfactual rates are driven by relatively high model coefficients that are not statistically significant, indicating non-robust results. Third, the aggregate country estimates do not properly display the variation of health effects among different age groups. In order to address this, we also analyze the results of the counterfactual exercise with help of our ```empl.rate.age``` function. The output of this for men is displayed in table XXX. As expected, both the current and counterfactual labor shares decrease at higher age. The difference between current and counterfactual shares is also increasing in age, though some exceptions (Austria, Italy and Greece) exist. This increasing difference points towards the negative health effects on labor associated with increasing age. Again, our results are in line with those obtained by @kalwij2005labour. 
+It must be stressed, however, that the counterfactual estimates presented by @kalwij2005labour should be interpreted with caution. First of all, the transformation of the status quo populations with perfectly health individuals is artificial and represents a state that could not realistically be reached with any policy. Second, some of the high counterfactual rates are driven by relatively high model coefficients that are not statistically significant, indicating non-robust results. Third, the aggregate country estimates do not properly display the variation of health effects among different age groups. In order to address this, we also analyze the results of the counterfactual exercise with help of our ```empl.rate.age``` function. The output of this for men is displayed in table XXX. As expected, both the current and counterfactual labor shares decrease at higher age. The difference between current and counterfactual shares is also increasing in age, though some exceptions (Austria, Italy and Greece) exist. This increasing difference points towards the negative health effects on labor associated with increasing age. Again, our results are in line with those obtained by @kalwij2005labour. 
 
 
 ```{r echo = FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
@@ -562,7 +565,7 @@ empl.counterfact.age = t(data.frame(lapply(allModels.cf, empl.rate.age)))
 employment.age           = data.frame(cbind(empl.current.age, empl.counterfact.age))
 colnames(employment.age) = paste(c(rep("Current", 3) , rep( "CF", 3)), 
                                   c("50-54","55-59", "60-64"))
-#Reorder colums
+#Reorder columns
 new.order = c(1,4,2,5,3,6)
 employment.age    = employment.age[,new.order]
 
