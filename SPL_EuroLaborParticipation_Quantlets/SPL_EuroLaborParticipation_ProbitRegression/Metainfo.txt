@@ -4,9 +4,12 @@ Name of Quantlet:   SPL_EuroLaborParticipation_ProbitRegression
 Published in:       'Statistical Programming Languages - Student Project on 
                     "EuroLaborParticipation"'
 
-Description:        ''
+Description:        'Implements and tests a probit regression model for each 
+                    country and gender split in the easySHARE data set'
 
-Keywords:           'regression'
+Keywords:           'regression, multicollinearity, estimation, distribution,
+                    variable, standard deviation, demography, probability,
+                    summary'
 
 Author:             Claudia Günther, Phi Nguyen, Julian Winkel
 
