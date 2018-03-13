@@ -13,7 +13,7 @@
 load('easySHARE_clean.RData')
 
 #Only keep relevant data sets
-df.out = datasets$df.out
+df.splits = datasets$df.splits
 rm(datasets)
 
 ################################################################################

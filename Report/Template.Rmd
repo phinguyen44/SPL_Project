@@ -1,6 +1,6 @@
 ---
 title: "Analysis and Graphical Representation of Health and  
-Labour Force Participation among the Elderly in Europe"
+Labor Force Participation among the Elderly in Europe"
 header-includes:
   - \usepackage{graphicx}
   - \usepackage{amsmath}
@@ -66,7 +66,7 @@ Seminar Paper by  \linebreak
 \medskip
 
 
-Berlin, 2018-03-15 \linebreak
+Berlin, 2018-03-16 \linebreak
 
 \end{center}
 
@@ -743,7 +743,7 @@ of others than the indicated sources. All passages which are literally or in gen
 out of publications or other sources are marked as such.
 \bigskip
 
-Berlin, 2018-03-15 
+Berlin, 2018-03-16 
 
 \smallskip
 

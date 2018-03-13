@@ -1,5 +1,5 @@
 ################################################################################
-# Probit.Regression
+# SPL_ELP_ProbitRegression.R
 #
 ################################################################################
 # Description:
@@ -13,7 +13,7 @@
 
 # **NOTE**: Change this to the file path where your LoadWald.R function is
 # located
-source("../SPL_EuroLaborParticipation_LoadWald/SPL_EuroLaborParticipation_LoadWald.R")
+source("../SPL_ELP_LoadWald/SPL_ELP_LoadWald.R")
 
 load('easySHARE_clean.RData')
 
