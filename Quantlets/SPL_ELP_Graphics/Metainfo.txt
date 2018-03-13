@@ -23,8 +23,3 @@ See also:           'SPL_ELP_ReadandClean,
 Submitted:          Fri, March 16 2018
 
 Datafile:           easySHARE_clean.RData
-
-Output:             
-- gridmap_laborft_byage.png : Tile grid map of % of full-time workers by age
-- healthdistribution_perceivedhealth.png: 'Distributions of self-perceived 
-                                          health by country and gender'
