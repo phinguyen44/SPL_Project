@@ -665,7 +665,7 @@ health.gridmap(xvar = 'country', facetting = 'gender')
 health.distribution(xvar = 'age', gen = 'MALEEEEEEE')
 ```
 
-We show an examples of correct output below. Here, we want to full-time employment percentage, facetted by age group. As we can see in this example, the percentage of the population that works full time generally decreases for all countries as age increases. However, in countries like Sweden and Switzerland, a higher percentage continue to work even in old age.
+We show an examples of correct output below. Here, we want to full-time employment percentage, facetted by age group. As we can see in Figure 1, the percentage of the population that works full time generally decreases for all countries as age increases. However, in countries like Sweden and Switzerland, a higher percentage continue to work even in old age.
 
 ```{r eval=FALSE}
 health.gridmap(xvar = 'h_obese', facetting = 'country')
@@ -678,7 +678,7 @@ img = readPNG("Quantlets/SPL_ELP_Graphics/gridmap_laborft_byage.png")
 grid.raster(img)
 ```
 
-Finally, we display an example of the health distribution map. Here, we seek to evaluate the spread of self-perceived health among survey respondents after removing outliers. The black line indicates the overall distribution for the entire data set. As we can see, there are not too many differences between male and female distributions within countries. However, countries like Spain tend to believe they are healthier than average, whereas the opposite effect is true in Switzerland.
+Finally, we display an example of the health distribution map. As can be seen in Figure 2, we seek to evaluate the spread of self-perceived health among survey respondents after removing outliers. The black line indicates the overall distribution for the entire data set. As we can see, there are not too many differences between male and female distributions within countries. However, countries like Spain tend to believe they are healthier than average, whereas the opposite effect is true in Switzerland.
 
 ```{r eval=FALSE}
 health.distribution(xvar = 'h_perceived', remove.outliers = FALSE)
@@ -956,7 +956,7 @@ read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
 # Beta is vector of coefficients of size k x 1 
 # Confidence.level is the desired confidence level (between 0 and 1). 
 # Default: 0.95
-# Spec is vector of integers of length 0 < m ≤ k specifying the subset of 
+# Spec is vector of integers of length 0 < m <= k specifying the subset of 
 # coefficients to be jointly tested
 
 joint.wald.test = function(model.summary, confidence.level=0.95, spec=NULL) {
@@ -1088,7 +1088,8 @@ general.wald.test = function(model.summary,
 
 [![Quantlet 5](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_Counterfactual/SPL_ELP_Counterfactual.R){width=25px}
 
-```{r Q5, eval=FAL################################################################################
+```{r Q5, eval=FALSE}
+################################################################################
 # Counterfactual
 #
 ################################################################################
@@ -1575,7 +1576,6 @@ health.gridmap = function(xvar, facetting) {
     }
 }
 
-    
 ###### VIEW DISTRIBUTION OF NUMERIC VARIABLES
 # Numeric variable: shows distribution for each country, then overlays average of entire data set 
 
