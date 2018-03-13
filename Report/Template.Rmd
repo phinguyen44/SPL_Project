@@ -252,14 +252,14 @@ datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 99)
 
 \section{Multidisciplinary and crossnational summary statistics}
 
-## Basics
+## Theory and Design
 
-We use various variables on objective and subjective health related variables. The effects of older people generally having worse health conditions than younger one remain uncompensated. Sample size and variance differ among countries. Data may be affected by different national pension schemes, that incentivize workers to extend or restrict working depending on age. 
+Since we are working with a cross-national survey, it is useful to to present an overview on a country-by-country basis. For each country, survey participants will be classified according to their age group. Within each class, shares of gender-specific as well as overall labor participation rates and health indicators are calculated and discussed. 
 
 
 ## Implementation
 
-An efficient way of seperating the SHARE dataset into country, gender and age is explained in the following. In order to minimize hard-coding and possibly related errors, a grid is expanded between named variables.
+An efficient way of seperating the easySHARE dataset into country, gender and age is explained in the following. In order to minimize hard-coding and possibly related errors, a grid is expanded between named variables.
 Functions that calculate group shares per country and labor participation rates can subsequently be applied onto the defined grid. 
 
 Besides the target data frame, `group.share` takes a boolean variable as an input that specifies whether aggregation on a national level is intended. The share of males or females (per country) is calculated by finding the sum of occurences and dividing by their total, represented by the length of the vector. A similar procedure that allows for multiple subsets and based upon `dplyr` is used in `labor`.
@@ -291,7 +291,7 @@ labor = function(df, .country, .gender, .age) {
 
 ```
 
-args.list contains three sub-lists divided in countries (`c`), gender (`g`) and age (`a`). The list is passed as an argument to `labor`, which are simulatenously iterated over the sub-lists in parallel using `pmap`.
+Within the code below, `args.list` contains three sub-lists divided by countriy (`c`), gender (`g`) and age (`a`). The list is passed as an argument to `labor`, which are simulatenously iterated over the sub-lists using `pmap`. This function has an advantage over a similar functions, since it allows multiple arguments and uses parallelization by default.  
 Including `with` to specify the data frame on which we expand the grid upon, modifies the data frame in a new environment. This simplifies name assignment. 
 
 ```{r, eval = FALSE}
@@ -316,17 +316,13 @@ labor.part.share.df = spread(labor.part.share, Var3, output.v) %>%
                    paste0("Age ", rep(c("50-54", "55-59", "60-64")))))
 ```
 
-The results can be easily bound into a data frame and arranged using `dplyr`. The same package is used to subset by gender. Using the pipe operator `%>%` keeps our code compact and avoids unnecessary variable assignment and inefficient memory requirements.
+The resulting `output` list can be easily bound into a data frame and arranged using `dplyr`. From this package we also use `spread` in order to subset by gender. Using the pipe operator `%>%` keeps our code compact and avoids unnecessary variable assignment and inefficient memory requirements.
 
-`vars` is actually a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the names that contain 'labor'. 
+
+In the next code chunk, `vars` is assigned to be a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes in the underlying data frame and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the column names that contain 'labor'. At this point, the meaning of the second argument in `group.share` (comment: name the first code chunk in this section) becomes clear. It is used to subset the target data frame `df` by the extracted variable names containing the string "labor". 
+Since this task involves invoking a function upon multiple list elements, `lapply` is the best candidate in order to construct labor participation rates grouped by gender, (optionally) by country and classified into non participation, part time and full time work.
 
 ```{r, eval = FALSE}
-
-# Get gender specific tables
-labor.part.f = labor.part.share.df %>% 
-    filter(Gender == "FEMALE") %>% 
-    set_rownames(levels(df.out$country)) %>% 
-    dplyr::select(-Gender, -Country)
 
 # Labor supply choice tables
 df.female = df.out %>% filter(gender == "FEMALE")
@@ -344,31 +340,44 @@ labor.supply.f.df = do.call(cbind.data.frame, labor.supply.f) %>%
 
 ## Empirical Results
 
+Before interpreting the data, we advise to note that some country's participants are generally older than other ones. As the evaluation of the probit model shows, we figure age to have a negative impact on health. Hence certain samples may appear less healthy than others due to the fact that they are older on average. Additionally, depending on the national pension schemes, workers may have a different incentive to extend or restrict working depending on their age [@kalwij2005labour].
+
+As depicted in the table below, the mean amount of chronic disease is 75%. On the other hand, 79% out of the 12689 participants have a good self-perceived health. At first sight, one may deduce that a the majority considers themselves to be healthy despite the prevalence of a chronic disease. But the use of the arithmetic mean is sensitive towards outliers and the amount of chronic diseases is in fact counted numerically. In combination, these values indicate an uneven distribution. 
+Surprisingly, the share of overweight people is only 42% compared to an EU-average which @eurostat reports reports to be 59.6% among 45 to 64 year old citizens. However, information on obesity grouped by age is not available to us. 
+
+
 ```{r, eval = TRUE, results = 'asis', warning = FALSE, comment = FALSE, message = FALSE, echo = FALSE}
 
 library("knitr")
 knitr::kable(t(round(sum.stats.tot, 2)), caption = "Summary Statistics over all groups")
 
+```
+
+
+Having obtained the share of labor force participation grouped by gender, country and age, striking values can be presented. 
+
+Among the selected countries, France, the Netherlands and Belgium have the fewest laborers among the oldest age group, which is ranging from 60 to 64 years. In the middle age group, ranging from 54-59, the Belgian and Italian population have sparse labor participation rates among men and women. Within the youngest age group including people from 50 to 54 years old, variance among men is generally low. This is not the case for Greek, Italian and Spanish women, whose participation rates do not exceed 45.5%. 
+
+Concerning health statistics, Switzerland and the Scandinavian countries stand out positively. Together, they from a group that has an overall low percentage of obese people while achieving high shares of self-reported good health. Among all other countries, the Swiss have the least number of chronic diseases and fewest overweight. Only the Greek have lower share of ADL's. 
+
+Switzerland and the Nordic countries additionally present the least non-participation rates and the highest full-time working rates. 
+Summary Statistics show that those countries, which strive in health topics are related to high labor force participation rates in all categories. 
+
+The overall age distribution is almost even in the younger age brackets (36% and 37%). The participants beween 54 and 59 years old make up 27%. 
+Generally, labor force participation is higher for males than for females. This applies to part-time work, too.
+
+The overall results of the descriptive statistics align well with @kalwij2005labour.
+
+
+```{r, eval = TRUE, results = 'asis', warning = FALSE, comment = FALSE, message = FALSE, echo = FALSE}
+
+library("knitr")
 
 knitr::kable(labor.part.m, caption = "Men: Labor Force Participation Rate by age")
 knitr::kable(labor.part.f, caption = "Women: Labor Force Participation Rate by age")
 
 ```
 
-
-Having obtained the share of labor force participation grouped by gender, country and age as well as the according health variables, striking values can be presented.
-
-Among the selected countries, France, Greece and Belgium have the fewest people among the oldest age group, which is ranging from 60 to 64 years. In the middle age group, ranging from 54-59, the German population is sparsely represented. Within the youngest age group, including people from 50 to 54 years old, Italy and Austria have the lowest share.  
-Instead, Austria represents by far the largest share in the oldest age group. Belgium, Italy, the Netherlands and Sweden dominate the highest ranks in the group ranging from 54 to 59 years. Additionally, Greece solely leads the share in the youngest age group. 
-
-Concerning health statistics, Switzerland and the Scandinavian countries stand out positively. Together, they from a group that has an overall low percentage of obese people while achieving high shares of self-reported good health. Among all other countries, the Swiss have the least number of chronic diseases and fewest overweight. Only the Greek have lower share of ADL's. 
-
-Switzerland and the Nordic countries additionally present the least non-participation rates and the highest full-time working rates. 
-Summary Statistics show that those countries, which strive in health topics are related to high labor force participation rates in all categories. Despite this, the only candidate for multicollinearity is the age dummy in the age group 50, which is omitted before model calculation. 
-
-Generally, labor force participation is higher for males than for females. This applies to part-time work, too.
-
-The overall results of the descriptive statistics align well with @kalwij2005labour
 
 \newpage
 
@@ -382,12 +391,11 @@ Probit models allow for the estimation of binary, random response variables.
 Probit and Logit models mitigate problems that would occur in case a (linear) regression would be used for a similar task. In this case, the range of the response variable would not be restricted to the interval (0,1). Consequently, as probabilities are commonly defined on this space, non-interpretable probability estimations would be delivered.
 The estimated coefficients are subject to a Wald Test on joint significance. 
 
-The model formula holds under the assumption that $\epsilon \sim N(0,1)$
-
-
+@schild2017 defines the model formula as
 $$
 P(Y = 1 | X = x) = \Phi (x \beta)'
 $$
+It holds under the assumption that $\epsilon \sim N(0,1)$ (wikipedia - how to quote?)
 
 Using this model, it is investigated how the probability of labor participation is influenced by health and age variables. 
 
@@ -399,7 +407,7 @@ In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is
 ## Implementation
 
 As stated in the 'Read and Clean' section, `df.splits` is obtained using the `split` function. A list is returned, that seperates the cleaned data frame by country and gender.
-This structure is helpful throughout the following sections, as it enables us to build a series of concatenated `lapply` functions. This function invokes a c-loop that iterates over each list element. As `lapply` takes a list as an input and returns a list, too; it preserves the initial structure. First, it is used to create a probit model for each subset within the list. One variable, namely the age 50 dummy variable, which is highly correlated with other regressors, is excluded due to multicollinearity. 
+This structure is helpful throughout the following sections, as it enables us to build a series of concatenated `lapply` functions. This function invokes a c-loop that iterates over each list element. As `lapply` takes a list as an input and returns a list, too; it preserves the initial structure. First, it is used to create a probit model for each subset within the list. Since we are estimating with an intercept, the age 50 dummy variable is perfectly correlated with the other age dummies. Hence it is excluded due to multicollinearity. 
 
 ```{r, eval = FALSE}
 
@@ -479,16 +487,15 @@ mfx.Models = lapply(df.splits, function(z){
 
 ## Empirical Results
 
-By means of the presented model, it is evaluated how labor force participation behavior of individuals aged 50-64 is influenced by different health indicators across 11 European countries.
-The underlying data enables us to mitigate justification bias and measurement error that occur when assessing health subjectively [@kalwij2005labour]. 
+By means of the presented model, we evaluate how labor force participation behavior of individuals aged 50-64 is influenced by different health indicators across 11 European countries.
 
-@kalwij2005labour summarize the results as follows:   
+@kalwij2005labour summarize their own results as follows:   
 
 - The influence of health (as captured by the indicators) on labor force participation differs among individuals and across countries
 - Health improvements are associated with higher labor force participation rates
 - Decreasing health explains decreasing labor force participation of the elderly in Europe
 
-These main results are validated by the analysis. As shown on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases negatively related to employment. Analysis of the marginal effects show, that the negative influence of age on the dependent variable is growing with increasing age. Conversely, high education positively predicts labor force participation for the specified group. Having children does not significantly influence the independent variable. These results are stable across different groups. 
+These main results are validated by the analysis. As shown on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases are negatively related to employment. Analysis of the marginal effects show, that the negative influence of age on the dependent variable is growing with increasing age. Conversely, high education positively predicts labor force participation for the specified group. Having children does not significantly influence the independent variable. These results are stable across different groups. 
 
 Comparing the marginal effects between our results and the paper by @kalwij2005labour shows similar results. Usually, significant coefficient estimates as well as their significance level are close to each other. However, as the data sets differ, there are deviations in the majority of models. This rarely affects the sign of the coefficients. 
 
