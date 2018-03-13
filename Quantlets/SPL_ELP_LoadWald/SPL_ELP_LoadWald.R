@@ -20,21 +20,6 @@
 # coefficients to be jointly tested
 
 joint.wald.test = function(model.summary, confidence.level=0.95, spec=NULL) {
-
-    # List all packages needed for session
-    neededPackages = c("Matrix")
-    allPackages    = c(neededPackages %in% installed.packages()[, "Package"])
-    
-    # Install packages (if not already installed)
-    if (!all(allPackages)) {
-        missingIDX = which(allPackages == FALSE)
-        needed     = neededPackages[missingIDX]
-        lapply(needed, install.packages)
-    }
-    
-    # Load all defined packages
-    invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
-        library(x, character.only = TRUE))))
     
     # Set up test restrictions
     if (is.null(spec)) {
@@ -95,6 +80,21 @@ general.wald.test = function(model.summary,
                              confidence.level = 0.95, 
                              R                = NULL, 
                              r                = NULL) {
+    
+    # List all packages needed for session
+    neededPackages = c("Matrix")
+    allPackages    = c(neededPackages %in% installed.packages()[, "Package"])
+    
+    # Install packages (if not already installed)
+    if (!all(allPackages)) {
+        missingIDX = which(allPackages == FALSE)
+        needed     = neededPackages[missingIDX]
+        lapply(needed, install.packages)
+    }
+    
+    # Load all defined packages
+    invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
+        library(x, character.only = TRUE))))
     
     # Check input
     if (class(model.summary) != "summary.glm") {
