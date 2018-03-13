@@ -1,5 +1,5 @@
 ################################################################################
-# SPL_EuroLaborParticipation_LoadWald.R
+# SPL_ELP_LoadWald.R
 #
 ################################################################################
 # Description:
@@ -36,7 +36,7 @@ joint.wald.test = function(model.summary, confidence.level=0.95, spec=NULL) {
     invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
         library(x, character.only = TRUE))))
     
-  # Set up test restrictions
+    # Set up test restrictions
     if (is.null(spec)) {
         spec = 1:length(beta) # default joint is significance test
     } else if (is.logical(spec)) {

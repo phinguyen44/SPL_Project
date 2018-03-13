@@ -1,8 +1,8 @@
 
-Name of Quantlet:   SPL_EuroLaborParticipation_LoadWald
+Name of Quantlet:   SPL_ELP_LoadWald
 
 Published in:       'Statistical Programming Languages - Student Project on 
-                    "EuroLaborParticipation"'
+                    "European Labor Participation"'
 
 Description:        'Creates Wald tests that can be used to test the joint
                     significance of a subset of model coefficients or check any
@@ -13,10 +13,10 @@ Keywords:           'hypothesis-testing, asymptotic, asymptotic chisquare test,
 
 Author:             Claudia Günther, Phi Nguyen, Julian Winkel
 
-See also:           'SPL_EuroLaborParticipation_ReadAndClean,
-                    SPL_EuroLaborParticipation_SummaryStatistics,  
-                    SPL_EuroLaborParticipation_ProbitRegression,
-                    SPL_EuroLaborParticipation_Counterfactual,
-                    SPL_EuroLaborParticipation_Graphics'
+See also:           'SPL_ELP_ReadandClean,
+                    SPL_ELP_SummaryStatistics,  
+                    SPL_ELP_ProbitRegression,
+                    SPL_ELP_Counterfactual,
+                    SPL_ELP_Graphics'
 
 Submitted:          Fri, March 16 2018

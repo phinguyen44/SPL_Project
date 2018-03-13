@@ -1,9 +1,11 @@
 ################################################################################
-# SPL_EuroLaborParticipation_Graphics.R
+# SPL_ELP_Graphics.R
 #
 ################################################################################
 # Description:
 # Functions designed to create useful graphics (quantlet 6)
+# Note that these functions are designed to specifically run with the 'df.out' 
+# data frame in the datasets lists found in `easySHARE_clean.RData`
 # 
 # health.gridmap(xvar, facetting): generate a tile grid map by a variable in
 # dataset, facetted by either gender or age. if numeric than average is
@@ -26,13 +28,6 @@
 
 # output side by side grid maps
 health.gridmap = function(xvar, facetting) {
-    
-    # Load dataset
-    load('easySHARE_clean.RData')
-    
-    #Only keep relevant data sets
-    df.out = datasets$df.out
-    rm(datasets)
     
     # List all packages needed for session
     neededPackages = c("dplyr", "ggplot2", "countrycode", 
@@ -118,8 +113,8 @@ health.gridmap = function(xvar, facetting) {
                   panel.background = element_blank(),
                   panel.grid       = element_blank(),
                   legend.position  = "bottom") +
-            theme(plot.title    = element_text(size=16),
-                  plot.subtitle = element_text(size=10, 
+            theme(plot.title    = element_text(size  = 16),
+                  plot.subtitle = element_text(size  = 10, 
                                                color = "#7F7F7F"))
         return(p)
     }
@@ -322,13 +317,6 @@ health.distribution = function(xvar,
                                countries        = "all", 
                                remove.outliers  = TRUE) {
     
-    # Load dataset
-    load('easySHARE_clean.RData')
-    
-    #Only keep relevant data sets
-    df.out = datasets$df.out
-    rm(datasets)
-    
     # List all packages needed for session
     neededPackages = c("dplyr", "ggplot2", "scales")
     allPackages    = c(neededPackages %in% installed.packages()[ , "Package"]) 
@@ -438,12 +426,3 @@ health.distribution = function(xvar,
     
     return(plot.bar)
 }
-
-###### EXAMPLES
-example1 = health.gridmap('labor_ft', 'age')
-ggsave("gridmap_laborft_byage.png", plot=example1, width=12, height=8, 
-       units="in")
-
-example2 = health.distribution('h_perceived', remove.outliers = FALSE)
-ggsave("healthdistribution_perceivedhealth.png", plot = last_plot(), width = 8, 
-       height = 5, units = "in")
