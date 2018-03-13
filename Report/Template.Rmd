@@ -285,10 +285,6 @@ joint.wald.test = function(model.summary, confidence.level = 0.95, spec = NULL){
     names(joint.wald.test) = c("Name","W","p-value", "df", "H0" , "Decision")
     beta                   = model.summary$coefficients[,1]
     Var_beta_est           = vcov(model.summary)
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 ```
 
 In order to set up default values for the hypothesis specification, we make use of a local if-else statement inside the `joint.wald.test` function. Here, we re-assign a sequence vector to `spec` that includes the number of all model coefficients in increasing order, unless `spec` is specified differently.
