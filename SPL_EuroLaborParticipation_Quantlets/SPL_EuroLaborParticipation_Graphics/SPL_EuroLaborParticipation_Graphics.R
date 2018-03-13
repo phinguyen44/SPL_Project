@@ -118,8 +118,8 @@ health.gridmap = function(xvar, facetting) {
                   panel.background = element_blank(),
                   panel.grid       = element_blank(),
                   legend.position  = "bottom") +
-            theme(plot.title    = element_text(size=16),
-                  plot.subtitle = element_text(size=10, 
+            theme(plot.title    = element_text(size  = 16),
+                  plot.subtitle = element_text(size  = 10, 
                                                color = "#7F7F7F"))
         return(p)
     }
