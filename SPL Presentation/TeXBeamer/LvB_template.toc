@@ -1,8 +1,0 @@
-\beamer@endinputifotherversion {3.36pt}
-\select@language {english}
-\beamer@sectionintoc {1}{random}{2}{0}{1}
-\beamer@sectionintoc {2}{Motivation}{2}{0}{2}
-\beamer@subsectionintoc {2}{1}{General ideas}{1}{0}{2}
-\beamer@sectionintoc {3}{Background \& Methods}{2}{0}{3}
-\beamer@sectionintoc {4}{Current project status}{2}{0}{4}
-\beamer@sectionintoc {5}{Next steps}{11}{0}{5}

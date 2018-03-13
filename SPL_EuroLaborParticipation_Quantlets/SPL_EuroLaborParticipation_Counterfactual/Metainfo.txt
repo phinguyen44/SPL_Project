@@ -1,0 +1,23 @@
+
+Name of Quantlet:   SPL_EuroLaborParticipation_Counterfactual
+
+Published in:       'Statistical Programming Languages - Student Project on 
+                    "EuroLaborParticipation"'
+
+Description:        'Calculates current and counterfactual labor participation
+                    rates for different age groups, countries, and genders'
+
+Keywords:           'regression, summary, demography, mean, population, model,
+                    function, mortality'
+
+Author:             Claudia Günther, Phi Nguyen, Julian Winkel
+
+See also:           'SPL_EuroLaborParticipation_ReadAndClean,
+                    SPL_EuroLaborParticipation_SummaryStatistics, 
+                    SPL_EuroLaborParticipation_LoadWald,
+                    SPL_EuroLaborParticipation_ProbitRegression,
+                    SPL_EuroLaborParticipation_Graphics'
+
+Submitted:          Fri, March 16 2018
+
+Datafile:           easySHARE_clean.RData

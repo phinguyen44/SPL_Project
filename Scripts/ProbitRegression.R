@@ -17,8 +17,11 @@
 
 ################################################################################
 # SOURCE DATA
+wd = paste0(Sys.getenv("USERPROFILE"), "/splrepo/SPL_Project")
+setwd(wd)
 
-#source("Scripts/ReadAndClean.R")
+source("Scripts/ReadAndClean.R")
+source("Scripts/LoadWald.R")
 datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda")
 
 #Only keep relevant data sets
@@ -102,46 +105,6 @@ for(i in 1:length(allSummaries)){
 wald.bound = as.data.frame(wald.log)
 colnames(wald.bound) = names(allModels)
 
-# Cross check with wald.test from aod package
-
-wald.check = list() # Save Wald Test Output
-for(i in 1:length(allModels)){
-    
-    # Get Element
-    ModelElement = allModels[[i]]
-   
-     # Specify the of coefficients to be tested: only health variable
-    health = c(16:19)
-    
-    # Test only the joint significance of health variables
-    testOutput = try(wald.test(b = coef(ModelElement), Sigma = vcov(ModelElement), Terms = health)$result)
-    if(class(testOutput) == "try-error"){
-        
-        # Display warning and investigate
-        msg = paste0("Wald Test failed for Model Element ", i)
-        warning(msg)
-        
-        wald.log[[i]] = "Error"
-        
-        next
-        
-    } else{
-        
-        wald.log[[i]] = testOutput
-        next
-    }
-    
-    rm(ModelElement) # clean up
-    
-    next
-    
-}
-
-wald.check = as.data.frame(wald.log)
-colnames(wald.check) = names(allModels)
-
-wald.bound[3,] 
-wald.check[3,]
 
 rm(list= ls()[!(ls() %in% c("allModels", "allSummaries", "wald.bound", "df.splits"))])
 
