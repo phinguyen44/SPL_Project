@@ -104,15 +104,17 @@ Berlin, 2018-03-15 \linebreak
 \newpage
 
 \section{Introduction}
-The proportion of elderly people in Europe continues to rise and is expected to impose major social, fiscal and economic challenges in the future. According to official projections, half of the European population is expected to be 50 years or older by 2050 [@eurostat2012active]. Analyzing the relationship between aging populations, health indicators and labor force participation is essential to come up with suitable policy responses to those demographic changes. Empirical results on the relation between health, wellbeing and employment are ambiguous. While some studies show that poor health contributes to early retirement [@cai2006health; @karpansalo2004perceived; @monden2005changing], another branch of research suggests that unemployment has negative effects on wellbeing and health [@shields2005exploring; @kassenboehmer2008you].
+The proportion of elderly people in Europe continues to rise and is expected to impose major social, fiscal and economic challenges in the future. According to official projections, half of the European population is expected to be 50 years or older by 2050 [@eurostat2012active]. Analyzing the relationship between aging populations, health indicators and labor force participation is essential to come up with suitable policy responses to those demographic changes. Empirical results on the relation between health, well-being and employment are ambiguous. While some studies show that poor health contributes to early retirement [@cai2006health; @karpansalo2004perceived; @monden2005changing], another branch of research suggests the opposite effect: that unemployment has negative effects on well-being and health [@shields2005exploring; @kassenboehmer2008you].
 
 The Survey of Health, Ageing and Retirement in Europe (SHARE) launched in 2004 is an excellent research base for aging related research designs. This multidisciplinary and cross-national panel database of data on health, socio-economic status and social networks contains data of more than 120,000 individuals aged 50 or older [@borsch2017survey]. Based on the first SHARE data release, @kalwij2005labour analyze the impact of different health indicator on individuals’ participation decisions in 11 European countries. They find that health effects on labor force participation behavior of individuals aged 50-64 differ considerable between countries, age groups and gender.
 
-In this paper, we present the developed code that can be utilised to replicate all the results from @kalwij2005labour and furthermore provides a basis for further data exploration and visualization. For this purpose, we use the recently released easySHARE data set. We design the code in a way that allows others to explore the easySHARE data set, generate comprehensible and instructive summary statistic tables or graphics and conduct regression-based analysis.
+In this paper, we present the developed code that can be utilized to replicate all the results from @kalwij2005labour and furthermore provides a basis for further data exploration and visualization. For this purpose, we use the recently released easySHARE data set. We design the code in a way that allows others to explore the easySHARE data set, generate comprehensible and instructive summary statistic tables or graphics, and conduct regression-based analysis.
 
-Our code is devided into six quantlets, wich are meant to be executed chronologically. In `Quantlet 1`[![Quantlet 1](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/ReadAndClean.R){width=25px}, we transform, clean and aggregate the variables in the raw data set and generate a list of data frames for subsequent data analysis. `Quantlet 2`[![Quantlet 2](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/SummaryStatistics.R){width=25px} generates a series of summary statistics tables that present health indicators, labor force particpation and labor supply choice by country, age group and gender. \linebreak
+Our code is divided into six quantlets, which are meant to be executed chronologically. In `Quantlet 1`[![Quantlet 1](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/ReadAndClean.R){width=25px}, we transform, clean and aggregate the variables in the raw data set and generate a list of data frames for subsequent data analysis. `Quantlet 2`[![Quantlet 2](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/SummaryStatistics.R){width=25px} generates a series of summary statistics tables that present health indicators, labor force participation and labor supply choice by country, age group and gender. \linebreak
 In `Quantlet 3`[![Quantlet 3](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/ProbitRegression.R){width=25px}, we conduct probit regression for each country and both genders, calculate marginal effects and average employment probability. `Quantlet 4`[![Quantlet 4](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/LoadWald.R){width=25px}
-lays the foundation for two Wald tests that can be used to test the joint significant of a subset of variables as well as any linear hypothesis. `Quantlet 5`[![Quantlet 5](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/Counterfactual.R){width=25px} presents counterfactual exercises that are based on the priorly carreid out probit estimations. By manipulating the population health indicators, we calculate current and counterfactual labor participation rates for different age groups. In `Quantlet 6`[![Quantlet 6](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/Graphics.R){width=25px}, we introduce new methods to graphically represent the summary statistics fo exploratory data analsis. Specifically, we provide tools to generate carefully selected graphics for a subset of desired variables and sample subsets.
+lays the foundation for two Wald tests that can be used to test the joint significant of a subset of variables as well as any linear hypothesis. `Quantlet 5`[![Quantlet 5](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/Counterfactual.R){width=25px} presents counterfactual exercises that are based on the previously carried out probit estimations. By manipulating the population health indicators, we calculate current and counterfactual labor participation rates for different age groups. In `Quantlet 6`[![Quantlet 6](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Scripts/Graphics.R){width=25px}, we introduce new methods to graphically represent the summary statistics fo exploratory data analysis. Specifically, we provide tools to generate carefully selected graphics for a subset of desired variables and sample subsets.
+
+\newpage
 
 \section{Data Cleaning and Manipulation}
 
@@ -252,6 +254,7 @@ JULIAN
 \subsection{Implementation}
 \subsection{Empirical Results}
 
+\newpage
 
 \section{Wald Test}
 In the context of probit regression, the Wald test can be used to test multiple hypotheses regarding the model specifications. For example, we test whether the fit of the model is improved if a subset of regression coefficients are all set equal to zero, an exclusion restriction. @kalwij2005labor conduct a Wald test to check the null hypothesis that none of the included health variables has an impact on labor participation in order to investigate the joint impact of health on participation.
@@ -440,6 +443,7 @@ general.wald.test(allSummaries$Switzerland.MALE, R = matrix.R, r = vector.right)
 In this example, `R`is an identity matrix of size $22 \times 22$, whereas `vector.wrong` is $21 \times 1$. As soon as we add another element to the `r` vector, the function works properly due to dimension matching.
 
 \newpage
+
 \section{Counterfactual Exercise}
 
 Counterfactual exercises are a common tool in economic policy analysis that allow assessing and quantifying possible effects of policies. In order to evaluate the quantitative importance of a healthy population on labor participation, @kalwij2005labor conduct a simple counterfactual exercise. They compare the current national employment rate to the predicted counterfactual rate. This counterfactual employment rate is obtained by assuming that all individuals are in perfect health. According to their definition, a perfectly healthy individual has never had a severe or mild medical condition, suffers from no restrictions in activities of daily living, is not obese, and has a grip strength of an average 50-51 year-old (fe)male individual.
@@ -573,37 +577,37 @@ Additionally, we choose to look at distributions of certain variables, rather th
 
 \subsection{Implementation}
 
-We develop two new graphics-oriented functions to generate both graphs listed above. The first is the tile grid maps, defined in the function `health.gridmap()`. Instead of just generating a single tile grid map, we create facets of tile grid maps, where the facetting is determined by the user. Either they can choose to split by gender (in which two grid maps will be displayed side-by-side) or by age group (in which three graphs will be shown). 
+We develop two new graphics-oriented functions to generate both graphs listed above. The first is the tile grid maps, defined in the function `health.gridmap()`. Instead of just generating a single tile grid map, we create facets of tile grid maps, where the facetting is determined by the user. Either they can choose to split by gender or by age group
 
 In order to draw the grid map, we must first draw the coordinates. This is done in a simple Excel spreadsheet to align each country with a specific point on a two-dimensional grid. Rather than sourcing this Excel file each time, we load the file once, then use the `dput` function to replicate the structure of the table (this is not shown in the script). This structure is then defined explicitly within the function. 
 
-We define a "base" plotting function that draws the initial outline of the tile grid, using the `ggplot2` package. Additional plotting parameters are added later based on the function parameters passed. This is an advantage of using `ggplot2`: we can define the initial plot, then 'layer' on additional graphical elements as needed, such as dynamic titles or flexible scales.
+We define a "base" plotting function that draws the initial outline of the tile grid, using the `ggplot2` package. Additional plotting parameters are added later based on the function parameters passed. This is an advantage of using `ggplot2`: we define the initial plot, then 'layer' on additional graphical elements as needed.
 
 ```{r eval=FALSE}
 plot_function = function(df) {
     
     p = ggplot(data = df, aes(x = X, y = Y)) +
         geom_tile(aes(fill = get(xvar), color = ""), 
-                    color = "white", size = 0.6) +
+                  color = "white", size = 0.6) +
         geom_text(aes(label = iso3c), color = "white") +
         geom_text(aes(label = round(get(xvar), 2)), vjust = 2, 
-                    color = "white", size = 3, na.rm = TRUE) +
+                  color = "white", size = 3, na.rm = TRUE) +
         coord_fixed(ratio = 1) +
         theme_minimal() +
-        theme(axis.line        = element_blank(),
-                axis.text        = element_blank(),
-                axis.title       = element_blank(),
-                panel.background = element_blank(),
-                panel.grid       = element_blank(),
-                legend.position  = "bottom") +
-        theme(plot.title    = element_text(size=16),
-                plot.subtitle = element_text(size=10, 
+        theme(axis.line          = element_blank(),
+              axis.text          = element_blank(),
+              axis.title         = element_blank(),
+              panel.background   = element_blank(),
+              panel.grid         = element_blank(),
+              legend.position    = "bottom") +
+        theme(plot.title      = element_text(size = 16),
+                plot.subtitle = element_text(size = 10, 
                                             color = "#7F7F7F"))
     return(p)
 }
 ```
 
-We opt for color-blind safe colors, using a sequential gradient color scheme, to enable maximal readability. The range of these color scales is always set to range from the minimum to maximum values between all facets of data. This is done to ensure that there are no values that fall out of bounds, as well as to apply the same color scale for all graphs in view.
+The range of the color scales is always set to range from the minimum to maximum values between all facets of data. This is done to ensure that there are no values that fall out of bounds, as well as to apply the same color scale for all graphs in view.
 
 ```{r eval=FALSE}
 minval = min(df.f[[xvar]], df.m[[xvar]], na.rm = TRUE)
@@ -619,9 +623,7 @@ ggsave("Output/gridmap_laborhrs_byage.png", plot=example5, width=12,
        height=8, units="in")
 ```
 
-The second function creates a series of individual bar charts, split by a collection of selected genders and countries, for a selected numeric variable. A vector of countries and/or genders can be passed as arguments to the function, in the event a user only cares about a subset of the overall data set. In the event no vector of countries and/or genders are supplied, the entire data set is used.
-
-In some cases, outliers in the data set may skew the view of the graphic. Therefore there is an additional default parameter to remove outliers. 
+The second function creates a series of individual bar charts, split by a collection of selected genders and countries, for a selected numeric variable. A vector of countries and/or genders can be passed as arguments to the function, in the event a user only cares about a subset of the overall data set. In the event no vector of countries and/or genders are supplied, the entire data set is used. An optional parameter allows for the removal of outliers.
 
 ```{r eval=FALSE}
 # Remove outliers (outside 1.5 IQR of 25% and 75% percentiles)
@@ -709,12 +711,14 @@ img = readPNG("Output/healthdistribution.png")
 grid.raster(img)
 ```
 
+\newpage
+
 \section{Conclusion}
-The purpose of this paper was to present the developed six quantlets that can be used to carry out statistical and graphical analysis based on the easySHARE data set. Our code is designed to easy the exploration of the easySHARE data set, generate comprehensible and instructive summary statistic tables or graphics and conduct regression-based analysis. The quantlets have been applied and tested on the easySHARE data set to replicate the results of @kalwij2005labour. The code as well as the empirical results have been saved in a workspace accessible on Github[![workspace](Images/qletlogo.png)](https://github.com/phister/SPL_Project){width=25px}.
+The purpose of this paper was to present the developed six quantlets that can be used to carry out statistical and graphical analysis based on the easySHARE data set. Our code is designed to simplify the exploration of the easySHARE data set, generate comprehensible and instructive summary statistic tables and graphics, and conduct regression-based analyses. The quantlets have been applied and tested on the easySHARE data set to replicate the results of @kalwij2005labour. The code as well as the empirical results have been saved in a workspace accessible on Github[![workspace](Images/qletlogo.png)](https://github.com/phister/SPL_Project){width=25px}.
 
-Our empirical results are in line with those obtained by @kalwij2005labour in general. However, some minor difference emerge as a results of differing sample size. Based on probit regression, we also find that higher age and worse health conditions are associated with lower labour particpation, although there is great variation in the realtionship across countries. Our results on the joint impact of health variables on participation (Wald test) are also similar except that we cannot reject the null in a higher number of cases. The same pattern emerges in the counterfactual exercise, where our results are diverging for some countries. This indicates that the results obtained by @kalwij2005labour are not entirely robust and should be validated.
+In general, our empirical results are in line with those obtained by @kalwij2005labour. However, some minor differences emerge as a result of differing sample sizes by country and differing availability in preciseness of survey responses. Based on using a probit regression, we also find that higher age and worse health conditions are associated with lower labor participation, although there is great variation in the relationship across countries. Our results on the joint impact of health variables on participation (Wald test) are also similar except that we are unable to reject the null in a higher number of cases. The same pattern emerges in the counterfactual exercise, where our results are diverging for some countries. This indicates that the results obtained by @kalwij2005labour are not entirely robust and should be validated.
 
-Overall, our quantlets perform well on the tested data set. The output generated by our functions is as expected and can be validated with other packages. It works fine for the replication of the chosen paper and should perform well for other tasks performed on the easySHARE data set. Since the quantlet or constructed with a modular design, they can be quickly adjusted for other research tasks. While some of our functions go beyond the functionality of other packages (e.g. `wald.test` from `aod` package), our main focus lies on the development of tools to comprehensively analyze the easySHARE data set. One notable source of weakness of our code is its specifictivity and limitation of scope. Since it has been developed for the special usage of the easySHARE data set, it might not perform well on other data. As a future task, our quantlets could therefore be modified to also be applicable to different panel data. 
+Overall, our quantlets perform well on the tested data set. The output generated by our functions is as expected and can be validated with other packages. It works fine for the replication of the chosen paper and should perform well for other tasks performed on the easySHARE data set. Since the quantlet or constructed with a modular design, they can be quickly adjusted for other research tasks. While some of our functions go beyond the functionality of other packages (e.g. `wald.test` from `aod` package), our main focus lies on the development of tools to comprehensively analyze the easySHARE data set. One notable source of weakness of our code is its specificity and limitation of scope. Since it has been developed for the special usage of the easySHARE data set, it might not perform well on other data. As a future task, our quantlets could therefore be modified to also be applicable to different panel data sets. 
 
 
 \newpage
