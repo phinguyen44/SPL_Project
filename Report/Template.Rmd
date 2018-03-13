@@ -18,7 +18,7 @@ bibliography: references.bib
 ---
 
 ```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
-wd = paste0(Sys.getenv("HOME"), "/Documents/SPL_Project")
+wd = paste0(Sys.getenv("HOME"), "/Documents/Projects/SPL_Project")
 knitr::opts_knit$set(root.dir = wd)
 
 ```
