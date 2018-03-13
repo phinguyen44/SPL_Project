@@ -356,7 +356,7 @@ knitr::kable(t(round(sum.stats.tot, 2)), caption = "Summary Statistics over all 
 
 Having obtained the share of labor force participation grouped by gender, country and age, striking values can be presented. 
 
-Among the selected countries, France, the Netherlands and Belgium have the fewest laborers among the oldest age group, which is ranging from 60 to 64 years. In the middle age group, ranging from 54-59, the Belgian and Italian population have sparse labor participation rates among men and women. Within the youngest age group including people from 50 to 54 years old, variance among men is generally low. This is not the case for Greek, Italian and Spanish women, whose participation rates do not exceed 45.5%. 
+Among the selected countries, France, the Netherlands and Belgium have the fewest laborers among the oldest age group, which is ranging from 60 to 64 years. In the middle age group, ranging from 54-59, the Belgian and Italian population have sparse labor participation rates among men and women. Within the youngest age group including people from 50 to 54 years old, variance among men is generally low. This is not the case female workers, among which Greek, Italian and Spanish participation rates do not exceed 45.5%. 
 
 Concerning health statistics, Switzerland and the Scandinavian countries stand out positively. Together, they from a group that has an overall low percentage of obese people while achieving high shares of self-reported good health. Among all other countries, the Swiss have the least number of chronic diseases and fewest overweight. Only the Greek have lower share of ADL's. 
 
@@ -387,19 +387,19 @@ knitr::kable(labor.part.f, caption = "Women: Labor Force Participation Rate by a
 
 ## Theory and Design 
 
-Probit models allow for the estimation of binary, random response variables.  
+Probit models allow for the estimation of binary, random response variables [@schild2017].  
 Probit and Logit models mitigate problems that would occur in case a (linear) regression would be used for a similar task. In this case, the range of the response variable would not be restricted to the interval (0,1). Consequently, as probabilities are commonly defined on this space, non-interpretable probability estimations would be delivered.
-The estimated coefficients are subject to a Wald Test on joint significance. 
+While literature often refers to use maximum likelihood to estimate coefficients, the `glm` function in `R` uses iterative re-weighted least squares [@stats]. The estimated coefficients are subject to a Wald Test on joint significance. 
 
 @schild2017 defines the model formula as
 $$
-P(Y = 1 | X = x) = \Phi (x \beta)'
+P(Y = 1 | X = x) = \Phi (x' \beta)
 $$
 It holds under the assumption that $\epsilon \sim N(0,1)$ (wikipedia - how to quote?)
 
-Using this model, it is investigated how the probability of labor participation is influenced by health and age variables. 
+Using this model, it is investigated how the probability of labor force participation is influenced by health and age variables. 
 
-We are especially focussing on the calculation and evaluation of marginal effects.
+Whereas a simple linear regression allows for direct interpretation of the estimated coefficients, this is not the case for probit models. As we are particularly interested in the effects of certain regressors on the probability of labor force participation, we are especially focussing on the calculation and evaluation of marginal effects.
 The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a ceteris paribus change of $x_j$ on the conditional probability that the response variable Y is realized as one.
 In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is dependent on x.
 
@@ -495,19 +495,7 @@ By means of the presented model, we evaluate how labor force participation behav
 - Health improvements are associated with higher labor force participation rates
 - Decreasing health explains decreasing labor force participation of the elderly in Europe
 
-These main results are validated by the analysis. As shown on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases are negatively related to employment. Analysis of the marginal effects show, that the negative influence of age on the dependent variable is growing with increasing age. Conversely, high education positively predicts labor force participation for the specified group. Having children does not significantly influence the independent variable. These results are stable across different groups. 
-
-Comparing the marginal effects between our results and the paper by @kalwij2005labour shows similar results. Usually, significant coefficient estimates as well as their significance level are close to each other. However, as the data sets differ, there are deviations in the majority of models. This rarely affects the sign of the coefficients. 
-
-
-```{r, eval = TRUE, results = 'asis', echo = FALSE, message = FALSE, warning = FALSE}
-
-library("xtable", quietly = TRUE)
-xtable::xtable( allSummaries[[1]], caption = "Probability of Austrian women participating in the labor market")
-
-# xtable::xtable(mfx.Models[[1]]$fit)
-
-```
+These main results are validated by the analysis. As shown representatively on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases are negatively related to employment. The overall negative influence and the statistical significance of age on the dependent variable is growing with increasing age. Conversely, high education and having second education positively predict labor force participation for the specified group, but statistical significance usually restricted to one of them. Additionally, we find maximum grip strength to be statistically significant in multiple models. Having children or a partner does not appear to make a difference. Especially the negative influence of age is extraordinarily stable across different models. 
 
 
 ```{r, eval = TRUE, results = 'asis', echo = FALSE, message = FALSE, warning = FALSE}
