@@ -9,7 +9,9 @@ header-includes:
   - \usepackage{setspace}
   - \usepackage{booktabs}
   - \onehalfspacing
-output: pdf_document
+output: 
+    pdf_document: 
+        fig_caption: yes
 latex_engine: lualatex
 geometry: margin = 2.5cm
 bibliography: references.bib
@@ -438,7 +440,7 @@ Counterfactual exercises are a common tool in economic policy analysis that allo
 Counterfactual exercises are based on regression methods that can be carried out in numerous ways.
 The simplest method to is to replace the existing covariates values $X$ with counterfactual values $X_{cf}$ [@chernozhukov2013inference]. For the case of probit regression with a binary response variable $y$ for employment, we can interpret the fitted values $\hat{y}$ and $\hat{y}_{cf}$ as current and counterfactual employment probabilities for each individual. Based on these calculated individual employment probabilities, we can calculate the current and counterfactual population employment rates ($\Pi_{ac}$, $\Pi_{cf}$) by taking the mean, making use of the Law of Large Numbers. 
 
-Obtaining the counterfactual probabilities $\hat{y}_{cf}$ requires a two-step procedure. First, the regular probit regression of $y$ on $X$ is tun to obtain the estimated coefficients $\hat{\beta}$. Second, the counterfactual probabilities for each individuals $\Pi_i$ are calculated by predicting y based on $X_{cf}$ and the estimated coefficients.  
+Obtaining the counterfactual probabilities $\hat{y}_{cf}$ requires a two-step procedure. First, the regular probit regression of $y$ on $X$ is tun to obtain the estimated coefficients $\hat{\beta}$. Second, the counterfactual probabilities for each individuals $\Pi_i$ are calculated by predicting y based on $X_{cf}$ and the estimated coefficients.     
 
 $$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) = \Phi(xi_{cf}'{\beta}\tag{***}) $$
 
@@ -660,13 +662,13 @@ health.gridmap(xvar = 'country', facetting = 'gender')
 health.distribution(xvar = 'age', gen = 'MALEEEEEEE')
 ```
 
-We show an examples of correct output below. Here, we want to examine average labor hours per week, facetted by age group. As we can see in this example, the percentage of the population that works full time generally decreases for all countries as age increases. However, in countries like Sweden and Switzerland, a higher percentage continue to work even in old age.
+We show an examples of correct output below. Here, we want to full-time employment percentage, facetted by age group. As we can see in this example, the percentage of the population that works full time generally decreases for all countries as age increases. However, in countries like Sweden and Switzerland, a higher percentage continue to work even in old age.
 
 ```{r eval=FALSE}
 health.gridmap(xvar = 'h_obese', facetting = 'country')
 ```
 
-```{r fig.width=8, fig.height=5.33, echo=FALSE}
+```{r fig.cap="Full-time labor employment tile grid maps by age group", fig.width=8, fig.height=5.33, echo=FALSE}
 library(png)
 library(grid)
 img = readPNG("Quantlets/SPL_ELP_Graphics/gridmap_laborft_byage.png")
@@ -679,7 +681,7 @@ Finally, we display an example of the health distribution map. Here, we seek to 
 health.distribution(xvar = 'h_perceived', remove.outliers = FALSE)
 ```
 
-```{r fig.width=8, fig.height=5, echo=FALSE}
+```{r fig.cap="Distribution of self-perceived health by country and gender", fig.width=8, fig.height=5, echo=FALSE}
 library(png)
 library(grid)
 img = readPNG("Quantlets/SPL_ELP_Graphics/healthdistribution_perceivedhealth.png")
