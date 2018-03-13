@@ -16,7 +16,7 @@
 # Beta is vector of coefficients of size k x 1 
 # Confidence.level is the desired confidence level (between 0 and 1). 
 # Default: 0.95
-# Spec is vector of integers of length 0 < m ≤ k specifying the subset of 
+# Spec is vector of integers of length 0 < m <= k specifying the subset of 
 # coefficients to be jointly tested
 
 joint.wald.test = function(model.summary, confidence.level=0.95, spec=NULL) {
