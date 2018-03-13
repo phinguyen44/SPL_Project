@@ -11,9 +11,10 @@
 ################################################################################
 # SOURCE DATA
 
-# **NOTE**: Change this to the file path where your LoadWald.R function is
-# located
-source("../SPL_ELP_LoadWald/SPL_ELP_LoadWald.R")
+######
+# IMPORTANT NOTE: THIS IS DESIGNED TO WORK IN THE .RMD file. If you want to run
+# this part manually, change the source
+source("Quantlets/SPL_ELP_LoadWald/SPL_ELP_LoadWald.R")
 
 load('easySHARE_clean.RData')
 
@@ -81,7 +82,7 @@ for (i in 1:length(allSummaries)) {
 wald.bound           = as.data.frame(wald.log)
 colnames(wald.bound) = names(allModels)
 
-rm(list= ls()[!(ls() %in% c("allModels", "allSummaries", "wald.bound", "df.splits"))])
+rm(list= ls()[!(ls() %in% c("allModels", "joint.wald.test", "general.wald.test", "allSummaries", "wald.bound", "df.splits"))])
 
 ################################################################################
 # Calculate employment probability

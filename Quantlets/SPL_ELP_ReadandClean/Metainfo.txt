@@ -1,5 +1,5 @@
 
-Name of Quantlet:   SPL_ELP_ReadAndClean
+Name of Quantlet:   SPL_ELP_ReadandClean
 
 Published in:       'Statistical Programming Languages - Student Project on 
                     "European Labor Participation"'

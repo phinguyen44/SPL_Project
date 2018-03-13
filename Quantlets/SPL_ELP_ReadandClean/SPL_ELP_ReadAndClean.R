@@ -1,5 +1,5 @@
 ################################################################################
-# SPL_ELP_ReadAndClean.R
+# SPL_ELP_ReadandClean.R
 #
 ################################################################################
 # Description:
@@ -13,18 +13,13 @@
 read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
 
     # LOAD NECESSARY PACKAGES & DATA
-    # List all packages needed for session
     neededPackages = c("dplyr", "magrittr", "infuser", "countrycode")
     allPackages    = c(neededPackages %in% installed.packages()[,"Package"])
-
-    # Install packages (if not already installed)
     if (!all(allPackages)) {
         missingIDX = which(allPackages == FALSE)
         needed     = neededPackages[missingIDX]
         lapply(needed, install.packages)
     }
-
-    # Load all defined packages
     invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
         library(x, character.only = TRUE))))
 

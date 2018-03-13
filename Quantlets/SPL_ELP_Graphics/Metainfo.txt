@@ -14,7 +14,7 @@ Keywords:           'descriptive-statistics, plot, graphical representation,
 
 Author:             Claudia Günther, Phi Nguyen, Julian Winkel
 
-See also:           'SPL_ELP_ReadAndClean,
+See also:           'SPL_ELP_ReadandClean,
                     SPL_ELP_SummaryStatistics, 
                     SPL_ELP_ProbitRegression,
                     SPL_ELP_LoadWald,
