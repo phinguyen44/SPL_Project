@@ -28,8 +28,13 @@ cite = lapply(pack, function(z){
 })
 
 
+
 citeexists = Filter(Negate(is.null), cite)
 
+nullidx = which(unlist(lapply(cite, is.null)))
+missingcitations = pack[nullidx]
+
+warning(paste0("Citations are missing for the following packages: \n", missingcitations, "\n"))
 
 
 sink(file = "packagereferences.bib", append = TRUE)
