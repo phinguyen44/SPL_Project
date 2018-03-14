@@ -414,12 +414,13 @@ $$
 PEA = \Phi(\beta_0 + \beta_1 \Sigma_{i = 1}^n x_i)\beta_1
 $$
 
-The "Average Partial Effect"( or "Average Marginal Effect") describes the effect of a regressor on the probability of Y = 1. 
+The "Average Partial Effect"( or "Average Marginal Effect") describes the effect of a regressor on the probability that Y = 1. 
 @dergutedietmar defines it as
 
 $$
 APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1
 $$
+(where ... define variables ... )
 
 ## Implementation
 
