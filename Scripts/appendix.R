@@ -4,7 +4,7 @@ neededPackages = c("dplyr", "magrittr", "infuser", "countrycode",
                    "formattable", "webshot", "htmltools", "webshot",
                    "aod", "devtools", "margins", "mfx",
                    "dplyr", "ggplot2", "countrycode", 
-                   "gridExtra", "grid", "infuser")
+                   "gridExtra", "grid", "infuser", "matrix")
 
 pack = unique(neededPackages)
 
@@ -35,6 +35,7 @@ nullidx = which(unlist(lapply(cite, is.null)))
 missingcitations = pack[nullidx]
 
 warning(paste0("Citations are missing for the following packages: \n", missingcitations, "\n"))
+warning("matrix is missing too")
 
 
 sink(file = "packagereferences.bib", append = TRUE)
