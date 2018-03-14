@@ -260,9 +260,10 @@ Since we are working with a cross-national survey, it is useful to to present an
 ## Implementation
 
 An efficient way of seperating the easySHARE dataset into country, gender and age is explained in the following. In order to minimize hard-coding and possibly related errors, a grid is expanded between named variables.
-Functions that calculate group shares per country and labor participation rates can subsequently be applied onto the defined grid. 
+A function that calculates labor participation rates can subsequently be applied onto the defined grid. 
 
-Besides the target data frame, `group.share` takes a boolean variable as an input that specifies whether aggregation on a national level is intended. The share of males or females (per country) is calculated by finding the sum of occurences and dividing by their total, represented by the length of the vector. A similar procedure that allows for multiple subsets and based upon `dplyr` is used in `labor`.
+`group.share` calculates the average or percentage for an input data frame and a column name by country. As it is applied on a data frame grouped by gender, one possible outcome is the average grip strength for Swedish women included in the survey. The particular share is calculated by finding the sum of occurences and dividing by their total, represented by the length of the vector. 
+A related procedure that allows for multiple subsets and based upon `dplyr` is used in `labor`, which calculates labor participation rates for all combinations of country, gender and age.
 
 ```{r, eval = FALSE}
 # Function for calculation group shares per country
@@ -292,7 +293,7 @@ labor = function(df, .country, .gender, .age) {
 ```
 
 Within the code below, `args.list` contains three sub-lists divided by countriy (`c`), gender (`g`) and age (`a`). The list is passed as an argument to `labor`, which are simulatenously iterated over the sub-lists using `pmap`. This function has an advantage over a similar functions, since it allows multiple arguments and uses parallelization by default.  
-Including `with` to specify the data frame on which we expand the grid upon, modifies the data frame in a new environment. This simplifies name assignment. 
+
 
 ```{r, eval = FALSE}
 
@@ -316,10 +317,10 @@ labor.part.share.df = spread(labor.part.share, Var3, output.v) %>%
                    paste0("Age ", rep(c("50-54", "55-59", "60-64")))))
 ```
 
-The resulting `output` list can be easily bound into a data frame and arranged using `dplyr`. From this package we also use `spread` in order to subset by gender. Using the pipe operator `%>%` keeps our code compact and avoids unnecessary variable assignment and inefficient memory requirements.
+The resulting `output` list can be easily bound into a data frame and arranged using `dplyr`. We then use `tidyr::spread` in order to spread the variable `Var3`, being the three age groups, into separate columns. Using the pipe operator `%>%` keeps our code compact and avoids unnecessary variable assignment and inefficient memory requirements.
 
 
-In the next code chunk, `vars` is assigned to be a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes in the underlying data frame and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the column names that contain 'labor'. At this point, the meaning of the second argument in `group.share` (comment: name the first code chunk in this section) becomes clear. It is used to subset the target data frame `df` by the extracted variable names containing the string "labor". 
+In the next code chunk, `vars` is assigned to be a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes in the underlying data frame and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the column names that contain 'labor'. This is forwarded as a name index to the second argument in `group.share` (comment: name the first code chunk in this section). It is used to subset the target data frame `df` by the extracted variable names containing the string "labor". 
 Since this task involves invoking a function upon multiple list elements, `lapply` is the best candidate in order to construct labor participation rates grouped by gender, (optionally) by country and classified into non participation, part time and full time work.
 
 ```{r, eval = FALSE}
@@ -403,6 +404,22 @@ Whereas a simple linear regression allows for direct interpretation of the estim
 The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a ceteris paribus change of $x_j$ on the conditional probability that the response variable Y is realized as one.
 In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is dependent on x.
 
+@wooldridge2012 specifies two possible interpretations of the mariginal effect. 
+
+The "Partial Effect at the Average" denotes the marginal effect of a regressor on an average person ($\frac{1}{n}\Sigma_{x_i}$). Problematic are discrete $x_i$ because the resulting averages do not represent anybody in particular. Furthermore, in case of a continuous explanatory variable wrapped inside a non-linear function, it remains unclear whether to apply the average over the function or insert the average into named function. 
+
+According to @dergutedietmar, the Partial Effect at the Average is defined as
+
+$$
+PEA = \Phi(\beta_0 + \beta_1 \Sigma_{i = 1}^n x_i)\beta_1
+$$
+
+The "Average Partial Effect"( or "Average Marginal Effect") describes the effect of a regressor on the probability of Y = 1. 
+@dergutedietmar defines it as
+
+$$
+APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1
+$$
 
 ## Implementation
 
@@ -468,7 +485,7 @@ Furthermore, the application of the Wald Test can easily be substitued. We use a
                                Sigma = vcov(ModelElement), Terms = health)$result)
 ```
 
-In line with the proposed concatenated `lapply` structure, the probability of employment can be predicted for each subset. Marginal effects are calculated using `probitmfx`, which firstly recalculates a probit model. 
+In line with the proposed concatenated `lapply` structure, the probability of employment can be predicted for each subset. Marginal effects are calculated using `probitmfx`, which firstly recalculates a probit model. As the boolean 'atmean' evaluates to `true`, the marginal effects are defined as the partial effects for the average observation [@mfx].
 
 ```{r, eval = FALSE, warning = FALSE}
 # Calculate marginal effects and standard errors
