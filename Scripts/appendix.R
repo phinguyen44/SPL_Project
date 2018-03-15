@@ -43,3 +43,8 @@ sink(file = "packagereferences2.bib", append = TRUE)
 for(i in 1:length(citeexists)) print(citeexists[[i]])
 
 sink()
+
+
+# Construct 'nocite' metadata:
+#p = paste0("@", pack, sep = ",")
+#cat(p)
