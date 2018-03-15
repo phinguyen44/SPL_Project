@@ -266,29 +266,29 @@ An efficient way of separating the easySHARE dataset into country, gender and ag
 A related procedure that allows for multiple subsets and based upon `dplyr` is used in `labor`, which calculates labor participation rates for all combinations of country, gender and age.
 
 ```{r, eval = FALSE}
-# Function for calculation group shares per country
-group.share = function(df, y, agg.country = TRUE) {
-    if (agg.country) {
-        final = tapply(df[[y]], df$country, function(x) {
-            val = sum(x)/length(x)
-            return(val)
-        })
-    } else { # return total if country-level aggregation not specified
-        final = sum(df[[y]])/length(df[[y]])
-    }
-    return(final)
-}
-
-# Function for calculating labor participation rate per country / gender / age
-labor = function(df, .country, .gender, .age) {
-    dataset = df %>% 
-        filter(country == .country & gender == .gender & get(.age) == TRUE)
-    denom = nrow(dataset)
-    numer = with(dataset, sum(labor_ft | labor_pt))
-    perc  = round(numer/denom, 4)
-    
-    return(perc)
-}
+[52]  # Function for calculation group shares per country
+[53]  group.share = function(df, y, agg.country = TRUE) {
+[54]      if (agg.country) {
+[55]          final = tapply(df[[y]], df$country, function(x) {
+[56]              val = sum(x)/length(x)
+[57]              return(val)
+[58]          })
+[59]      } else { # return total if country-level aggregation not specified
+[60]          final = sum(df[[y]])/length(df[[y]])
+[61]      }
+[62]      return(final)
+[63]  }
+[64]  
+[65]  # Function for calculating labor participation rate per country / gender / age
+[66]  labor = function(df, .country, .gender, .age) {
+[67]      dataset = df %>% 
+[68]          filter(country == .country & gender == .gender & get(.age) == TRUE)
+[69]      denom = nrow(dataset)
+[70]      numer = with(dataset, sum(labor_ft | labor_pt))
+[71]      perc  = round(numer/denom, 4)
+[72]      
+[73]      return(perc)
+[74]  }
 
 ```
 
@@ -297,24 +297,24 @@ Within the code below, `args.list` contains three sub-lists divided by country (
 
 ```{r, eval = FALSE}
 
-# use expand.grid to get all combinations of country / gender / age
-agegroups = names(df.out[, 4:6])
-args      = with(df.out, 
-                 expand.grid(levels(country), levels(gender), agegroups, 
-                             stringsAsFactors = FALSE))
-args.list = list(c = as.vector(t(args[1])), 
-                 g = as.vector(t(args[2])), 
-                 a = as.vector(t(args[3])))
-
-# Map over multiple arguments
-output   = pmap(args.list, function(c, g, a) labor(df.out, c, g, a))
-output.v = do.call("c", output)
-
-labor.part.share    = cbind(args, output.v)
-labor.part.share.df = spread(labor.part.share, Var3, output.v) %>% 
-    arrange(desc(Var2)) %>% 
-    set_colnames(c("Country", "Gender", 
-                   paste0("Age ", rep(c("50-54", "55-59", "60-64")))))
+[76]  # use expand.grid to get all combinations of country / gender / age
+[77]  agegroups = names(df.out[, 4:6])
+[78]  args      = with(df.out, 
+[79]                 expand.grid(levels(country), levels(gender), agegroups, 
+[80]                               stringsAsFactors = FALSE))
+[81]  args.list = list(c = as.vector(t(args[1])), 
+[82]                   g = as.vector(t(args[2])), 
+[83]                   a = as.vector(t(args[3])))
+[84]  
+[85]  # Map over multiple arguments
+[86]  output   = pmap(args.list, function(c, g, a) labor(df.out, c, g, a))
+[87]  output.v = do.call("c", output)
+[88]  
+[89]  labor.part.share    = cbind(args, output.v)
+[90]  labor.part.share.df = spread(labor.part.share, Var3, output.v) %>% 
+[91]      arrange(desc(Var2)) %>% 
+[92]      set_colnames(c("Country", "Gender", 
+[93]                     paste0("Age ", rep(c("50-54", "55-59", "60-64")))))
 ```
 
 The resulting `output` list can be easily bound into a data frame and arranged using `dplyr`. We then use `tidyr::spread` in order to spread the variable `Var3`, being the three age groups, into separate columns. Using the pipe operator `%>%` keeps our code compact and avoids unnecessary variable assignment and inefficient memory requirements.
@@ -323,14 +323,14 @@ In the next code chunk, `vars` is assigned to be a name vector that specifies wh
 Since this task involves invoking a function upon multiple list elements, `lapply` is the best candidate in order to construct labor participation rates grouped by gender, (optionally) by country and classified into non participation, part time and full time work.
 
 ```{r, eval = FALSE}
-
-# Labor supply choice tables
-df.female = df.out %>% filter(gender == "FEMALE")
-vars      = names(df.out)[grep("labor", names(df.out))][3:1] # invert
-
-labor.supply.f    = lapply(vars, function(x) group.share(df.female, x, 1))
-labor.supply.f.df = do.call(cbind.data.frame, labor.supply.f) %>% 
-    set_colnames(c("Nonparticipation", "Half time", "Full time"))
+  
+[105]  # Labor supply choice tables
+[106]  df.female = df.out %>% filter(gender == "FEMALE")
+[107]  vars      = names(df.out)[grep("labor", names(df.out))][3:1] # invert
+[108]  
+[109]  labor.supply.f    = lapply(vars, function(x) group.share(df.female, x, 1))
+[110]  labor.supply.f.df = do.call(cbind.data.frame, labor.supply.f) %>% 
+[111]      set_colnames(c("Nonparticipation", "Half time", "Full time"))
 
 
 ```
