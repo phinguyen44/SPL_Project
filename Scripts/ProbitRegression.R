@@ -17,7 +17,7 @@
 
 ################################################################################
 # SOURCE DATA
-wd = paste0(Sys.getenv("USERPROFILE"), "/splrepo/SPL_Project")
+wd = paste0(Sys.getenv("HOME"), "/Documents/Projects/SPL_Project")
 setwd(wd)
 
 source("Scripts/ReadAndClean.R")

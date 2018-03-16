@@ -4,7 +4,8 @@
 ################################################################################
 # Description:
 # 
-# Calculates current and counterfactual labor participation rates for different # age groups, countries, and genders
+# Calculates current and counterfactual labor participation rates for different 
+# age groups, countries, and genders
 # 
 ################################################################################
 
@@ -13,7 +14,7 @@
 load('easySHARE_clean.RData')
 
 #Only keep relevant data sets
-df.out = datasets$df.out
+df.splits = datasets$df.splits
 rm(datasets)
 
 ################################################################################
@@ -100,7 +101,7 @@ empl.rate.age = function(model, group.size = 5, group.low = c(50,55,60)) {
     IND_row_vec = list()
     
     # Define vector of relevant age groups by youngest age
-    for (i in group.low){
+    for (i in group.low) {
         # Define upper bound k of age group
         k         = i + group.size -1
         # Create labels and contents of each age group
