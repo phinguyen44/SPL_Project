@@ -17,7 +17,7 @@ geometry: margin = 2.5cm
 bibliography: references.bib
 ---
 nocite: |
-  @dplyr, @magrittr, @infuser, @countrycode, @tidyr, @purrr, @formattable, @webshot, @htmltools, @aod,       @devtools, @margins, @mfx, @ggplot2, @gridExtra, @grid, @matrix
+  @dplyr, @magrittr, @infuser, @countrycode, @tidyr, @purrr, @formattable, @webshot, @htmltools, @aod,       @devtools, @margins, @mfx, @ggplot2, @gridExtra,  @matrix
 ...
 
 
@@ -33,10 +33,10 @@ knitr::opts_chunk$set(fig.pos = 'H')
 #         xtable.table.placement="H")
 ```
 
-# ```{r, eval = TRUE, echo = FALSE, cache = TRUE, include = FALSE}
-# source("Scripts/SummaryStatistics.R")
-# source("Scripts/ProbitRegression.R")
-# ```
+```{r, eval = TRUE, echo = FALSE, cache = TRUE, include = FALSE}
+ source("Scripts/SummaryStatistics.R")
+ source("Scripts/ProbitRegression.R")
+```
 
 
 \pagenumbering{gobble}
@@ -368,7 +368,7 @@ Probit models allow for the estimation of binary, random response variables [@sc
 $$
 P(Y = 1 | X = x) = \Phi (x' \beta)
 $$
-The error term is assumed to be independent and identically distributed (@wooldrige2012)
+The error term is assumed to be independent and identically distributed (@wooldridge2012)
 
 Using this model, it is investigated how the probability of labor force participation is influenced by health and age variables.
 
@@ -398,70 +398,72 @@ As stated in the 'Read and Clean' section, `df.splits` is obtained using the `sp
 This structure is helpful throughout the following sections, as it enables us to build a series of concatenated `lapply` functions. This function invokes a c-loop that iterates over each list element. As `lapply` takes a list as an input and returns a list, too; it preserves the initial structure. First, it is used to create a probit model for each subset within the list. Since we are estimating with an intercept, the age 50 dummy variable is perfectly correlated with the other age dummies. Hence it is excluded due to multicollinearity.
 
 ```{r, eval = FALSE}
-# Probit for each country and gender
-allModels = lapply(df.splits, function(z){
-    z     = z[-z$age50] # Multicollinearity
-    model = glm(z$labor_participationTRUE ~., family = binomial(link = "probit"), data = z)
-
-    return(model)
-})
-
-# Return summaries
-allSummaries = lapply(allModels, summary)
+[53]  # Probit for each country and gender
+[54]  allModels = lapply(df.splits, function(z){
+[55]    
+[56]      z     = z[-z$age50] # Multicollinearity
+[57]      model = glm(z$labor_participationTRUE ~., family = binomial(link = "probit"), data = z)
+[58]  
+[59]      return(model)
+[60]  
+[61]  })
+[62]
+[63]  # Return summaries
+[64]  allSummaries = lapply(allModels, summary)
 ```
 
 The loop below is a robust way to apply the Wald Test for the dataset subsetted by country and gender and utilises only health-related variables. A list intended to log is created, which tracks failure of applying the Wald Test on joint significance of the selected variables. `Try` ensures continuation of the loop despite possible errors. In case an error occurs, the class of `testOutput` will be `try-error` and consequently logged into named list at the index `i`. Since it preserves the structure as specified before, results can be easily transformed and named. This setup has proven to be useful for debugging our test as well as finding out that some health variables are empty for certain subgroups, leading to selective failure of the test.
 
 
 ```{r, eval = FALSE}
-# Wald Test for all models
-wald.log = list() # Save Wald Test Output
-
-for(i in 1:length(allSummaries)){
-
-    # Get Element
-    SummaryElement = allSummaries[[i]]
-
-    # Specify the of coefficients to be tested: only health variables
-    health = c(16:19)
-
-    # Test only the joint significance of health variables
-    testOutput = try(joint.wald.test(allSummaries[[i]], 0.95, health))
-
-    if(class(testOutput) == "try-error"){
-        msg = paste0("Wald Test failed for Model Element ", i)
-        warning(msg)
-        wald.log[[i]] = "Error"
-    } else{
-        wald.log[[i]] = testOutput
-    }
-    rm(SummaryElement) # clean up
-}
-
-wald.bound           = as.data.frame(wald.log)
-colnames(wald.bound) = names(allModels)
+[70]  # Wald Test for all models
+[71]  wald.log = list() # Save Wald Test Output
+[72]  
+[73]  for(i in 1:length(allSummaries)){
+[74]    
+[75]    # Get Element
+[76]    SummaryElement = allSummaries[[i]]
+[77]    
+[78]    # Specify the of coefficients to be tested: only health variables
+[79]    health = c(16:19)
+[80]    
+[81]    # Test only the joint significance of health variables
+[82]    testOutput = try(joint.wald.test(allSummaries[[i]], 0.95, health))
+[83]    
+[84]    if(class(testOutput) == "try-error"){
+[85]      msg = paste0("Wald Test failed for Model Element ", i)
+[86]      warning(msg)
+[87]      wald.log[[i]] = "Error"
+[88]    } else{
+[89]      wald.log[[i]] = testOutput
+[90]    }
+[91]    rm(SummaryElement) # clean up
+[92]  }
+[93]  
+[94]  wald.bound = as.data.frame(wald.log)
+[95]  colnames(wald.bound) = names(allModels)
 ```
 
 Furthermore, the application of the Wald Test can easily be substitued. We use a different Wald Test to validate our results.
 
 ```{r, eval = FALSE}
-    testOutput = try(wald.test(b = coef(ModelElement),
-                               Sigma = vcov(ModelElement), Terms = health)$result)
+[82]    testOutput = try(wald.test(b = coef(ModelElement),
+[83]                               Sigma = vcov(ModelElement), Terms = health)$result)
 ```
 
 Marginal effects are calculated using `probitmfx`, which firstly recalculates a probit model. As the boolean 'atmean' evaluates to `true`, the marginal effects are defined as the partial effects for the average observation [@mfx].
 
 ```{r, eval = FALSE, warning = FALSE}
-# Calculate marginal effects and standard errors
-
-# Same structure as before, but must calculate model again.
-mfx.Models = lapply(df.splits, function(z){
-
-    z   = z[-z$age50] # Multicollinearity
-    res = probitmfx(z$labor_participationTRUE ~.,atmean = TRUE,  data = z)
-
-    return(res)
-})
+[117]  # Calculate marginal effects and standard errors
+[118]  
+[119]  # Same structure as before, but must calculate model again.
+[120]  mfx.Models = lapply(df.splits, function(z){
+[121]  
+[122]      z   = z[-z$age50] # Multicollinearity
+[123]      res = probitmfx(z$labor_participationTRUE ~.,atmean = TRUE,  data = z)
+[124]  
+[125]      return(res)
+[126]  })
 ```
 
 ## Empirical Results
@@ -475,8 +477,10 @@ By means of the presented model, we evaluate how labor force participation behav
 These main results are validated by the analysis. As shown representatively on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases are negatively related to employment. The overall negative influence and the statistical significance of age on the dependent variable is growing with increasing age. Conversely, high education and having second education positively predict labor force participation for the specified group, but statistical significance usually restricted to one of them. Additionally, we find maximum grip strength to be statistically significant in multiple models. Having children or a partner does not appear to make a difference. Especially the negative influence of age is extraordinarily stable across different models.
 
 ```{r, eval = TRUE, results = 'asis', echo = FALSE, message = FALSE, warning = FALSE}
-library("knitr", quietly = TRUE)
-knitr::kable(mfx.Models[[1]]$fit, caption = "Marginal effects of health and age related variables on the probability of labor market participation of Austrian women")
+library("xtable", quietly = TRUE)
+xtab = xtable(mfx.Models[[1]]$fit, caption = "Marginal effects of health and age related variables on the probability of labor market participation of Austrian women")
+
+print.xtable(xtab, caption.placement = "top")
 ```
 
 \pagebreak
