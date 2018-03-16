@@ -106,7 +106,7 @@ wald.bound = as.data.frame(wald.log)
 colnames(wald.bound) = names(allModels)
 
 
-rm(list= ls()[!(ls() %in% c("allModels", "allSummaries", "wald.bound", "df.splits"))])
+#rm(list= ls()[!(ls() %in% c("allModels", "allSummaries", "wald.bound", "df.splits"))])
 
 
 ################################################################################
