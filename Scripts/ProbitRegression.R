@@ -17,7 +17,7 @@
 
 ################################################################################
 # SOURCE DATA
-wd = paste0(Sys.getenv("HOME"), "/Documents/Projects/SPL_Project")
+wd = paste0(Sys.getenv("USERPROFILE"), "/splrepo/SPL_Project")
 setwd(wd)
 
 source("Scripts/ReadAndClean.R")
@@ -54,7 +54,6 @@ lapply(neededPackages, library, character.only = TRUE)
 allModels = lapply(df.splits, function(z){
   
   z = z[-z$age50] # Multicollinearity
-  
   model = glm(z$labor_participationTRUE ~., family = binomial(link = "probit"), data = z)
   
   return(model)
@@ -68,7 +67,6 @@ allSummaries = lapply(allModels, summary)
 ################################################################################
 
 # Wald Test for all models
-
 wald.log = list() # Save Wald Test Output
 
 for(i in 1:length(allSummaries)){
@@ -79,28 +77,18 @@ for(i in 1:length(allSummaries)){
   # Specify the of coefficients to be tested: only health variables
   health = c(16:19)
   
-  
   # Test only the joint significance of health variables
   testOutput = try(joint.wald.test(allSummaries[[i]], 0.95, health))
   
   if(class(testOutput) == "try-error"){
-   
-    
     msg = paste0("Wald Test failed for Model Element ", i)
     warning(msg)
-    
     wald.log[[i]] = "Error"
-    
-    
-  } else{
-    
+    } else{
     wald.log[[i]] = testOutput
-    
-  }
-  
+    }
   rm(SummaryElement) # clean up
-  
-}
+  }
 
 wald.bound = as.data.frame(wald.log)
 colnames(wald.bound) = names(allModels)
@@ -132,11 +120,9 @@ empl.Models = lapply(allModels, empl.prob)
 mfx.Models = lapply(df.splits, function(z){
     
     z = z[-z$age50] # Multicollinearity
-    
     res = probitmfx(z$labor_participationTRUE ~.,atmean = TRUE,  data = z)
     
     return(res)
-    
 })
 
 ################################################################################
