@@ -16,9 +16,13 @@ latex_engine: lualatex
 geometry: margin = 2.5cm
 bibliography: references.bib
 ---
+nocite: |
+  @dplyr, @magrittr, @infuser, @countrycode, @tidyr, @purrr, @formattable, @webshot, @htmltools, @aod,       @devtools, @margins, @mfx, @ggplot2, @gridExtra, @grid, @matrix
+...
+
 
 ```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
-wd = paste0(Sys.getenv("HOME"), "/SPL_Project")
+wd = paste0(Sys.getenv("USERPROFILE"), "/splrepo/SPL_Project")
 knitr::opts_knit$set(root.dir = wd)
 
 ```
