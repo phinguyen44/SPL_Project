@@ -15,10 +15,10 @@ output:
 latex_engine: lualatex
 geometry: margin = 2.5cm
 bibliography: references.bib
----
 nocite: |
-  @dplyr, @magrittr, @infuser, @countrycode, @tidyr, @purrr, @formattable, @webshot, @htmltools, @aod,       @devtools, @margins, @mfx, @ggplot2, @gridExtra,  @matrix
-...
+  @dplyr, @magrittr, @infuser, @countrycode, @tidyr, @purrr, @formattable, @webshot, @htmltools, @aod, @devtools, @margins, @mfx, @ggplot2, @gridExtra, @matrix
+---
+
 
 
 ```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
