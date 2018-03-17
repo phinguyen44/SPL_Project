@@ -131,14 +131,13 @@ lays the foundation for two Wald tests that can be used to test the joint signif
 \newpage
 
 \section{Data Cleaning and Manipulation}
-
-The original SHARE data set used by Kalwij and Vermeulen (2005), released in spring 2005, contains data on the life circumstances of eligible members from approximately 18,000 households. The SHARE survey contains a variety of different health, social, and socioeconomic indicators. SHARE contains data from eleven countries: Austria, Belgium, Denmark, France, Germany, Greece, Italy, the Netherlands, Spain, Sweden and Switzerland.
+The SHARE survey is a panel data set of more than 120,000 individuals covering data from six survey waves carried out between 2004 and 2015. It consists of a variety of different health, social, and socioeconomic indicators from 27 European countries and Israel. The analysis conducted by Kalwij and Vermeulen (2005) is based on the first wave of the SHARE data set. Their sample contains observations from approximately 18,000 households from the eleven countries that participated in the first wave between 2004 and 2005: Austria, Belgium, Denmark, France, Germany, Greece, Italy, the Netherlands, Spain, Sweden and Switzerland.
 
 \subsection{Theory and Design}
 
-The easySHARE data set, released in spring 2017, is the data set for which we will be focusing on in this paper. It is a panel data set of more than 100,000 individuals covering data from six survey waves carried out between 2004 and 2015. As can be derived from its name, it is designed to be a simplified version of the broader SHARE data set. As a result, the data set includes slightly different observations and does not provide the same level of granularity in variables broader SHARE data set, which we shall show below.
+The easySHARE data set, released in spring 2017, is the the basis for the following analysis. As can be derived from its name, it is designed to be a simplified version of the broader SHARE data set. As a result, the data set includes slightly less observations and does not provide the same level of granularity in variables compared to broader SHARE data set. Our main aspiration of the data cleaning process is to make our code readily accessible and comprehensible for other users of the easySHARE data set.
 
-The rest of this section describes our process of data transformation, aggregation, and cleaning , not only to match as closely as possible the initial SHARE data set, but also to convert our data sets into a more accessible state for future analyses.
+The rest of this section describes our process of data transformation, aggregation, and cleaning, not only to match as closely as possible to the initial easySHARE data set, but also to convert our data sets into a more accessible state for future analyses.
 
 \subsection{Implementation}
 
