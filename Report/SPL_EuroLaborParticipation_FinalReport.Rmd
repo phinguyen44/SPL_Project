@@ -1,0 +1,1940 @@
+---
+title: "Analysis and Graphical Representation of Health and
+Labor Force Participation among the Elderly in Europe"
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{amsmath}
+  - \usepackage{float}
+  - \usepackage{hyperref}
+  - \usepackage{setspace}
+  - \usepackage{booktabs}
+  - \onehalfspacing
+output:
+    pdf_document:
+        fig_caption: yes
+latex_engine: lualatex
+geometry: margin = 2.5cm
+bibliography: references.bib
+nocite: |
+  @dplyr, @magrittr, @infuser, @countrycode, @tidyr, @purrr, @formattable, @webshot, @htmltools, @aod, @devtools, @margins, @mfx, @ggplot2, @gridExtra, @matrix
+---
+
+
+
+```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
+
+# NOTE: Please change the WD in order to run the file.
+
+wd = paste0(Sys.getenv("HOME"), "/Documents/Projects/SPL_Project")
+knitr::opts_knit$set(root.dir = wd)
+
+```
+
+```{r global_options, include=FALSE, echo=TRUE}
+knitr::opts_chunk$set(fig.pos = 'H')
+# options(xtable.comment = FALSE,
+#         xtable.table.placement="H")
+```
+
+```{r, eval = TRUE, echo = FALSE, cache = TRUE, include = FALSE}
+ source("Scripts/SummaryStatistics.R")
+ source("Scripts/ProbitRegression.R")
+```
+
+
+\pagenumbering{gobble}
+
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+            {-2.5ex\@plus -1ex \@minus -.25ex}%
+            {1.25ex \@plus .25ex}%
+            {\normalfont\normalsize\bfseries}}
+\makeatother
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+\bigskip
+
+\begin{center}
+
+
+Humboldt-Universität zu Berlin \linebreak
+School of Business and Economics  \linebreak
+Ladislaus von Bortkiewicz Chair of Statistics   \linebreak
+\medskip
+
+
+\includegraphics[width=0.2\textwidth]{HU_Logo_small.png}
+
+
+\textbf{Statistical Programming Languages} \linebreak
+Winter 2017/18
+
+\medskip
+
+
+Seminar Paper by  \linebreak
+
+\textbf{Claudia Günther, Phi Nguyen, Julian Winkel}  \linebreak
+576419, 526624, 562959 \linebreak
+
+\medskip
+
+\medskip
+
+
+Berlin, 2018-03-16 \linebreak
+
+\end{center}
+
+\medskip
+
+\medskip
+
+\newpage
+
+\listoftables
+
+\newpage
+
+\listoffigures
+
+\newpage
+
+\pagenumbering{arabic}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+The proportion of elderly people in Europe continues to rise and is expected to impose major social, fiscal and economic challenges in the future. According to official projections, half of the European population is expected to be 50 years or older by 2050 [@eurostat2012active]. Analyzing the relationship between aging populations, health indicators and labor force participation is essential to come up with suitable policy responses to those demographic changes. Empirical results on the relation between health, well-being and employment are ambiguous. While some studies show that poor health contributes to early retirement [@cai2006health; @karpansalo2004perceived; @monden2005changing], another branch of research suggests the opposite effect: that unemployment has negative effects on well-being and health [@shields2005exploring; @kassenboehmer2008you].
+
+The Survey of Health, Ageing and Retirement in Europe (SHARE) launched in 2004 is an excellent research base for aging related research designs. This multidisciplinary and cross-national panel database of data on health, socio-economic status and social networks contains data of more than 120,000 individuals aged 50 or older [@borsch2017survey]. Based on the first SHARE data release, @kalwij2005labour analyze the impact of different health indicator on individuals’ participation decisions in 11 European countries. They find that health effects on labor force participation behavior of individuals aged 50-64 differ considerable between countries, age groups and gender.
+
+In this paper, we present the developed code that can be utilized to replicate all the results from @kalwij2005labour and furthermore provides a basis for further data exploration and visualization. For this purpose, we use the recently released easySHARE data set. We design the code in a way that allows others to explore the easySHARE data set, generate comprehensible and instructive summary statistic tables or graphics, and conduct regression-based analysis.
+
+Our code is divided into six quantlets, which are meant to be executed chronologically. In `Quantlet 1`[![Quantlet 1](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_ReadandClean/SPL_ELP_ReadandClean.R){width=25px}, we transform, clean and aggregate the variables in the raw data set and generate a list of data frames for subsequent data analysis. `Quantlet 2`[![Quantlet 2](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_SummaryStatistics/SPL_ELP_SummaryStatistics.R){width=25px} generates a series of summary statistics tables that present health indicators, labor force participation and labor supply choice by country, age group and gender. \linebreak
+In `Quantlet 3`[![Quantlet 3](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R){width=25px}, we conduct probit regression for each country and both genders, calculate marginal effects and average employment probability. `Quantlet 4`[![Quantlet 4](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_LoadWald/SPL_ELP_LoadWald.R){width=25px}
+lays the foundation for two Wald tests that can be used to test the joint significant of a subset of variables as well as any linear hypothesis. `Quantlet 5`[![Quantlet 5](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_Counterfactual/SPL_ELP_Counterfactual.R){width=25px} presents counterfactual exercises that are based on the previously carried out probit estimations. By manipulating the population health indicators, we calculate current and counterfactual labor participation rates for different age groups. In `Quantlet 6`[![Quantlet 6](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_Graphics/SPL_ELP_Graphics.R){width=25px}, we introduce new methods to graphically represent the summary statistics fo exploratory data analysis. Specifically, we provide tools to generate carefully selected graphics for a subset of desired variables and sample subsets.
+
+\newpage
+
+\section{Data Cleaning and Manipulation}
+
+The original SHARE data set used by Kalwij and Vermeulen (2005), released in spring 2005, contains data on the life circumstances of eligible members from approximately 18,000 households. The SHARE survey contains a variety of different health, social, and socioeconomic indicators. SHARE contains data from eleven countries: Austria, Belgium, Denmark, France, Germany, Greece, Italy, the Netherlands, Spain, Sweden and Switzerland.
+
+\subsection{Theory and Design}
+
+The easySHARE data set, released in spring 2017, is the data set for which we will be focusing on in this paper. It is a panel data set of more than 100,000 individuals covering data from six survey waves carried out between 2004 and 2015. As can be derived from its name, it is designed to be a simplified version of the broader SHARE data set. As a result, the data set includes slightly different observations and does not provide the same level of granularity in variables broader SHARE data set, which we shall show below.
+
+The rest of this section describes our process of data transformation, aggregation, and cleaning , not only to match as closely as possible the initial SHARE data set, but also to convert our data sets into a more accessible state for future analyses.
+
+\subsection{Implementation}
+
+The `read.and.clean()` function is designed to take the raw easySHARE data set file, which is provided in an `.rda` file format, and convert that into a list of data frames. The function additionally accepts a wave number as an argument. Although we are only concerned with the initial wave for our study, this additional parameter may allows us to conduct supplementary panel studies. The function only runs specifically with the raw easySHARE data set (`easySHARE_rel6_0_0.rda`), which is the default `dataset` argument. The `dataset` argument may alternatively be specified to point to the directory where that data set is located. Otherwise it is assumed that it is located in the root directory.
+
+We begin by initializing and downloading the packages (if necessary) required for this function. Much of the function utilizes the functions in the `tidyverse` family of functions developed by Hadley Wickham, namely  `dplyr` and `magrittr`. The `dplyr` package is designed for uncomplicated data manipulation, and it works specifically with data frames. The package provides a consistent set of verbs that do a small thing very well, such as aggregation, selection, filtering, or creation of new variables. The `magrittr` package expands upon this further with the pipe operator `%>%`, which enables the chaining of smaller functions to create something more complex.
+
+```{r eval=FALSE, echo=TRUE}
+[16]    neededPackages = c("dplyr", "magrittr", "infuser", "countrycode")
+[17]    allPackages    = c(neededPackages %in% installed.packages()[,"Package"])
+[18]    if (!all(allPackages)) {
+[19]        missingIDX = which(allPackages == FALSE)
+[20]        needed     = neededPackages[missingIDX]
+[21]        lapply(needed, install.packages)
+[22]    }
+[23]    invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
+[24]        library(x, character.only = TRUE))))
+```
+
+We continue with basic filtering to select only variables that are pertinent to our study. Then we encode missing values. The specific reason for the missing values are documented well in the "Guide to easySHARE release 6.0.0" and specifically coded. For example, the numbers -13 and -14 refer to “not asked in this wave” and “not asked in this country”. Since this coding scheme is not useful for the purpose of our analysis, we recode all of the missing values as "NA".
+
+```{r eval=FALSE}
+[53]    # Encode missing values according to SHARE data set guidelines
+[54]    a = c(-2, -3, -4, -7, -9, -12, -13, -14, -15, -16)
+[55]    b = c("tocheck","implausible", "tocheck", "uncoded", "notApplicable",
+[56]          "dontKnow", "notAskedWave", "notAskedCountry", "noInformation",
+[57]          "noDropOff")
+[58]    missing.value.codes = data.frame(a,b)
+
+[62]    # Find NA locations and declare them as such
+[63]    df.decl = apply(dat, 2, function(z) {
+[64]        na.loc    = which(z %in% a)
+[65]        z[na.loc] = NA
+[66]       return(z)
+[67]    })
+```
+
+We use the `countrycode` package to change the country codes into human-friendly country names. Then we make minor transformations to the variables. There are minor differences between the data set that Kalwij and Vermeulen (2005) use and the easySHARE data set, which means we must make certain assumptions in our data cleaning process. For example, certain questions in the survey are an aggregated total of a series of questions, such as the types of chronic diseases the subjects suffer from. Whereas the original authors have access to the specific diseases, we are only provided a count of the total number. Therefore we replace certain variables with the closest relative we have available. In other cases, multiple variables are provided in our data set but it is ambiguous which one the original authors use. An interesting example is employment status: our data set contains one variable for type of employment (full-time, part-time, or not working) and one for labor hours (the number of hours worked by the survey respondent). However, some respondents gave answers that ran counter (for example, saying they worked full-time but only working 20 hours a week). The differences in answers can be attributed to varying interpretations of survey responses.
+
+A simplified example of the final script is shown below.
+
+```{r eval=FALSE}
+[91]    df.out       = df %>%
+[92]            dplyr::left_join(country_data, by = c("country_mod" = "iso3n")) %>%
+[93]            dplyr::filter(iso3c %in% country_list) %>%
+[94]            dplyr::mutate(country       = factor(country.name.en),
+[95]                          gender        = factor(ifelse(female, "FEMALE", "MALE")),
+[99]                          age           = factor(floor(age)),
+[100]                         edu_low       = isced1997_r %in% c(0, 1),
+[102]                         edu_high      = isced1997_r %in% c(5, 6),
+[105]                         h_chronic     = chronic_mod,
+[108]                         h_overweight  = bmi2 == 3,
+[115]                         labor_ft      = ep013_mod >= 32,
+[118]                         labor_hrs     = floor(ep013_mod)) %>%
+[119]           dplyr::select(country, gender,
+[121]                         starts_with("h_"),
+[124]                         starts_with("labor_")) %>%
+[125]           na.omit() %>%                               # remove missing values
+[126]           set_rownames(NULL)                          # reset row numbering
+```
+
+Our last step involves splitting the data sets, standardizing any numeric variables, converting the data frames into a model matrix, then storing the resultant data frames into a list that is the final object returned by the function.
+
+The data frames are split into separate country and gender splits, since we will create separate regressions for each of these splits. Then we apply a custom-built standardization function, which finds and standardizes all numeric variables and ignores all other variables. Finally, we use a custom-built function that takes advantage of the base `model.matrix()` function to convert all split data frames into a model matrix. This useful function converts all logical vectors into dummies to replicate the process used in the paper. A corollary benefit is that the resultant data frames can be directly used in R's in-built regression functions.
+
+```{r eval=FALSE}
+[146]    standardize.df = function(df) {
+[148]        idx = sapply(df, is.numeric)
+[149]        idx = seq(1:length(idx))[idx]
+
+[154]        df.reg = df %>%
+[155]            mutate_at(.vars = vars(idx),
+[156]                      .funs = standardize) %>%
+[157]            mutate(labor_participation = !labor_np) %>%
+[158]            dplyr::select(country, gender, age,
+[159]                          h_chronic, h_adla, h_obese, h_maxgrip,
+[160]                          edu_second, edu_high, children, couple,
+[161]                          labor_participation)
+[162]
+[163]        return(df.reg)
+[164]    }
+
+[167]    splits    = split(df.out, f = list(df.out$country, df.out$gender),
+[168]                      drop = TRUE)
+[169]    df.reg    = standardize.df(df.out)
+[170]    df.splits = lapply(splits, standardize.df)
+
+[173]    dummify = function(df) {
+[174]        df = df %>%
+[175]            dplyr::select(-country, -gender)
+[176]        model      = ~ 0 + .
+[177]        new.df     = model.matrix(model, df)
+[178]        new.df     = data.frame(new.df)
+[179]        return(new.df)
+[180]    }
+[181]
+[182]    df.splits = lapply(df.splits, dummify)
+```
+
+\subsection{Empirical Results}
+
+The validity of our `read.and.clean()` can be verified by comparing the overall results when running the `read.and.clean()` function with the ones presented in the original paper. As the function is called, messages are printed to the console to show the status of the data reading process and the data frames contained within the outputted list.
+
+In the original paper, the authors retain a sample of 12,237 observations, which is slightly smaller than our retained observations of 12,689. However, at the individual country level, some peculiarities in number of observations emerge. Namely, we have almost twice as many observations in France, while having relative sparsity in Austria. This again is likely due to differences in data set and in the data gathering process. We will discuss more details about the summary statistics in future sections.
+
+```{r echo=TRUE, eval=TRUE}
+source('Quantlets/SPL_ELP_ReadandClean/SPL_ELP_ReadandClean.R')
+datasets = read.and.clean(dataset = "easySHARE_rel6_0_0.rda", wav = 1)
+```
+
+\newpage
+
+\section{Multidisciplinary and Cross-National Summary Statistics}
+
+## Theory and Design
+
+Since we are working with a cross-national survey, it is useful to to present an overview on a country-by-country basis. For each country, survey participants will be classified according to their age group. Within each class, shares of gender-specific as well as overall labor participation rates and health indicators are calculated and discussed.
+
+## Implementation
+
+An efficient way of separating the easySHARE data set into country, gender, and age is explained in the following. In order to minimize hard-coding and possibly related errors, we use the `expand.grid` function to expand a grid between named variables in the data set. This allows us to calculate the necessary summary statistics for all combinations of country, gender, and age.
+
+We create the function `labor()`, which calculates labor participation rates for the corresponding country, gender, and age cell within the grid. The `group.share()` function calculates the average or percentage for an input data frame and a column name by country. The particular share is calculated by finding the sum of occurences and dividing by their total, represented by the length of the vector.
+
+```{r, eval = FALSE}
+[52]  # Function for calculation group shares per country
+[53]  group.share = function(df, y, agg.country = TRUE) {
+[54]      if (agg.country) {
+[55]          final = tapply(df[[y]], df$country, function(x) {
+[56]              val = sum(x)/length(x)
+[57]              return(val)
+[58]          })
+[59]      } else { # return total if country-level aggregation not specified
+[60]          final = sum(df[[y]])/length(df[[y]])
+[61]      }
+[62]      return(final)
+[63]  }
+[64]
+[65]  # Function for calculating labor participation rate per country / gender / age
+[66]  labor = function(df, .country, .gender, .age) {
+[67]      dataset = df %>%
+[68]          filter(country == .country & gender == .gender & get(.age) == TRUE)
+[69]      denom = nrow(dataset)
+[70]      numer = with(dataset, sum(labor_ft | labor_pt))
+[71]      perc  = round(numer/denom, 4)
+[72]
+[73]      return(perc)
+[74]  }
+```
+
+Within the code below, `args.list` contains three sub-lists divided by country (`c`), gender (`g`) and age (`a`). The list is passed as an argument to `labor`, which are simulatenously iterated over the sub-lists using `pmap`. This function has an advantage over a similar functions, since it allows multiple arguments and uses parallelization by default.
+
+```{r, eval = FALSE}
+
+[76]  # use expand.grid to get all combinations of country / gender / age
+[77]  agegroups = names(df.out[, 4:6])
+[78]  args      = with(df.out,
+[79]                 expand.grid(levels(country), levels(gender), agegroups,
+[80]                               stringsAsFactors = FALSE))
+[81]  args.list = list(c = as.vector(t(args[1])),
+[82]                   g = as.vector(t(args[2])),
+[83]                   a = as.vector(t(args[3])))
+[84]
+[85]  # Map over multiple arguments
+[86]  output   = pmap(args.list, function(c, g, a) labor(df.out, c, g, a))
+[87]  output.v = do.call("c", output)
+[88]
+[89]  labor.part.share    = cbind(args, output.v)
+[90]  labor.part.share.df = spread(labor.part.share, Var3, output.v) %>%
+[91]      arrange(desc(Var2)) %>%
+[92]      set_colnames(c("Country", "Gender",
+[93]                     paste0("Age ", rep(c("50-54", "55-59", "60-64")))))
+```
+
+The resulting `output` list can be easily bound into a data frame and arranged using `dplyr`. We then use `tidyr::spread` in order to spread the variable `Var3`, being the three age groups, into separate columns. Using the pipe operator `%>%` keeps our code compact and avoids unnecessary variable assignment and inefficient memory requirements.
+
+In the next code chunk, `vars` is assigned to be a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes in the underlying data frame and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the column names that contain 'labor'. This is forwarded as a name call to the second argument in `group.share`. It is used to subset the target data frame `df` by the extracted variable names containing the string "labor".
+
+Since this task involves invoking a function upon multiple list elements, `lapply` is the best candidate in order to construct labor participation rates grouped by gender, (optionally) by country and classified into non participation, part time and full time work.
+
+```{r, eval = FALSE}
+[105]  # Labor supply choice tables
+[106]  df.female = df.out %>% filter(gender == "FEMALE")
+[107]  vars      = names(df.out)[grep("labor", names(df.out))][3:1] # invert
+[108]
+[109]  labor.supply.f    = lapply(vars, function(x) group.share(df.female, x, 1))
+[110]  labor.supply.f.df = do.call(cbind.data.frame, labor.supply.f) %>%
+[111]      set_colnames(c("Nonparticipation", "Half time", "Full time"))
+```
+
+## Empirical Results
+
+We can verify the validity of our results by comparing them directly with the findings in the original paper. Before interpreting the data, we advise to note that some country's participants are generally older than other ones. As the evaluation of the probit model shows, we figure age to have a negative impact on health. Hence certain samples may appear less healthy than others due to the fact that they are older on average. 
+
+As depicted in the table below, the mean value of chronic diseases is 75%. Conversely, 79% out of the 12689 participants have a good self-perceived health. At first sight, one may deduce that the majority considers themselves to be healthy despite the prevalence of a chronic disease. But the use of the arithmetic mean is sensitive towards outliers and the amount of chronic diseases is in fact counted numerically. In combination, these values indicate an uneven distribution. Surprisingly, the share of overweight people is only 42% compared to an EU-average which @eurostat reports reports to be 59.6% among 45 to 64 year old citizens. However, information on obesity grouped by age is not available to us.
+
+```{r, eval = TRUE, results = 'asis', warning = FALSE, comment = FALSE, message = FALSE, echo = FALSE}
+library("knitr")
+knitr::kable(t(round(sum.stats.tot, 2)), caption = "Summary Statistics over all groups")
+
+```
+
+Having obtained the share of labor force participation grouped by gender, country and age, striking values can be presented. Among the selected countries, France, the Netherlands and Belgium have the fewest laborers among the oldest age group, which is ranging from 60 to 64 years. In the middle age group, ranging from 54-59, the Belgian and Italian population have sparse labor participation rates among men and women. Within the youngest age group including people from 50 to 54 years old, variance among men is generally low. This is not the case female workers, among which Greek, Italian and Spanish participation rates do not exceed 45.5%.
+
+Concerning health statistics, Switzerland and the Scandinavian countries stand out positively. Together, they from a group that has an overall low percentage of obese people while achieving high shares of self-reported good health. Among all other countries, the Swiss have the least number of chronic diseases and fewest overweight. Only the Greek have lower share of activities of daily living (ADL). Switzerland and the Nordic countries additionally present the least non-participation rates and the highest full-time working rates. Summary statistics show that those countries, which strive in health topics, are related to high labor force participation rates in all categories.
+
+The overall age distribution is almost even in the younger age brackets (36% and 37%). The participants beween 54 and 59 years old make up 27%. Generally, labor force participation is higher for males than for females. This applies to part-time work, too.
+
+The overall results of the descriptive statistics align well with @kalwij2005labour.
+
+```{r, eval = TRUE, results = 'asis', warning = FALSE, comment = FALSE, message = FALSE, echo = FALSE}
+library("knitr")
+
+knitr::kable(labor.part.m, caption = "Men: Labor Force Participation Rate by age")
+knitr::kable(labor.part.f, caption = "Women: Labor Force Participation Rate by age")
+```
+
+\newpage
+
+\section{Crosssectional Probit Regression}
+
+## Theory and Design
+
+Probit models allow for the estimation of binary, random response variables [@schild2017]. Probit and Logit models mitigate problems that would occur in case a (linear) regression would be used for a similar task. In this case, the range of the response variable would not be restricted to the interval (0,1). Consequently, as probabilities are commonly defined on this space, non-interpretable probability estimations would be delivered. While literature often refers to use maximum likelihood to estimate coefficients, the `glm` function in `R` uses iterative re-weighted least squares [@stats]. The estimated coefficients are subject to a Wald Test on joint significance.
+
+@schild2017 defines the model formula as
+$$
+P(Y = 1 | X = x) = \Phi (x' \beta)
+$$
+The error term is assumed to be independent and identically distributed (@wooldridge2012)
+
+Using this model, it is investigated how the probability of labor force participation is influenced by health and age variables.
+
+Whereas a simple linear regression allows for direct interpretation of the estimated coefficients, this is not the case for probit models. As we are particularly interested in the effects of certain regressors on the probability of labor force participation, we are especially focussing on the calculation and evaluation of marginal effects.
+The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a ceteris paribus change of $x_j$ on the conditional probability that the response variable Y is realized as one. In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is dependent on x.
+
+@wooldridge2012 specifies two possible interpretations of the mariginal effect. The "Partial Effect at the Average" (PEA) denotes the marginal effect of a regressor on an average person ($\frac{1}{n}\Sigma_{x_i}$). Problematic are discrete $x_i$ because the resulting averages do not represent anybody in particular. Furthermore, in case of a continuous explanatory variable wrapped inside a non-linear function, it remains unclear whether to apply the average over the function or insert the average into named function.
+
+According to @dergutedietmar, the Partial Effect at the Average is defined as
+
+$$
+PEA = \Phi(\hat{\beta_0} + \hat{\beta_1} \Sigma_{i = 1}^n x_i)\beta_1
+$$
+
+The "Average Partial Effect"( or "Average Marginal Effect", APE) describes the effect of a regressor on the probability that $Y = 1$.
+@dergutedietmar defines it as
+
+$$
+APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1
+$$
+
+where $\beta$ is the vector of coefficients and $x_i$ is the vector of observations at index i. $\Phi$ represents the cumulative standard normal distribution function.
+
+## Implementation
+
+As stated in the 'Read and Clean' section, `df.splits` is obtained using the `split` function. A list is returned, that seperates the cleaned data frame by country and gender.
+This structure is helpful throughout the following sections, as it enables us to build a series of concatenated `lapply` functions. This function invokes a c-loop that iterates over each list element. As `lapply` takes a list as an input and returns a list, too; it preserves the initial structure. First, it is used to create a probit model for each subset within the list. Since we are estimating with an intercept, the age 50 dummy variable is perfectly correlated with the other age dummies. Hence it is excluded due to multicollinearity.
+
+```{r, eval = FALSE}
+[53]  # Probit for each country and gender
+[54]  allModels = lapply(df.splits, function(z){
+[55]    
+[56]      z     = z[-z$age50] # Multicollinearity
+[57]      model = glm(z$labor_participationTRUE ~., family = binomial(link = "probit"), data = z)
+[58]  
+[59]      return(model)
+[60]  
+[61]  })
+[62]
+[63]  # Return summaries
+[64]  allSummaries = lapply(allModels, summary)
+```
+
+The loop below is a robust way to apply the Wald Test for the dataset subsetted by country and gender and utilises only health-related variables. A list intended to log is created, which tracks failure of applying the Wald Test on joint significance of the selected variables. `Try` ensures continuation of the loop despite possible errors. In case an error occurs, the class of `testOutput` will be `try-error` and consequently logged into named list at the index `i`. Since it preserves the structure as specified before, results can be easily transformed and named. This setup has proven to be useful for debugging our test as well as finding out that some health variables are empty for certain subgroups, leading to selective failure of the test.
+
+
+```{r, eval = FALSE}
+[70]  # Wald Test for all models
+[71]  wald.log = list() # Save Wald Test Output
+[72]  
+[73]  for(i in 1:length(allSummaries)){
+[74]    
+[75]    # Get Element
+[76]    SummaryElement = allSummaries[[i]]
+[77]    
+[78]    # Specify the of coefficients to be tested: only health variables
+[79]    health = c(16:19)
+[80]    
+[81]    # Test only the joint significance of health variables
+[82]    testOutput = try(joint.wald.test(allSummaries[[i]], 0.95, health))
+[83]    
+[84]    if(class(testOutput) == "try-error"){
+[85]      msg = paste0("Wald Test failed for Model Element ", i)
+[86]      warning(msg)
+[87]      wald.log[[i]] = "Error"
+[88]    } else{
+[89]      wald.log[[i]] = testOutput
+[90]    }
+[91]    rm(SummaryElement) # clean up
+[92]  }
+[93]  
+[94]  wald.bound = as.data.frame(wald.log)
+[95]  colnames(wald.bound) = names(allModels)
+```
+
+Furthermore, the application of the Wald Test can easily be substitued. We use a different Wald Test to validate our results.
+
+```{r, eval = FALSE}
+[82]    testOutput = try(wald.test(b = coef(ModelElement),
+[83]                               Sigma = vcov(ModelElement), Terms = health)$result)
+```
+
+Marginal effects are calculated using `probitmfx`, which firstly recalculates a probit model. As the boolean 'atmean' evaluates to `true`, the marginal effects are defined as the partial effects for the average observation [@mfx].
+
+```{r, eval = FALSE, warning = FALSE}
+[117]  # Calculate marginal effects and standard errors
+[118]  
+[119]  # Same structure as before, but must calculate model again.
+[120]  mfx.Models = lapply(df.splits, function(z){
+[121]  
+[122]      z   = z[-z$age50] # Multicollinearity
+[123]      res = probitmfx(z$labor_participationTRUE ~.,atmean = TRUE,  data = z)
+[124]  
+[125]      return(res)
+[126]  })
+```
+
+## Empirical Results
+
+By means of the presented model, we evaluate how labor force participation behavior of individuals aged 50-64 is influenced by age and demographic as well as health indicators  across 11 European countries. @kalwij2005labour summarize their own results as follows:
+
+- The influence of health (as captured by the indicators) on labor force participation differs among individuals and across countries
+- Health improvements are associated with higher labor force participation rates
+- Decreasing health explains decreasing labor force participation of the elderly in Europe
+
+These main results are validated by the analysis. As shown representatively on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases are negatively related to employment. The overall negative influence and the statistical significance of age on the dependent variable is growing with increasing age. Conversely, high education and having second education positively predict labor force participation for the specified group, but statistical significance usually restricted to one of them. Additionally, we find maximum grip strength to be statistically significant in multiple models. Having children or a partner does not appear to make a difference. Especially the negative influence of age is extraordinarily stable across different models.
+
+```{r, eval = TRUE, results = 'asis', echo = FALSE, message = FALSE, warning = FALSE}
+library("xtable", quietly = TRUE)
+xtab = xtable(mfx.Models[[1]]$fit, caption = "Marginal effects of health and age related variables on the probability of labor market participation of Austrian women")
+
+print.xtable(xtab, caption.placement = "top", comment = FALSE)
+```
+
+\pagebreak
+\newpage
+
+\newpage
+
+\section{Wald Test}
+
+In the context of probit regression, the Wald test can be used to test multiple hypotheses regarding the model specifications. For example, we test whether the fit of the model is improved if a subset of regression coefficients are all set equal to zero, an exclusion restriction. @kalwij2005labour conduct a Wald test to check the null hypothesis that none of the included health variables has an impact on labor participation in order to investigate the joint impact of health on participation.
+
+\subsection{Theory and Design}
+Depending on the estimation method and distributional assumptions, the Wald statistic can be formulated in different ways. The general form of the Wald statistic after MLE for testing hypothesis regarding our $k \times 1$ parameter vector $\theta$ is given by
+$$
+W = c(\hat{\theta})'[\nabla_{\theta}c(\hat{\theta})\hat{V}\nabla_{\theta}c(\hat{\theta})]^{-1}c(\hat{\theta})
+\tag{***}
+$$
+
+
+where $c(\hat{\theta})$ is a $m \times 1$ vector of linear or nonlinear restrictions, $\nabla_{\theta}c(\hat{\theta})$ is the $m \times k$ Jacobian of $c(\hat{\theta})$ evaluated
+at $\hat{\theta}$ and $\hat{V}$ is the estimated asymptotic covariance matrix [@wooldridge2010econometric, 463]. Under H0, the Wald test statistic is asymptotically $\chi2_m$ distributed, with m being the number of specified restrictions. In order to assure the test statistic W has the assumed limiting distribution, we need to impose some restrictions: Under H0, $\theta$ must lie within parameter space and R must be of rank m [@wooldridge2010econometric, 362].
+We limit our attention to testing a set of general linear restrictions since the Wald test is not invariant to the re-formulation of non-linear hypothesis. We thus formulate our null hypothesis in accordance with the common linear restriction structure of H0: $R \hat{\beta} = r$ against the alternative H1:  $R \hat{\beta} \neq r$ to facilitate the derivation of our test statistics, where R is a $m \times k$ matrix of rank m (equivalent to the Jacobian), whereas the restriction function r is a $m \times 1$ vector. Given the conditions mentioned above, the Wald statistic can then be rewritten as
+$$    W = (R \hat{\beta} - r)'[R \hat{V}R']^{-1}(R \hat{\beta} - r)
+\tag{***}
+$$
+which facilitates our calculations [@greene2012econometric, 527-529; @wooldridge2010econometric, 362]. When we are interested in the joint significance of a subset of $s$ coefficients, the Wald test statistic $W \stackrel{a}{\sim}\chi2_s$ can be simplified further [@wooldridge2010econometric, 362]:
+ $$   W = \hat{\beta}_s'[R\hat{V}R']^{-1}\hat{\beta}_s = \hat{\beta}_s'[\hat{V}_s]^{-1}\hat{\beta}_s
+ \tag{***}
+ $$
+
+\subsection{Implementation}
+In order to test the linear hypothesis regarding the model specifications, we design two Wald test versions. The function `joint.wald.test` can be used to test the joint significance of a subset of model coefficients, whereas `general.wald.test` allows for us to check any linear hypothesis. The two tests are designed in a way that they align well with the `glm` estimation output. The only required input is the model summary from `glm` estimation, whereas the significance level and test specifications are optional.
+
+```{r eval=FALSE}
+[22]    joint.wald.test = function(model.summary, confidence.level=0.95, spec=NULL) {
+
+[46]        joint.wald.test        = numeric(4)
+[47]        names(joint.wald.test) = c("W","p-value", "df", "Decision")
+[48]        beta                   = model.summary$coefficients[,1]
+[49]        Var_beta_est           = vcov(model.summary)
+```
+
+In order to set up default values for the hypothesis specification, we make use of a local if-else statement inside the `joint.wald.test` function. In line 26 we re-assign a sequence vector to `spec` that includes the number of all model coefficients in increasing order, unless `spec` is specified differently.
+
+```{r eval=FALSE}
+[25]    if (is.null(spec)) {
+[26]        spec = 1:length(beta) # default joint is significance test
+[27]    } else if (is.logical(spec)) {
+[28]        stop("spec cannot be a logical vector, tranform to integer vector!")
+[29]    } else if (any(spec == 0)) {
+[30]        stop("spec cannot contain zero values!")
+[31]    } else if (!is.integer(spec)) {
+[32]        spec.len = length(spec)
+[33]        spec     = as.integer(spec, length = spec.len)
+[34]        warning("Converting spec to integer and proceeding")
+[35]    }
+
+[51]    # Wald test statistic
+[52]    W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
+```
+
+This means `joint.wald.test` will conduct a joint significance test on all model coefficients by default. The Wald test statistic is calculated via simple matrix algebra based on the provided input by the model summary. This formula is equivalent to equation YYY.
+
+The proper format of the specification vector `spec` is crucial as it is used to extract the needed estimates from the model coefficient vector and covariance matrix. To select the right covariance elements and degrees of freedom, `spec` must be a vector of integers of length $0< m \leq k$. Specifically, we make sure `spec` is neither logical nor contains any zero in line 27-30. Furthermore, we only allow for integers since we are testing the joint significance of coefficients.
+
+<!-- As a last step we set up the test output by assigning values to the empty vector elements of `joint.wald.test`. This vector will be the function output that is returned. We determine the critical value and p-value in lines XXX-XXX based on the inbuilt ``` qchisq``` and display four significant decimal places. As can be seen in lines XX, we do not only list the test statistic and p-value but also the degrees of freedom, null hypothesis and test decision as output to assure comprehensibility and correctness of the test. -->
+
+<!-- ``` -->
+<!--     # Set up test output -->
+<!--     chi2               = qchisq(confidence.level, df = length(spec)) -->
+<!--     pval               = 1-pchisq(W,length(spec)) -->
+<!--     joint.wald.test[1] = "Wald" -->
+<!--     joint.wald.test[2] = format(   W, digits = 4)  -->
+<!--     joint.wald.test[3] = format(pval, digits = 4) -->
+<!--     joint.wald.test[4] = length(spec) -->
+<!--     joint.wald.test[5] = "b equal to 0" -->
+<!--     joint.wald.test[6] = ifelse(pval <= 1- confidence.level, "Reject H0", "Cannot reject H0") -->
+<!--     joint.wald.test -->
+<!-- ``` -->
+
+The general Wald test is designed in a similar manner, except it allows for the general formulation of linear hypothesis of the form $R \hat{\beta} = r$. The test statistic is given by equation YYY. As in the `joint.wald.test` function, we use local local if-else statements to setup a default settings. If only the model summary is given as an input, the `general.wald.test` conducts a joint significance test at a 95% confidence level.
+
+The crucial elements for usage of this function are the correctly specified Jacobian matrix R and restriction vector r, which must be of size $m \times k$ and $m \times 1$ respectively. We additionally need to assure that R is of rank m. These conditions are tested in line 123-131.
+
+```{r eval=FALSE}
+[100]    if (class(model.summary) != "summary.glm") {
+[101]        stop("model.summary must be a glm summary!")
+[102]    }
+[103]    if (confidence.level > 1 | confidence.level < 0) {
+[104]        stop("confidence.level out of bounds!")
+[105]    }
+
+[123]    dim_R = dim(R) # Testing R
+[124]    k     = length(beta)  # Columns
+[125]    m     = length(r) # Rows; general hypothesis test, therefore m = length(r)
+
+[128]    if (dim_R[1] != m | dim_R[2] != k) stop("R has wrong dimension!")
+[131]    if (rankMatrix(R)[1] != m) stop("R has wrong rank!")
+```
+
+We furthermore check whether the `model.summary` has the right class and whether the significance level lies within the expected interval. Otherwise, the execution of the function will be stopped. In the second step, we make sure the matrix `R` and the restriction vector `r` have matching dimensions.
+
+\subsection{Empirical Results}
+We use our designed Wald test functions to check the null hypothesis that none of the four included health variables has an impact on labor participation for each country and for both men and women. The results for men can be seen in table XXX.
+
+```{r start_wald, echo = FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
+# SOURCE DATA
+invisible(capture.output(source("Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R")))
+
+# Store men Wald test results and display them
+wald.men = t(wald.bound[c(1,2,4),12:22])
+colnames(wald.men) = c("W statistic", "p-value", "Test decision")
+
+library(stringr)
+rownames(wald.men)  = str_sub(rownames(wald.men), end= -6)
+knitr::kable(wald.men, caption = "Wald test on no joint impact of health on participation", digits = 2, align = "l")
+```
+
+Our results are in line with the findings of @kalwij2005labour. As expected, the null hypothesis of no impact of health on labor participation is rejected at a 95% confidence level for most countries. One difference is the inability to reject the null for France. We explain this with our differing sample size and overall lower employment. Regarding the Wald tests for women, our results are very similar to those @kalwij2005labour. The inability to reject the null for some countries is due to relatively low health-related probit coefficients (in absolute terms), which implies that these health indicators are not strongly related with the labor participation decision.
+
+The results of our `joint.wald.test` function are comparable those of our packages, like the `wald.test` from the `aod` package. For example, for German women, the `aod` package and our `joint.wald.test` return similar output:
+
+```{r eval=FALSE}
+wald.test(Sigma = vcov(allModels$Germany.FEMALE),
+              b = allModels$Germany.FEMALE$coefficients, Terms = 16:19)
+joint.wald.test(allSummaries$Germany.FEMALE, spec = 16:19)
+```
+```{r echo=FALSE, eval=TRUE, error=FALSE, warning=FALSE, message=FALSE}
+# SOURCE DATA
+invisible(capture.output(source("Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R")))
+
+wald.test(Sigma = vcov(allModels$Germany.FEMALE),
+          b = allModels$Germany.FEMALE$coefficients, Terms = 16:19)
+
+joint.wald.test(allSummaries$Germany.FEMALE, spec = 16:19)
+
+```
+
+A weakness of the `aod` package is that its Wald test cannot deal with empty classes. For the case of Switzerland, where our male sample does not include any 64-year-olds, the ` wald.test` from the `aod` package leads to an error message.
+
+```{r eval=FALSE}
+wald.test(Sigma = vcov(allModels$Switzerland.MALE),
+              b = allModels$Switzerland.MALE$coefficients, Terms = 16:19)
+```
+```{r echo=FALSE, eval=TRUE, error=TRUE, warning=FALSE, message=FALSE}
+# SOURCE DATA
+invisible(capture.output(source("Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R")))
+
+wald.test(Sigma = vcov(allModels$Switzerland.MALE),
+              b = allModels$Switzerland.MALE$coefficients, Terms = 16:19)
+```
+
+Our Wald test function is robust against the presence of empty classes since we work with model summaries, meaning that the coefficients of empty classes have been dropped instead of being a missing value.
+
+```{r eval=FALSE}
+joint.wald.test(allSummaries$Switzerland.MALE, spec = 16:19)
+```
+```{r echo=FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+invisible(capture.output(source("Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R")))
+joint.wald.test(allSummaries$Switzerland.MALE, spec = 16:19)
+```
+
+Both our Wald test functions are sensitive to the improper formulation of tested model restrictions. For example, the `general.wald.test` function stop from executing if the Jacobian matrix `R` and the restriction vector `r` have non-matching dimensions.
+
+```{r echo=TRUE, eval=FALSE}
+matrix.R     = diag(1, 23)
+vector.wrong = rep(1,22)
+vector.right = rep(1,23)
+general.wald.test(allSummaries$Switzerland.MALE, R = matrix.R, r = vector.wrong)
+general.wald.test(allSummaries$Switzerland.MALE, R = matrix.R, r = vector.right)
+```
+```{r echo=FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE, error= TRUE}
+invisible(capture.output(source("Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R")))
+matrix.R     = diag(1, 22)
+vector.wrong = rep(1,21)
+vector.right = rep(1,22) # Test joint significance
+general.wald.test(allSummaries$Switzerland.MALE, R = matrix.R, r = vector.wrong)
+general.wald.test(allSummaries$Switzerland.MALE, R = matrix.R, r = vector.right)
+```
+
+In this example, `R`is an identity matrix of size $22 \times 22$, whereas `vector.wrong` is $21 \times 1$. As soon as we add another element to the `r` vector, the function works properly due to dimension matching.
+
+\section{Counterfactual Exercise}
+
+Counterfactual exercises are a common tool in economic policy analysis that allow assessing and quantifying possible effects of policies. In order to evaluate the quantitative importance of a healthy population on labor participation, @kalwij2005labour conduct a simple counterfactual exercise. They compare the current national employment rate to the predicted counterfactual rate. This counterfactual employment rate is obtained by assuming that all individuals are in perfect health. According to their definition, a perfectly healthy individual has never had a severe or mild medical condition, suffers from no restrictions in activities of daily living, is not obese, and has a grip strength of an average 50-51 year-old (fe)male individual.
+
+\subsection{Theory and Design}
+Counterfactual exercises are based on regression methods that can be carried out in numerous ways.
+The simplest method to is to replace the existing covariates values $X$ with counterfactual values $X_{cf}$ [@chernozhukov2013inference]. For the case of probit regression with a binary response variable $y$ for employment, we can interpret the fitted values $\hat{y}$ and $\hat{y}_{cf}$ as current and counterfactual employment probabilities for each individual. Based on these calculated individual employment probabilities, we can calculate the current and counterfactual population employment rates ($\Pi_{ac}$, $\Pi_{cf}$) by taking the mean, making use of the Law of Large Numbers.
+
+Obtaining the counterfactual probabilities $\hat{y}_{cf}$ requires a two-step procedure. First, the regular probit regression of $y$ on $X$ is tun to obtain the estimated coefficients $\hat{\beta}$. Second, the counterfactual probabilities for each individuals $\Pi_i$ are calculated by predicting y based on $X_{cf}$ and the estimated coefficients.
+
+$$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) = \Phi(xi_{cf}'{\beta}\tag{***}) $$
+
+We can assess counterfactual health-related effects by comparing the actual and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$. We gain closer insights into the non-linear relation between health effects and participation by calculating $\Pi_{ac}$ and $\Pi_{cf}$ for different age groups. This also allows assessing the proportion of decline in participation that is due to decline in health condition according to our model estimates.
+
+<!--\1
+Optional text: Not that important
+@kalwij2005labour define this measure $\delta_{decline}$ as
+$$ \delta_{decline} =  \frac{\Pi_{cf}[age60.64]- \Pi_{ac}[age60.64] -   \Pi_{cf}[age50.54]- \Pi_{ac}[age50.54]}{\Pi_{ac}[age50.54] - \Pi_{ac}[age60.64]} \tag{***}$$
+where $\Pi_{cf}[age60.64]$ and $\Pi_{ac}[age60.64]$ refer to the counterfactual and actual employment rates of 60 to 64 year old individuals. Though this measure is  oversimplified since XXXXXXXXX,
+It nevertheless gives us a first hint towards the size of participation decline among elderly that is associated with declining health conditions.
+\1-->
+
+\subsection{Implementation}
+Our counterfactual effects are based on the manipulation of explanatory variables according to some specified criteria. We design this counterfactual exercise in a way that allows us to directly use the output from our probit estimation. As a first step, we create a simple function `empl.rate` that takes an estimation model object as input and predicts the employment rate, i.e. the mean of fitted values, as an output. In order to calculate the both current and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$ conveniently, we  manipulate the original covariates contained in our model objects. For this purpose we design the function `X.cf`, whose only input the model object, allowing us to treat each country separately later on. As can be seen in line 54, the function creates a duplicate version of original data `X`, whose values will be replaced later on.
+
+In line 60, we calculate the minimum value for each variable in `X`, which corresponds to the perfect health
+conditions of the variables `h_chronic`, `h_adlaTRUE`, and `h_obeseTRUE` since we are dealing with standardized variables. We obtain these values with making use of the apply function and store them in the vector `X_min`. We also calculate the mean average grip strength of 50- to 51-years old in the sample `X`. As can be seen in line 64, we derive this mean with the `tapply` command because it allows us to specify an age group index and returns a vector whose elements we can access.
+
+```{r echo=TRUE, eval = FALSE, warning = FALSE, message = FALSE}
+[50]    X.cf = function(model) {
+[52]        X                      = model$data
+[54]        X_cf                   = X
+[57]        X_min                  = data.frame(t(apply(X, 2, min)))
+[59]        names.vec              = c("h_chronic", "h_adlaTRUE", "h_obeseTRUE")
+[60]        X_cf[, names.vec]      = X_min[names.vec]
+[62]        age_50_51              = ifelse(X$age50 == 1 | X$age51 == 1, 1,0)
+[64]        X_cf[, c("h_maxgrip")] = tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
+[65]        model$data             = X_cf
+```
+
+To obtain the counterfactual covariates, the values in `X_cf` are replaced with perfect health values. As a final step, we replace the original model data in `X_cf`. This allows us to access both the model estimates and counterfactual covariates in one object. By running our `empl.rate` function on the returned model, we directly obtain the counterfactual employment rate for a given country.
+
+Since we are also interested in the current and counterfactual employment rates of different age groups, we create a more advanced function `empl.rate.age`. This function requires the estimation model as mandatory argument and has two optional arguments (`group.size` and `group.low`) that allow to change the age group and group sizes. Given the specified arguments, the function then calculates the current and counterfactual employment rate for each age group.
+
+```{r echo=TRUE, eval = FALSE, warning = FALSE, message = FALSE}
+[88]     empl.rate.age = function(model, group.size = 5, group.low = c(50,55,60)) {
+[94]         X                = model$data
+[96]         # Predict probability of being employed of all individuals
+[97]         empl.probability = predict(object = model, newdata =  X, type = "response")
+```
+The proper value assignment of the numerical vector `group.low` is essential since we base the dynamic creation of age groups on it. As can be seen in line 104, we use a small `for` loop to determine the age group upper bound and create a label of each age group. Furthermore, we assign all of the corresponding age values (e.g. `age50`, `age51`) to the vector `z`, which correspond to the age variable names in `X`.
+
+```{r echo=TRUE, eval = FALSE, warning = FALSE, message = FALSE}
+[104]    for (i in group.low) {
+[106]        k         = i + group.size -1
+[108]        vec.label = paste("names.vec.age", i, sep = ".")
+[110]        z         = assign(vec.label, paste0("age", i:k))
+```
+We need to assign the age values to `z` in order to locate the right individuals in our data frame `X`. We find the individuals belonging to a given age group by summing over rows of `X` and storing this vector inside the list `IND_row_vec` displayed in line 118 We can take the sum because the age values assigned to `z` correspond to the column names of the data frame `X`. Thus, for a given individual, the row sum of `X[, z]` is either zero or one, depending on wether the individual belongs to the age group or not. Following this step, we filter out only the relevant age groups via indexing.
+
+```{r echo=TRUE, eval = FALSE, warning = FALSE, message = FALSE}
+[118]    IND_row_vec[[i]] = apply(X[, z], 1, sum)
+
+[123]    IND_row_vec  = IND_row_vec[group.low]
+
+[128]    empl.rate[k] = empl.probability %*% IND_row_vec[[k]] / sum(IND_row_vec[[k]])
+```
+
+Finally, we calculate the employment rate for each age group in line 128 For this, we first sum the predicted employment probability for all individuals in age group k via vector multiplication. Next, we divide this sum by the overall number of individuals in that age group, corresponding to the vector length `IND_row_vec[[k]]`.
+
+Running the `empl.rate.age` function on a given model object will return a numerical vector containing the employment rate of the specified age groups.
+
+\subsection{Empirical Results}
+Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table XXX display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (ceteris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage points higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obesity in absolute terms, combined with the above average prevalence of chronic disease and obesity among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obesity in absolute terms. As expected, our results are in line with @kalwij2005labour general, though the estimated participation rates differ for some countries, as a result of differing samples.
+
+```{r cf_code_eval, echo=FALSE, eval=TRUE, warning=FALSE, message=FALSE}
+# SOURCE DATA
+invisible(capture.output(source("Quantlets/SPL_ELP_Counterfactual/SPL_ELP_Counterfactual.R")))
+
+# Store results and display them
+employment            = data.frame(cbind(unlist(empl.current), unlist(empl.counterfact)))
+colnames(employment)  = c("Employment Current" , "Employment Counterfactual")
+library(stringr)
+rownames(employment)  = str_sub(rownames(employment), end= -8)
+knitr::kable(employment[1:11,], caption = "Women's current and counterfactual labor share",
+            digits = 2, align = "c")
+```
+
+It must be stressed that the counterfactual estimates presented by @kalwij2005labour should be interpreted with caution. First of all, the transformation of the status quo populations with perfectly health individuals is artificial and represents a state that could not realistically be reached with any policy. Second, some of the high counterfactual rates are driven by relatively high model coefficients that are not statistically significant, indicating non-robust results. Third, the aggregate country estimates do not properly display the variation of health effects among different age groups. In order to address this, we also analyze the results of the counterfactual exercise with help of our `empl.rate.age` function. The output of this for men is displayed in table XXX. As expected, both the current and counterfactual labor shares decrease at higher age. The difference between current and counterfactual shares is also increasing in age, though some exceptions (Austria, Italy and Greece) exist. Again, our results are in line with those obtained by @kalwij2005labour.
+
+```{r echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
+# SOURCE DATA
+invisible(capture.output(source("Quantlets/SPL_ELP_Counterfactual/SPL_ELP_Counterfactual.R")))
+# Store results and display them
+
+empl.current.age     = t(data.frame(lapply(allModels, empl.rate.age)))
+empl.counterfact.age = t(data.frame(lapply(allModels.cf, empl.rate.age)))
+employment.age           = data.frame(cbind(empl.current.age, empl.counterfact.age))
+colnames(employment.age) = paste(c(rep("Current", 3) , rep( "CF", 3)),
+                                  c("50-54","55-59", "60-64"))
+#Reorder columns
+new.order = c(1,4,2,5,3,6)
+employment.age    = employment.age[,new.order]
+
+library(stringr)
+rownames(employment.age)  = str_sub(rownames(employment.age), end= -6)
+knitr::kable(employment.age[12:22,], caption = "Men's current and counterfactual (CF) labor share for different age groups", digits = 2, align = "l")
+```
+
+\section{Graphical Representation}
+
+In this section, we want to introduce novel graphical elements not present in the paper to augment the existing summary statistic tables. Tables, although useful for organizing and displaying many discrete data points, lack both detail and readability. Furthermore, tables offer no visibility into distributions inherent to the data. We believe that a necessary and important enhancement to the paper would be to include graphs that allow readers to view distributions, analyze trends, and compare data points across groups or geographies.
+
+\subsection{Theory and Design}
+
+An increasingly commonly used method for representing country-level data graphically is with choropleth maps. Choropleth maps shade or pattern areas within a defined geographic region (such as a country, state, or city) in relation to a data variable. They are useful for identifying values that are associated with a given geographic location and quickly comparing those values across different regions.
+
+However, we opt not to use choropleths, instead focusing on an approach called tile grid maps. Rather than using actual geographic borders, countries are reduced to a uniform shape and size (in our case, a simple square) in order to ensure equal visual weight. This is done to avoid visual imbalances inherent to choropleth maps: larger geographic regions appear to have more value, influencing the perception for a reader on the relative importance of such a region.
+
+Additionally, we choose to look at distributions of certain variables, rather than just looking at the mean or median values. By looking at the overall spread of each numeric data variable, we are able to gather a more holistic picture of the nature of the data variable.
+
+\subsection{Implementation}
+
+We develop two new graphics-oriented functions to generate both graphs listed above. The first is the tile grid maps, defined in the function `health.gridmap()`. Instead of just generating a single tile grid map, we create facets of tile grid maps, where the facetting is determined by the user. Either they can choose to split by gender or by age group
+
+In order to draw the grid map, we must first draw the coordinates. This is done in a simple Excel spreadsheet to align each country with a specific point on a two-dimensional grid. Rather than sourcing this Excel file each time, we load the file once, then use the `dput` function to replicate the structure of the table (this is not shown in the script). This structure is then defined explicitly within the function.
+
+We define a "base" plotting function that draws the initial outline of the tile grid, using the `ggplot2` package. Additional plotting parameters are added later based on the function parameters passed. This is an advantage of using `ggplot2`: we define the initial plot, then 'layer' on additional graphical elements as needed.
+
+```{r eval=FALSE}
+[100]    plot_function = function(df) {
+[101]
+[102]        p = ggplot(data = df, aes(x = X, y = Y)) +
+[103]            geom_tile(aes(fill = get(xvar), color = ""),
+[104]                      color = "white", size = 0.6) +
+[105]            geom_text(aes(label = iso3c), color = "white") +
+[106]            geom_text(aes(label = round(get(xvar), 2)), vjust = 2,
+[107]                      color = "white", size = 3, na.rm = TRUE) +
+[108]            coord_fixed(ratio = 1) +
+[109]            theme_minimal() +
+[110]            theme(axis.line          = element_blank(),
+[111]                  axis.text          = element_blank(),
+[112]                  axis.title         = element_blank(),
+[113]                  panel.background   = element_blank(),
+[114]                  panel.grid         = element_blank(),
+[115]                  legend.position    = "bottom") +
+[116]            theme(plot.title      = element_text(size = 16),
+[117]                    plot.subtitle = element_text(size = 10,
+[118]                                                color = "#7F7F7F"))
+[119]        return(p)
+[120]    }
+```
+
+The range of the color scales is always set to range from the minimum to maximum values between all facets of data. This is done to ensure that there are no values that fall out of bounds, as well as to apply the same color scale for all graphs in view.
+
+```{r eval=FALSE}
+[174]    minval = min(df.f[[xvar]], df.m[[xvar]], na.rm = TRUE)
+[175]    maxval = max(df.f[[xvar]], df.m[[xvar]], na.rm = TRUE)
+```
+
+If a logical variable is selected, we display the percentage of survey respondents for which that value is true. If a numeric variable is selected, we display the average value within survey respondents. The final output is stored as a `grob`, an element from the `gridExtra` package, which allows us to organize mutliple graphs side-by-side in a single window. We can either draw the final output using the `grid.draw()` function or we can save to disk using the `ggsave()` function.
+
+```{r eval=FALSE}
+example1 = health.gridmap('labor_hrs', 'age')
+grid.draw(example1)
+ggsave("Output/gridmap_laborhrs_byage.png", plot=example1, width=12,
+       height=8, units="in")
+```
+
+The second function creates a series of individual bar charts, split by a collection of selected genders and countries, for a selected numeric variable. A vector of countries and/or genders can be passed as arguments to the function, in the event a user only cares about a subset of the overall data set. In the event no vector of countries and/or genders are supplied, the entire data set is used. An optional parameter allows for the removal of outliers.
+
+```{r eval=FALSE}
+# Remove outliers (outside 1.5 IQR of 25% and 75% percentiles)
+[370]    rm.outliers = function(x, na.rm = TRUE) {
+[371]        qnt = quantile(df.out[[x]], probs = c(0.25, 0.75), na.rm = na.rm)
+[372]        out = 1.5*IQR(df.out[[x]], na.rm = na.rm)
+[373]
+[374]        new.out = df.out
+[375]        new.out[(df.out[[x]] < qnt[1] - out), ] = NA
+[376]        new.out[(df.out[[x]] > qnt[2] + out), ] = NA
+[377]
+[378]        new.out = new.out[complete.cases(new.out), ]
+[379]        return(new.out)
+[380]    }
+[381]
+[382]    if (remove.outliers) df.out = rm.outliers(x = xvar)
+```
+
+In addition, bars indicating the average over the entire data set are overlaid on top of each bar chart. This is to enable readers to see how similar or different one distribution is compared to the average.
+
+```{r eval=FALSE}
+[385]    total.dist = table(df.out[[xvar]])/nrow(df.out)
+[386]
+[387]    total        = expand.grid(countries, gen, sort(unique(df.out[[xvar]])))
+[388]    names(total) = c("country", "gender", xvar)
+[389]    total        = arrange(total, country, gender, get(xvar))
+[390]    total$value  = rep(total.dist, times = length(countries)*length(gen))
+```
+
+Finally, to prevent overcrowding in the view, we decide on the optimal way to arrange the graphs. If only a single gender is selected, we organize the graphs so that only four columns are shown. If all genders are selected, the graphs are organized so that gender is along the y-axis and countries are along the x-axis.
+
+```{r eval=FALSE}
+[418]    if (length(gen) == 1) {
+[419]        plot.bar = plot.bar +
+[420]            labs(subtitle = paste0("Faceted by country. Gender selected is ", gen,
+                 ". Distribution of the entire data set shown is overlaid on each graph.")) +
+[421]            facet_wrap(~ country, ncol = 4)
+[422]    } else {
+[423]        plot.bar = plot.bar +
+[424]            facet_grid(gender ~ country)
+[425]    }
+```
+
+\subsection{Empirical Results}
+
+We can test the validity of each of the graphics by generating a few sample outputs. For the tile grid maps, we include some stopping conditions to ensure correct facetting and/or to ensure that only a numeric or logical variable is supplied. A similar sequence of error messages is shown for the health distribution maps when the variable is not numeric, the countries supplied are not contained within the data set, or the correct genders are not supplied.
+
+
+```{r graphz, eval=TRUE, results='hide', echo=TRUE, error=TRUE, message=FALSE}
+source('Quantlets/SPL_ELP_Graphics/SPL_ELP_Graphics.R')
+load('easySHARE_clean.RData')
+
+#Only keep relevant data sets
+df.out = datasets$df.out
+
+health.gridmap(xvar = 'country', facetting = 'gender')
+health.distribution(xvar = 'age', gen = 'MALEEEEEEE')
+```
+
+We show an examples of correct output below. Here, we want to full-time employment percentage, facetted by age group. As we can see in Figure 1, the percentage of the population that works full time generally decreases for all countries as age increases. However, in countries like Sweden and Switzerland, a higher percentage continue to work even in old age.
+
+```{r eval=FALSE}
+health.gridmap(xvar = 'h_obese', facetting = 'country')
+```
+
+```{r fig.cap="Full-time labor employment tile grid maps by age group", fig.width=8, fig.height=5.33, echo=FALSE}
+library(png)
+library(grid)
+img = readPNG("Quantlets/SPL_ELP_Graphics/gridmap_laborft_byage.png")
+grid.raster(img)
+```
+
+Finally, we display an example of the health distribution map. As can be seen in Figure 2, we seek to evaluate the spread of self-perceived health among survey respondents after removing outliers. The black line indicates the overall distribution for the entire data set. As we can see, there are not too many differences between male and female distributions within countries. However, countries like Spain tend to believe they are healthier than average, whereas the opposite effect is true in Switzerland.
+
+```{r eval=FALSE}
+health.distribution(xvar = 'h_perceived', remove.outliers = FALSE)
+```
+
+```{r fig.cap="Distribution of self-perceived health by country and gender", fig.width=8, fig.height=5, echo=FALSE}
+library(png)
+library(grid)
+img = readPNG("Quantlets/SPL_ELP_Graphics/healthdistribution_perceivedhealth.png")
+grid.raster(img)
+```
+
+\newpage
+
+\section{Conclusion}
+The purpose of this paper was to present the developed six quantlets that can be used to carry out statistical and graphical analysis based on the easySHARE data set. Our code is designed to simplify the exploration of the easySHARE data set, generate comprehensible and instructive summary statistic tables and graphics, and conduct regression-based analyses. The quantlets have been applied and tested on the easySHARE data set to replicate the results of @kalwij2005labour. The code as well as the empirical results have been saved in a workspace accessible on Github[![workspace](Images/qletlogo.png)](https://github.com/phister/SPL_Project){width=25px}.
+
+In general, our empirical results are in line with those obtained by @kalwij2005labour. However, some minor differences emerge as a result of differing sample sizes by country and differing availability in preciseness of survey responses. Based on using a probit regression, we also find that higher age and worse health conditions are associated with lower labor participation, although there is great variation in the relationship across countries. Our results on the joint impact of health variables on participation (Wald test) are also similar except that we are unable to reject the null in a higher number of cases. The same pattern emerges in the counterfactual exercise, where our results are diverging for some countries. This indicates that the results obtained by @kalwij2005labour are not entirely robust and should be validated.
+
+Overall, our quantlets perform well on the tested data set. The output generated by our functions is as expected and can be validated with other packages. It works fine for the replication of the chosen paper and should perform well for other tasks performed on the easySHARE data set. Since the quantlet or constructed with a modular design, they can be quickly adjusted for other research tasks. While some of our functions go beyond the functionality of other packages (e.g. `wald.test` from `aod` package), our main focus lies on the development of tools to comprehensively analyze the easySHARE data set. One notable source of weakness of our code is its specificity and limitation of scope. Since it has been developed for the special usage of the easySHARE data set, it might not perform well on other data. As a future task, our quantlets could therefore be modified to also be applicable to different panel data sets.
+
+
+\newpage
+
+\section{References}
+
+
+<div id="refs"></div>
+
+
+\newpage
+
+\section{Appendix}
+
+\subsection{Quantlet Code}
+
+\subsubsection{Quantlet 1}
+
+[![Quantlet 1](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_ReadandClean/SPL_ELP_ReadandClean.R){width=25px}
+
+```{r Q1, eval=FALSE}
+################################################################################
+# SPL_ELP_ReadandClean.R
+#
+################################################################################
+# Description:
+# Function loads easySHARE data set and outputs relevant data frames for
+# analysis and regression. Additionally, print error messages if data set is
+# not the correct easySHARE data set and relevant statistics printed (e.g. num
+# rows dropped, variables retained, data type)
+#
+################################################################################
+
+read.and.clean <- function(dataset = "easySHARE_rel6_0_0.rda", wav = 1) {
+
+    # LOAD NECESSARY PACKAGES & DATA
+    neededPackages = c("dplyr", "magrittr", "infuser", "countrycode")
+    allPackages    = c(neededPackages %in% installed.packages()[,"Package"])
+    if (!all(allPackages)) {
+        missingIDX = which(allPackages == FALSE)
+        needed     = neededPackages[missingIDX]
+        lapply(needed, install.packages)
+    }
+    invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
+        library(x, character.only = TRUE))))
+
+    # Load dataset
+    cat("Loading data set...", sep = "\n")
+    load(dataset)
+
+    dat.input = easySHARE_rel6_0_0
+    rm(easySHARE_rel6_0_0)
+
+    rows.dat.input = nrow(dat.input)
+
+    if (!(wav %in% 1:6)) stop('Out of bounds.
+                              Select a value between 1 and 6.')
+
+    ############################################################################
+    # ENCODE MISSING VALUES
+
+    # Organize data.frame by selecting relevant variables
+    cat(infuse("Selecting values only from Wave {{wav}} and between ages 50 and 64.", wav = wav), sep = "\n")
+
+    dat = dat.input %>%
+        dplyr::filter(wave == wav & (age <= 64 & age >= 50)) %>%
+        dplyr::select(wave, country_mod,                 # dataset details
+               female, age, isced1997_r, ch001_, mar_stat, # demo variables
+               chronic_mod, maxgrip, adla, bmi, bmi2, eurod, sphus, # health
+               ep013_mod, ep005_)                          # labor (outcome var)
+
+    rm(dat.input)
+
+    # Encode missing values according to SHARE dataset guidelines
+    a = c(-2, -3, -4, -7, -9, -12, -13, -14, -15, -16)
+    b = c("tocheck","implausible", "tocheck", "uncoded", "notApplicable",
+          "dontKnow", "notAskedWave", "notAskedCountry", "noInformation",
+          "noDropOff")
+    missing.value.codes = data.frame(a,b)
+    # This data frame can be used to verify NA codes easily.
+    # But for the encoding only the numeric vector a is necessary.
+
+    # Find NA locations and declare them as such
+    df.decl = apply(dat, 2, function(z) {
+        na.loc    = which(z %in% a)
+        z[na.loc] = NA
+        return(z)
+    })
+
+    df = data.frame(df.decl)
+
+    # If working hours is NA and job status is not employed, this means
+    # individuals don't work
+    # If working hours is NA and job status is employed, we assume part time
+    # work
+    df$ep013_mod[is.na(df$ep013_mod) & df$ep005_ != 2] = 0
+    df$ep013_mod[is.na(df$ep013_mod) & df$ep005_ == 2] = 1
+
+    ############################################################################
+    # CREATE DATA FRAMES FOR ANALYSIS AND ESTIMATION
+
+    # Get country information from "countrycode" package
+    country_list = c("BEL", "NLD", "FRA", "SWE", "DEU", "GRC", "ITA", "ESP",
+                     "DNK", "AUT", "CHE")
+    country_data = with(countrycode_data,
+                        data.frame(iso3c, iso3n, country.name.en))
+
+    # Variables are cleaned, converted into human-readable naming conventions,
+    # and converted to dummies as described in the paper
+    cat("Removing missing values.", sep = "\n")
+
+    df.out       = df %>%
+        dplyr::left_join(country_data, by = c("country_mod" = "iso3n")) %>%
+        dplyr::filter(iso3c %in% country_list) %>%
+        dplyr::mutate(country       = factor(country.name.en),
+                      gender        = factor(ifelse(female, "FEMALE", "MALE")),
+                      age50_54      = age < 55,
+                      age55_59      = age >= 55 & age < 60,
+                      age60_64      = age >= 60,
+                      age           = factor(floor(age)),
+                      edu_low       = isced1997_r %in% c(0, 1),
+                      edu_second    = isced1997_r %in% 2:4,
+                      edu_high      = isced1997_r %in% c(5, 6),
+                      children      = ch001_,
+                      couple        = mar_stat %in% 1:3,
+                      h_chronic     = chronic_mod,
+                      h_maxgrip     = maxgrip,
+                      h_adla        = adla > 0,
+                      h_overweight  = bmi2 == 3,
+                      h_obese       = bmi2 == 4,
+                      h_badmental   = eurod > 3,
+                      h_goodsp      = sphus < 4,
+                      h_bmi         = floor(bmi),
+                      h_depression  = eurod,
+                      h_perceived   = sphus,
+                      labor_ft      = ep013_mod >= 32,
+                      labor_pt      = ep013_mod < 32 & ep013_mod > 0,
+                      labor_np      = ep013_mod == 0,
+                      labor_hrs     = floor(ep013_mod)) %>%
+        dplyr::select(country, gender,              # country and gender
+                      starts_with("age"),           # age dummy
+                      starts_with("h_"),            # health indicators
+                      starts_with("edu_"),          # eduction dummies
+                      children, couple,             # demographic details
+                      starts_with("labor_")) %>%    # labor supply outcomes
+        na.omit() %>%                               # remove missing values
+        set_rownames(NULL)                          # reset row numbering
+
+    rows.df.out    = nrow(df.out)
+    rows.remove    = rows.dat.input - rows.df.out
+
+    cat(infuse("Rows removed:   {{rows.remove}}", rows.remove = rows.remove),
+        sep = "\n")
+    cat(infuse("Rows remaining: {{rows.dat}}", rows.dat = rows.df.out),
+        sep = "\n")
+    cat("", sep = "\n")
+
+    # Create standardized variables for numeric data
+    standardize = function(x) {
+        mean = sum(x)/length(x)
+        std  = sd(x)
+        val  = (x - mean) / std
+        return(val)
+    }
+
+    # Standardize and select correct variables
+    standardize.df = function(df) {
+        # Gives a vector of integer column positions of numeric variables
+        idx = sapply(df, is.numeric)
+        idx = seq(1:length(idx))[idx]
+
+        # Creating separate data set with standardized numeric variables for
+        # regression, then reselect variables as described in paper (e.g. self-
+        # reported health is removed)
+        df.reg = df %>%
+            mutate_at(.vars = vars(idx),
+                      .funs = standardize) %>%
+            mutate(labor_participation = !labor_np) %>% # invert to get labor_pt
+            dplyr::select(country, gender, age,
+                          h_chronic, h_adla, h_obese, h_maxgrip,
+                          edu_second, edu_high, children, couple,
+                          labor_participation)
+
+        return(df.reg)
+    }
+
+    # Split data frames into country/gender splits, then standardize numeric
+    splits    = split(df.out, f = list(df.out$country, df.out$gender),
+                      drop = TRUE)
+    df.reg    = standardize.df(df.out)
+    df.splits = lapply(splits, standardize.df)
+
+    # Create necessary dummary variables for regression
+    dummify = function(df) {
+        df = df %>%
+            dplyr::select(-country, -gender)        # remove country/gender
+        model      = ~ 0 + .                        # needed to remove intercept
+        new.df     = model.matrix(model, df)# create dummies
+        new.df     = data.frame(new.df)
+        return(new.df)
+    }
+
+    df.splits = lapply(df.splits, dummify)
+
+    # df.out is for analysis, df.reg and df.splits are for estimation
+    all.output = list(df.out = df.out, df.reg = df.reg, df.splits = df.splits)
+
+    cat("Final output is a list containing 3 data.frames:", sep = "\n")
+    cat("`df.out` is a data.frame containing variables for calculating summary statistics.", sep = "\n")
+    cat("`df.reg` is a data.frame containing standardized variables for regression.", sep = "\n")
+    cat("`df.splits` splits the regression data.frame into individual data.frames for each country/
+        gender split. 22 data.frames are contained in this list.", sep = "\n")
+
+    return(all.output)
+}
+```
+
+
+\subsubsection{Quantlet 2}
+
+[![Quantlet 2](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_SummaryStatistics/SPL_ELP_SummaryStatistics.R){width=25px}
+
+```{r Q2, eval=FALSE}
+
+```
+
+\subsubsection{Quantlet 3}
+
+[![Quantlet 3](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R){width=25px}
+
+```{r Q3, eval=FALSE}
+
+```
+
+\subsubsection{Quantlet 4}
+
+[![Quantlet 4](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_LoadWald/SPL_ELP_LoadWald.R){width=25px}
+
+```{r Q4, eval=FALSE}
+################################################################################
+# SPL_ELP_LoadWald.R
+#
+################################################################################
+# Description:
+# Contains a series of Wald tests
+#
+################################################################################
+
+################################################################################
+# Wald Test for Joint Significance
+
+# Note: This a Wald test for the joint signifance of a subset of model
+# coefficients
+# m = number of restrictions
+# Beta is vector of coefficients of size k x 1
+# Confidence.level is the desired confidence level (between 0 and 1).
+# Default: 0.95
+# Spec is vector of integers of length 0 < m <= k specifying the subset of
+# coefficients to be jointly tested
+
+joint.wald.test = function(model.summary, confidence.level=0.95, spec=NULL) {
+
+    # List all packages needed for session
+    neededPackages = c("Matrix")
+    allPackages    = c(neededPackages %in% installed.packages()[, "Package"])
+
+    # Install packages (if not already installed)
+    if (!all(allPackages)) {
+        missingIDX = which(allPackages == FALSE)
+        needed     = neededPackages[missingIDX]
+        lapply(needed, install.packages)
+    }
+
+    # Load all defined packages
+    invisible(lapply(neededPackages, function(x) suppressPackageStartupMessages(
+        library(x, character.only = TRUE))))
+
+    # Set up test restrictions
+    if (is.null(spec)) {
+        spec = 1:length(beta) # default joint is significance test
+    } else if (is.logical(spec)) {
+        stop("spec cannot be a logical vector, tranform to integer vector!")
+    } else if (any(spec == 0)) {
+        stop("spec cannot contain zero values!")
+    } else if (!is.integer(spec)) {
+        spec.len = length(spec)
+        spec     = as.integer(spec, length = spec.len)
+        warning("Converting spec to integer and proceeding")
+    }
+
+    # Check Input
+    if (class(model.summary) != "summary.glm") {
+        stop("model.summary must be a glm summary!")
+    }
+    if (confidence.level > 1 | confidence.level < 0) {
+        stop("confidence.level out of bounds!")
+    }
+
+    # Define test elements
+    joint.wald.test        = numeric(4)
+    names(joint.wald.test) = c("W","p-value", "df", "Decision")
+    beta                   = model.summary$coefficients[,1]
+    Var_beta_est           = vcov(model.summary)
+
+    # Wald test statistic
+    W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
+
+    # Set up test output
+    pval               = 1-pchisq(W,length(spec))
+    joint.wald.test[1] = format(W, digits = 4)
+    joint.wald.test[2] = format(pval, digits = 4)
+    joint.wald.test[3] = length(spec)
+    joint.wald.test[4] = ifelse(pval <= 1- confidence.level, "Reject H0",
+                                "Cannot reject H0")
+    return(joint.wald.test)
+}
+
+################################################################################
+## Wald Test for Linear Hypothesis
+
+# Note: This a general Wald test for linear hypothesis of model beta
+# coefficients
+# m = number of restrictions
+# Beta is vector of coefficients of size k x 1
+# Confidence level is the desired confidence level (between 0 and 1).
+# Default: 0.95
+# R is Jacobian matrix of size m x k
+# r is restriction function size m x 1
+# Example: H0: b1 + b2 = 1 and 2*b1 = 0  (2 restrictions, m = 2)
+# R = 1 1 0 0 ...0      and r = 1
+#     2 0 0 0 ...0              0
+
+general.wald.test = function(model.summary,
+                             confidence.level = 0.95,
+                             R                = NULL,
+                             r                = NULL) {
+
+    # Check input
+    if (class(model.summary) != "summary.glm") {
+        stop("model.summary must be a glm summary!")
+    }
+    if (confidence.level > 1 | confidence.level < 0) {
+        stop("confidence.level out of bounds!")
+    }
+
+    # Define test elements
+    general.wald.test        = numeric(4)
+    names(general.wald.test) = c("W","p-value", "df", "Decision")
+    beta                     = model.summary$coefficients[, 1]
+    Var_beta_est             = vcov(model.summary)
+
+    # Set up restriction matrix/vector for linear hypothesis
+    # default option is joint significants of all coefficients
+    if (is.null(R)) {
+        R = diag(1, length(beta)) # default of R is identity matrix
+    }
+    if (is.null(r)) {
+        r = rep(0, length(beta)) # default for r is null vector
+    }
+
+    # Now R and r definitely exist, check dimensions
+    dim_R = dim(R) # Testing R
+    k     = length(beta)  # Columns
+    m     = length(r) # Rows; general hypothesis test, therefore m = length(r)
+
+    ##  Apply test
+    if (dim_R[1] != m | dim_R[2] != k) stop("R has wrong dimension!")
+
+    # Check rank of R
+    if (rankMatrix(R)[1] != m) stop("R has wrong rank!")
+
+    # Wald test statistic
+    W = t(R%*%beta - r) %*% solve(R%*% Var_beta_est %*% t(R)) %*% (R%*%beta - r)
+
+    # Set up test output
+    pval                 = 1-pchisq(W,length(r))
+    general.wald.test[1] = format(   W, digits = 4)
+    general.wald.test[2] = format(pval, digits = 4)
+    general.wald.test[3] = length(r)
+    general.wald.test[4] = ifelse(pval <= 1- confidence.level, "Reject H0", "Cannot reject H0")
+
+    return(general.wald.test)
+}
+```
+
+\subsubsection{Quantlet 5}
+
+[![Quantlet 5](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_Counterfactual/SPL_ELP_Counterfactual.R){width=25px}
+
+```{r Q5, eval=FALSE}
+################################################################################
+# Counterfactual
+#
+################################################################################
+# Description:
+#
+# Calculates current and counterfactual labor participation rates for different
+# age groups, countries, and genders
+#
+################################################################################
+
+################################################################################
+# SOURCE DATA
+load('easySHARE_clean.RData')
+
+#Only keep relevant data sets
+df.splits = datasets$df.splits
+rm(datasets)
+
+################################################################################
+
+# Probit for each country and gender
+allModels = lapply(df.splits, function(z) {
+    model = glm(z$labor_participationTRUE ~ . -age50,
+                family = binomial(link = "probit"),
+                data   = z)
+    return(model)
+})
+
+# Return summaries
+allSummaries = lapply(allModels, summary)
+
+################################################################################
+# Counterfactual Exercise
+
+# Calculate employment rate based on whole population with mean probability
+
+# Estimate current employment rate
+empl.rate = function(model) {
+    # Select data from model
+    X                = model$data
+    # Predict probability of being employed of all individuals
+    empl.probability = predict(object = model, newdata =  X, type = "response")
+    # Calculate predicted current employment rate
+    empl.rate        = sum(empl.probability)  / length(empl.probability)
+    return(empl.rate)
+}
+
+# Function for defining models with modified dataset (perfect health)
+X.cf = function(model) {
+    # Select data from model
+    X                      = model$data
+    #Create counterfactual data set with ideal health condition
+    X_cf                   = X
+    # Find ideal health conditions by finding the minimum value for each
+    # variable
+    X_min                  = data.frame(t(apply(X, 2, min)))
+    # Replace mean values by values representing no health issues
+    names.vec              = c("h_chronic", "h_adlaTRUE", "h_obeseTRUE")
+    X_cf[, names.vec]      = X_min[names.vec]
+    # Create index vector for 50 and 51 year olds
+    age_50_51              = ifelse(X$age50 == 1 | X$age51 == 1, 1,0)
+    # Calculate max grip mean of individuals age 50-51 and replace
+    X_cf[, c("h_maxgrip")] =  tapply(X$h_maxgrip, age_50_51 == 1, mean)[[2]]
+    model$data             = X_cf
+    return(model)
+}
+
+# Returns a list with all models with modified datasets
+allModels.cf = lapply(allModels, X.cf)
+
+# Calculate current and counterfactual employment rates
+empl.current     = lapply(allModels, empl.rate)
+empl.counterfact = lapply(allModels.cf, empl.rate)
+
+# Store results and display them
+employment            = data.frame(cbind(unlist(empl.current),
+                                         unlist(empl.counterfact)))
+colnames(employment)  = c("Employment Current" , "Employment Counterf.")
+
+################################################################################
+# Counterfactual exercise for each age group
+
+### Function for current and counterfactual employment rate among age groups
+# Default arguments: group size and lower bound of age groups (group.low)
+
+# Estimate current employment rate for age groups
+empl.rate.age = function(model, group.size = 5, group.low = c(50,55,60)) {
+
+    #Initialize storage of results
+    empl.rate        = numeric(3)
+
+    # Select data from model
+    X                = model$data
+
+    # Predict probability of being employed of all individuals
+    empl.probability = predict(object = model, newdata =  X, type = "response")
+
+    # Create age group Index vectors
+    # Initialize result list containing age group index vectors
+    IND_row_vec = list()
+
+    # Define vector of relevant age groups by youngest age
+    for (i in group.low) {
+        # Define upper bound k of age group
+        k         = i + group.size -1
+        # Create labels and contents of each age group
+        vec.label = paste("names.vec.age", i, sep=".")
+        # Assign ages to the age groups
+        z         = assign(vec.label, paste0("age",i:k))
+        # For age groups of size 1, use simple indexing (cannot use apply)
+        if (length(z) == 1) {
+            IND_row_vec[[i]] = X[, z]
+
+        # For all age groups greater than size 1
+        } else {
+            # Sum over rows to find individuals belonging to age group i
+            IND_row_vec[[i]] = apply(X[, z], 1, sum)
+        }
+    }
+
+    # Extract list of relevant age groups, which are each stored in a list
+    IND_row_vec   = IND_row_vec[group.low]
+
+# Calculate predicted current employment rate for age groups
+# loop over age group list
+    for (k in 1: length(IND_row_vec)) {
+        empl.rate[k] = empl.probability %*% IND_row_vec[[k]] /
+            sum(IND_row_vec[[k]])
+    }
+    return(empl.rate)
+}
+
+# Calculate current and counterfactual employment rates for age groups
+empl.current.age     = t(data.frame(lapply(allModels, empl.rate.age)))
+empl.counterfact.age = t(data.frame(lapply(allModels.cf, empl.rate.age)))
+
+employment.age           = data.frame(cbind(empl.current.age,
+                                            empl.counterfact.age))
+colnames(employment.age) = paste0(c(rep("empl.current", 3),
+                                    rep( "empl.counterfact", 3)),
+                                  c("50.54","55.59", "60.64"))
+
+# Test for other age groups: Example of employment for each age group
+empl.rate.age(allModels$Germany.MALE, group.size = 1, group.low = c(50:63))
+empl.rate.age(allModels.cf$Germany.MALE, group.size = 1, group.low = c(50:63))
+
+################################################################################
+
+# Decline in participation due to decline in health condition
+health.decline = function(X) {
+    # Differences between counterf. and current participation rates
+    dif.60.64 = X[,"empl.counterfact60.64"] - X[, "empl.current60.64"]
+    dif.50.54 = X[,"empl.counterfact50.54"] - X[, "empl.current50.54"]
+
+    # Absolute difference in current participation rate
+    dif.abs   = X[,"empl.current50.54"] - X[,"empl.current60.64"]
+    measure   =  (dif.60.64 - dif.50.54) / dif.abs
+    return(measure)
+}
+
+participation.health = data.frame(health.decline(employment.age))
+
+################################################################################
+# Some Remarks
+
+# Define outout formate of counterfactual estimates: list
+empl.each.age = list()
+
+# Calculate employment for each age for all countries
+for (i in 1:length(allModels)) {
+    k                  = allModels[[i]]
+    empl.each.age[[i]] = empl.rate.age(k, group.size = 1, group.low = c(50:64))
+}
+
+names(empl.each.age) = names(allModels)
+```
+
+\subsubsection{Quantlet 6}
+
+[![Quantlet 6](Images/qletlogo.png)](https://github.com/phister/SPL_Project/blob/master/Quantlets/SPL_ELP_Graphics/SPL_ELP_Graphics.R){width=25px}
+
+```{r Q6, eval=FALSE}
+################################################################################
+# SPL_ELP_Graphics.R
+#
+################################################################################
+# Description:
+# Functions designed to create useful graphics (quantlet 6)
+# Note that these functions are designed to specifically run with the 'df.out'
+# data frame in the datasets lists found in `easySHARE_clean.RData`
+#
+# health.gridmap(xvar, facetting): generate a tile grid map by a variable in
+# dataset, facetted by either gender or age. if numeric than average is
+# calculated. if logical than % is calculated. both xvar and facetting should be
+# character vectors. returns a grid object, which can be printed to device with # grid.draw() or saved with ggsave()
+#
+# health.distribution(xvar, gen, countries, remove.outliers): show distribution
+# of numeric variable in dataset, facetted by gender and country.
+# Select a numeric variable in xvar (as a string), a vector of genders, and a
+# vector of countries. By default, outliers are removed.
+#
+################################################################################
+
+###### GEOGRAPHIC VISUALIZATION OF NUMERIC DATA
+# Tile grid map of numeric variables by geographic location
+
+# accept metric and facetting as input. xvar is a character vector
+# facetting can take either 'gender' or 'age' as inputs
+# return error if neither 'gender' or 'age' is inputted
+
+# output side by side grid maps
+health.gridmap = function(xvar, facetting) {
+
+    # List all packages needed for session
+    neededPackages = c("dplyr", "ggplot2", "countrycode",
+                       "gridExtra", "grid", "infuser")
+    allPackages    = c(neededPackages %in% installed.packages()[ , "Package"])
+
+    # Install packages (if not already installed)
+    if(!all(allPackages)) {
+        missingIDX = which(allPackages == FALSE)
+        needed     = neededPackages[missingIDX]
+        lapply(needed, install.packages)
+    }
+
+    # Load all defined packages (silently)
+    invisible(lapply(neededPackages, library, character.only = TRUE))
+
+    # first convert age to numeric, not factor variable
+    if (is.factor(df.out$age)) {
+        df.out$age = as.numeric(levels(df.out$age)[df.out$age])
+    }
+
+    # STOPPING CONDITIONS
+    if (!is.numeric(df.out[[xvar]]) & !is.logical(df.out[[xvar]])) {
+        stop("'xvar' must be numeric
+        or logical")
+    }
+    if (!(facetting %in% c('gender', 'age'))) {
+        stop("'facetting' variable
+        must be either 'gender' or 'age'")
+    }
+    # ADD TILE GRID LAYOUT
+    coordinates = structure(list(
+        Country = c("Albania", "Austria", "Belarus", "Belgium",
+                    "Bosnia and Herzegovina", "Bulgaria", "Croatia",
+                    "Czech Republic", "Denmark", "Estonia", "Finland", "France",
+                    "Germany", "Greece", "Hungary", "Iceland", "Ireland",
+                    "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta",
+                    "Montenegro", "Netherlands", "Norway", "Poland", "Portugal",
+                    "Republic of Moldova", "Romania", "Russian Federation",
+                    "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden",
+                    "Switzerland", "The former Yugoslav Republic of Macedonia",
+                    "Ukraine",
+                    "United Kingdom of Great Britain and Northern Ireland"
+                    ),
+        X = c(6, 5, 7, 3, 6, 8, 5, 5, 5, 7, 7, 2, 5, 7, 6, 1, 1, 4, 8, 7, 3, 3,
+              6, 4, 5, 6, 1, 8, 7, 9, 7, 6, 4, 2, 6, 4, 8, 7, 2
+              ),
+        Y = c(1, 4, 6, 6, 3, 3, 3, 5, 7, 8, 9, 5, 6, 1, 4, 9, 7, 4, 7, 7, 5, 3,
+              2, 6, 9, 6, 4, 4, 4, 7, 3, 5, 3, 4, 9, 5, 2, 5, 7
+              ),
+        InSet = c(FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE,
+                  FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE,
+                  FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE,
+                  FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE,
+                  FALSE, FALSE, FALSE
+                  )
+        ),
+        .Names = c("Country", "X", "Y", "InSet"),
+        row.names = c(NA, -39L),
+        class = c("tbl_df", "tbl", "data.frame")
+    )
+
+    # Get correct country information
+    codes       = countrycode_data
+    df.codes    = left_join(coordinates, codes,
+                            by = c("Country" = "country.name.en")) %>%
+        dplyr::select(Country, iso3c, X, Y)
+
+    # plot function to be used later
+    plot_function = function(df) {
+
+        p = ggplot(data = df, aes(x = X, y = Y)) +
+            geom_tile(aes(fill = get(xvar), color = ""),
+                      color = "white", size = 0.6) +
+            geom_text(aes(label = iso3c), color = "white") +
+            geom_text(aes(label = round(get(xvar), 2)), vjust = 2,
+                      color = "white", size = 3, na.rm = TRUE) +
+            coord_fixed(ratio = 1) +
+            theme_minimal() +
+            theme(axis.line        = element_blank(),
+                  axis.text        = element_blank(),
+                  axis.title       = element_blank(),
+                  panel.background = element_blank(),
+                  panel.grid       = element_blank(),
+                  legend.position  = "bottom") +
+            theme(plot.title    = element_text(size  = 16),
+                  plot.subtitle = element_text(size  = 10,
+                                               color = "#7F7F7F"))
+        return(p)
+    }
+
+    # IF GENDER SELECTED:
+    if (facetting == 'gender') {
+
+        # if logical than calculate percentage
+        if (is.logical(df.out[[xvar]])) {
+
+            var.type = '% with'
+
+            df.graph = df.out %>%
+                dplyr::select(country, gender, `xvar`) %>%
+                group_by(country, gender) %>%
+                summarize(value = sum(get(xvar))/length(get(xvar)))
+            names(df.graph)[3] = xvar
+
+            # split by gender
+            df.m = df.graph %>%
+                filter(gender == "MALE")
+            df.f = df.graph %>%
+                filter(gender == "FEMALE")
+            df.m = suppressWarnings(
+                left_join(df.codes, df.m, c('Country' = 'country'))) %>%
+                dplyr::select(iso3c, X, Y, `xvar`)
+            df.f = suppressWarnings(
+                left_join(df.codes, df.f, c('Country' = 'country'))) %>%
+                dplyr::select(iso3c, X, Y, `xvar`)
+        }
+
+        # if numeric than calculate average
+        if (is.numeric(df.out[[xvar]])) {
+
+            var.type = 'Avg.'
+
+            df.graph = df.out %>%
+                dplyr::select(country, gender, `xvar`) %>%
+                group_by(country, gender) %>%
+                summarize(value = mean(get(xvar)))
+            names(df.graph)[3] = xvar
+
+            # split by gender
+            df.m = df.graph %>%
+                filter(gender == "MALE")
+            df.f = df.graph %>%
+                filter(gender == "FEMALE")
+            df.m = suppressWarnings(
+                left_join(df.codes, df.m, c('Country' = 'country'))) %>%
+                dplyr::select(iso3c, X, Y, `xvar`)
+            df.f = suppressWarnings(
+                left_join(df.codes, df.f, c('Country' = 'country'))) %>%
+                dplyr::select(iso3c, X, Y, `xvar`)
+        }
+
+        # set equal range for color scales
+        minval = min(df.f[[xvar]], df.m[[xvar]], na.rm = TRUE)
+        maxval = max(df.f[[xvar]], df.m[[xvar]], na.rm = TRUE)
+
+        # PLOT
+        output = lapply(list(df.m, df.f), plot_function)
+        output[[1]] = output[[1]] +
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}",
+                                   intro = var.type, metric = xvar,
+                                   split = 'male'),
+                 fill     = xvar) +
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04",
+                                  na.value = "#CCCCCC",
+                                  limits = c(minval, maxval))
+        output[[2]] = output[[2]] +
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}",
+                                   intro = var.type, metric = xvar,
+                                   split = 'female'),
+                 fill     = xvar) +
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04",
+                                  na.value = "#CCCCCC",
+                                  limits = c(minval, maxval))
+        return(arrangeGrob(output[[1]], output[[2]], ncol = 2))
+    }
+
+    # IF AGE SELECTED:
+    if (facetting == 'age') {
+
+        # if logical than calculate percentage
+        if (is.logical(df.out[[xvar]])) {
+
+            var.type = '% with'
+
+            # split by age group
+            df50 = df.out %>%
+                filter(age50_54 == TRUE) %>%
+                group_by(country) %>%
+                summarize(value = sum(get(xvar))/length(get(xvar)))
+            df50 = suppressWarnings(
+                right_join(df50, df.codes, c('country' = 'Country'))) %>%
+                dplyr::select(iso3c, X, Y, value)
+            names(df50)[4] = xvar
+
+            df55 = df.out %>%
+                filter(age55_59 == TRUE) %>%
+                group_by(country) %>%
+                summarize(value = sum(get(xvar))/length(get(xvar)))
+            df55 = suppressWarnings(
+                right_join(df55, df.codes, c('country' = 'Country'))) %>%
+                dplyr::select(iso3c, X, Y, value)
+            names(df55)[4] = xvar
+
+            df60 = df.out %>%
+                filter(age60_64 == TRUE) %>%
+                group_by(country) %>%
+                summarize(value = sum(get(xvar))/length(get(xvar)))
+            df60 = suppressWarnings(
+                right_join(df60, df.codes, c('country' = 'Country'))) %>%
+                dplyr::select(iso3c, X, Y, value)
+            names(df60)[4] = xvar
+        }
+
+        # if numeric than calculate average
+        if (is.numeric(df.out[[xvar]])) {
+
+            var.type = 'Avg.'
+
+            # split by age group
+            df50 = df.out %>%
+                filter(age50_54 == TRUE) %>%
+                group_by(country) %>%
+                summarize(value = mean(get(xvar)))
+            df50 = suppressWarnings(
+                right_join(df50, df.codes, c('country' = 'Country'))) %>%
+                dplyr::select(iso3c, X, Y, value)
+            names(df50)[4] = xvar
+
+            df55 = df.out %>%
+                filter(age55_59 == TRUE) %>%
+                group_by(country) %>%
+                summarize(value = mean(get(xvar)))
+            df55 = suppressWarnings(
+                right_join(df55, df.codes, c('country' = 'Country'))) %>%
+                dplyr::select(iso3c, X, Y, value)
+            names(df55)[4] = xvar
+
+            df60 = df.out %>%
+                filter(age60_64 == TRUE) %>%
+                group_by(country) %>%
+                summarize(value = mean(get(xvar)))
+            df60 = suppressWarnings(
+                right_join(df60, df.codes, c('country' = 'Country'))) %>%
+                dplyr::select(iso3c, X, Y, value)
+            names(df60)[4] = xvar
+        }
+
+        # set equal range for color scales
+        minval = min(df50[[xvar]], df55[[xvar]], df60[[xvar]], na.rm = TRUE)
+        maxval = max(df50[[xvar]], df55[[xvar]], df60[[xvar]], na.rm = TRUE)
+
+        # PLOT
+        output = lapply(list(df50, df55, df60), plot_function)
+        output[[1]] = output[[1]] +
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}",
+                                   intro = var.type, metric = xvar,
+                                   split = 'age50_54'),
+                 fill     = xvar) +
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04",
+                                  na.value = "#CCCCCC",
+                                  limits = c(minval, maxval))
+        output[[2]] = output[[2]] +
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}",
+                                   intro = var.type, metric = xvar,
+                                   split = 'age55_59'),
+                 fill     = xvar) +
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04",
+                                  na.value = "#CCCCCC",
+                                  limits = c(minval, maxval))
+        output[[3]] = output[[3]] +
+            labs(title    = infuse("{{intro}} {{metric}} for {{split}}",
+                                   intro = var.type, metric = xvar,
+                                   split = 'age60_64'),
+                 fill     = xvar) +
+            scale_fill_continuous(low = "#fdd0a2", high = "#8c2d04",
+                                  na.value = "#CCCCCC",
+                                  limits = c(minval, maxval))
+
+        return(arrangeGrob(output[[1]], output[[2]], output[[3]], ncol = 3))
+
+    }
+}
+
+###### VIEW DISTRIBUTION OF NUMERIC VARIABLES
+# Numeric variable: shows distribution for each country, then overlays average of entire data set
+
+# slicing by dummy variables is not included. that can be done before the function is called and then that df can be paseed to this
+
+# xvar is a character vector
+# by default, gender is "all". can either be "all", "MALE" or "FEMALE"
+# by default, countries is "all". can also pass a character vector of countries
+
+health.distribution = function(xvar,
+                               gen              = "all",
+                               countries        = "all",
+                               remove.outliers  = TRUE) {
+
+    # List all packages needed for session
+    neededPackages = c("dplyr", "ggplot2", "scales")
+    allPackages    = c(neededPackages %in% installed.packages()[ , "Package"])
+
+    # Install packages (if not already installed)
+    if(!all(allPackages)) {
+        missingIDX = which(allPackages == FALSE)
+        needed     = neededPackages[missingIDX]
+        lapply(needed, install.packages)
+    }
+
+    # Load all defined packages (silently)
+    suppressMessages(lapply(neededPackages, library, character.only = TRUE))
+
+    # first convert age to numeric, not factor variable
+    if (is.factor(df.out$age)) {
+        df.out$age = as.numeric(levels(df.out$age)[df.out$age])
+    }
+
+    # STOPPING CONDITIONS
+    if (!is.numeric(df.out[[xvar]])) stop("'xvar'
+                                          must be numeric")
+    if (length(gen) > 1 | !all(gen %in% c("all", "MALE", "FEMALE"))) {
+        stop("'gender' must be one of
+             'all', 'MALE', or 'FEMALE'")
+    }
+    if (length(countries) > 1 & !all(countries %in% levels(df.out$country))) {
+        stop("'countries'
+             must be 'all' or a character vector containing countries
+             in the `df.out` data frame")
+    }
+    if (length(countries) == 1) {
+        if (!(countries %in% c('all', levels(df.out$country)))) {
+            stop("'countries'
+                 must be 'all' or a character vector containing countries
+                 in the `df.out` data frame")
+        }
+    }
+
+    # Set faceting variables
+    if (gen == "all") gen = c("MALE", "FEMALE")
+    if (length(countries) == 1) {
+        if (countries == "all") countries = levels(df.out$country)
+    }
+
+    # Filter countries/genders as selected
+    df.out = df.out %>%
+        filter(country %in% countries, gender %in% gen)
+
+    # Remove outliers (outside 1.5 IQR of 25% and 75% percentiles)
+    rm.outliers = function(x, na.rm = TRUE) {
+        qnt = quantile(df.out[[x]], probs = c(0.25, 0.75), na.rm = na.rm)
+        out = 1.5*IQR(df.out[[x]], na.rm = na.rm)
+
+        new.out = df.out
+        new.out[(df.out[[x]] < qnt[1] - out), ] = NA
+        new.out[(df.out[[x]] > qnt[2] + out), ] = NA
+
+        new.out = new.out[complete.cases(new.out), ]
+        return(new.out)
+    }
+
+    if (remove.outliers) df.out = rm.outliers(x = xvar)
+
+    # Overlay lines for average over entire data set
+    total.dist = table(df.out[[xvar]])/nrow(df.out)
+
+    total        = expand.grid(countries, gen, sort(unique(df.out[[xvar]])))
+    names(total) = c("country", "gender", xvar)
+    total        = arrange(total, country, gender, get(xvar))
+    total$value  = rep(total.dist, times = length(countries)*length(gen))
+
+    plot.bar = ggplot(data = df.out, aes(x = get(xvar))) +
+
+        geom_bar(aes(fill  = country,
+                     color = country,
+                     y     = ..prop..),
+                 alpha = 0.4) +
+
+        geom_errorbar(data = total, aes(x    = get(xvar),
+                                        ymin = value,
+                                        ymax = value)) +
+
+        theme_minimal() +
+        theme(legend.position = "none") +
+        theme(panel.grid.minor = element_blank()) +
+        theme(panel.grid.major = element_blank()) +
+        theme(axis.text.y = element_blank()) +
+
+        labs(title = paste0("Distribution of ", xvar, " by Country")) +
+        labs(subtitle = "Faceted by country & gender. Distribution of the entire data set shown is overlaid on each graph.") +
+        labs(x = xvar) +
+        labs(y = "") +
+
+        theme(plot.title = element_text(size=16)) +
+        theme(plot.subtitle = element_text(size=10, color = "#7F7F7F"))
+
+    # show correct faceting and titles
+    if (length(gen) == 1) {
+        plot.bar = plot.bar +
+            labs(subtitle = paste0("Faceted by country. Gender selected is ", gen, ". Distribution of the entire data set shown is overlaid on each graph.")) +
+            facet_wrap(~ country, ncol = 4)
+    } else {
+        plot.bar = plot.bar +
+            facet_grid(gender ~ country)
+    }
+
+    return(plot.bar)
+}
+```
+
+\newpage
+
+\begin{Large}
+\textbf{Declaration of Authorship}
+\end{Large}
+
+\bigskip
+\bigskip
+
+We hereby confirm that we have authored this Seminar paper independently and without use
+of others than the indicated sources. All passages which are literally or in general matter taken
+out of publications or other sources are marked as such.
+\bigskip
+
+Berlin, 2018-03-16
+
+\smallskip
+
+Claudia Günther, Phi Nguyen, Julian Winkel
+\bigskip

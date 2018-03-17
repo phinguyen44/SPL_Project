@@ -22,7 +22,10 @@ nocite: |
 
 
 ```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
-wd = paste0(Sys.getenv("USERPROFILE"), "/splrepo/SPL_Project")
+
+# NOTE: Please change the WD in order to run the file.
+
+wd = paste0(Sys.getenv("HOME"), "/Documents/Projects/SPL_Project")
 knitr::opts_knit$set(root.dir = wd)
 
 ```
@@ -34,8 +37,8 @@ knitr::opts_chunk$set(fig.pos = 'H')
 ```
 
 ```{r, eval = TRUE, echo = FALSE, cache = TRUE, include = FALSE}
- source("Scripts/SummaryStatistics.R")
- source("Scripts/ProbitRegression.R")
+ source("Quantlets/SPL_ELP_SummaryStatistics/SPL_ELP_SummaryStatistics.R")
+ source("Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R")
 ```
 
 
@@ -261,7 +264,7 @@ Since we are working with a cross-national survey, it is useful to to present an
 
 An efficient way of separating the easySHARE data set into country, gender, and age is explained in the following. In order to minimize hard-coding and possibly related errors, we use the `expand.grid` function to expand a grid between named variables in the data set. This allows us to calculate the necessary summary statistics for all combinations of country, gender, and age.
 
-We create the function `labor()`, which calculates labor participation rates for the corresponding country, gender, and age cell within the grid. The `group.share()` function calculates the average or percentage for an input data frame and a column name by country. As it is applied on a data frame grouped by gender, one possible outcome is the average grip strength for Swedish women included in the survey. The particular share is calculated by finding the sum of occurences and dividing by their total, represented by the length of the vector.
+We create the function `labor()`, which calculates labor participation rates for the corresponding country, gender, and age cell within the grid. The `group.share()` function calculates the average or percentage for an input data frame and a column name by country. The particular share is calculated by finding the sum of occurences and dividing by their total, represented by the length of the vector.
 
 ```{r, eval = FALSE}
 [52]  # Function for calculation group shares per country
@@ -315,7 +318,7 @@ Within the code below, `args.list` contains three sub-lists divided by country (
 
 The resulting `output` list can be easily bound into a data frame and arranged using `dplyr`. We then use `tidyr::spread` in order to spread the variable `Var3`, being the three age groups, into separate columns. Using the pipe operator `%>%` keeps our code compact and avoids unnecessary variable assignment and inefficient memory requirements.
 
-In the next code chunk, `vars` is assigned to be a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes in the underlying data frame and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the column names that contain 'labor'. This is forwarded as a name call to the second argument in `group.share` (comment: name the first code chunk in this section). It is used to subset the target data frame `df` by the extracted variable names containing the string "labor".
+In the next code chunk, `vars` is assigned to be a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes in the underlying data frame and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the column names that contain 'labor'. This is forwarded as a name call to the second argument in `group.share`. It is used to subset the target data frame `df` by the extracted variable names containing the string "labor".
 
 Since this task involves invoking a function upon multiple list elements, `lapply` is the best candidate in order to construct labor participation rates grouped by gender, (optionally) by country and classified into non participation, part time and full time work.
 
@@ -331,7 +334,7 @@ Since this task involves invoking a function upon multiple list elements, `lappl
 
 ## Empirical Results
 
-We can verify the validity of our results by comparing them directly with the findings in the original paper. Before interpreting the data, we advise to note that some country's participants are generally older than other ones. As the evaluation of the probit model shows, we figure age to have a negative impact on health. Hence certain samples may appear less healthy than others due to the fact that they are older on average. Additionally, depending on the national pension schemes, workers may have a different incentive to extend or restrict working depending on their age [@kalwij2005labour].
+We can verify the validity of our results by comparing them directly with the findings in the original paper. Before interpreting the data, we advise to note that some country's participants are generally older than other ones. As the evaluation of the probit model shows, we figure age to have a negative impact on health. Hence certain samples may appear less healthy than others due to the fact that they are older on average. 
 
 As depicted in the table below, the mean value of chronic diseases is 75%. Conversely, 79% out of the 12689 participants have a good self-perceived health. At first sight, one may deduce that the majority considers themselves to be healthy despite the prevalence of a chronic disease. But the use of the arithmetic mean is sensitive towards outliers and the amount of chronic diseases is in fact counted numerically. In combination, these values indicate an uneven distribution. Surprisingly, the share of overweight people is only 42% compared to an EU-average which @eurostat reports reports to be 59.6% among 45 to 64 year old citizens. However, information on obesity grouped by age is not available to us.
 
@@ -476,7 +479,7 @@ By means of the presented model, we evaluate how labor force participation behav
 
 These main results are validated by the analysis. As shown representatively on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases are negatively related to employment. The overall negative influence and the statistical significance of age on the dependent variable is growing with increasing age. Conversely, high education and having second education positively predict labor force participation for the specified group, but statistical significance usually restricted to one of them. Additionally, we find maximum grip strength to be statistically significant in multiple models. Having children or a partner does not appear to make a difference. Especially the negative influence of age is extraordinarily stable across different models.
 
-```{r, eval = TRUE, results = 'asis', echo = FALSE, message = FALSE, warning = FALSE}
+```{r, eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
 library("xtable", quietly = TRUE)
 xtab = xtable(mfx.Models[[1]]$fit, caption = "Marginal effects of health and age related variables on the probability of labor market participation of Austrian women")
 
