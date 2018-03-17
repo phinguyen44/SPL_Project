@@ -12,6 +12,8 @@
 # Template files
 Report/Template_cache
 Report/Template_files
+Report/SPL_EuroLaborParticipation_FinalReport_cache
+Report/SPL_EuroLaborParticipation_FinalReport_files
 
 # Other
 .vscode
