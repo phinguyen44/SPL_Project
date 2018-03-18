@@ -80,7 +80,7 @@ Seminar Paper by  \linebreak
 \medskip
 
 
-Berlin, 2018-03-16 \linebreak
+Berlin, 2018-03-18 \linebreak
 
 \end{center}
 
@@ -350,11 +350,13 @@ $$ P(Y = 1 | X = x) = \Phi (x' \beta) \tag{1} $$
 
 The error term is assumed to be independent and identically distributed (@wooldridge2012). Using this model, it is investigated how the probability of labor force participation is affected by health and age variables. Whereas a simple linear regression allows for direct interpretation of the estimated coefficients, this is not the case for probit models where we deal with non-linear effects. Instead of interpreting the model coefficients, we focus on marginal effects. The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a ceteris paribus change of $x_j$ on the conditional probability that the response variable Y is realized as one. In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is dependent on x.
 
-@wooldridge2012 specifies two possible interpretations of the marginal effect. The "Partial Effect at the Average" (PEA) denotes the marginal effect of a regressor on an average person ($\frac{1}{n}\Sigma_{x_i}$). Problematic are discrete $x_i$ because the resulting averages do not represent anybody in particular. Furthermore, in case of a continuous explanatory variable wrapped inside a non-linear function, it remains unclear whether to apply the average over the function or insert the average into named function. We therefore focus on the "Average Partial/Marginal Effect" (APE), which describes the average effect of a regressor on the probability that $Y = 1$ of all individuals. @dergutedietmar defines it as
+@wooldridge2012 specifies two possible interpretations of the marginal effect. The "Partial Effect at the Average" (PEA) and  "Average Partial Effect". Following the approach of @kalwij2005labour, we focus on PEA, which denotes the marginal effect of a regressor on an average person ($\frac{1}{n}\Sigma_{x_i}$).
+@dergutedietmar defines PEA it as
 
-$$ APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1 \tag{2} $$
-
-where $\beta$ is the vector of coefficients and $x_i$ is the vector of observations at index i. $\Phi$ represents the cumulative standard normal distribution function.
+$$
+PEA = \Phi(\hat{\beta_0} + \hat{\beta_1} \Sigma_{i = 1}^n x_i)\beta_1
+$$
+where $\beta$ is the vector of coefficients and $x_i$ is the vector of observations at index i. $\Phi$ represents the cumulative standard normal distribution function. Problematic are discrete $x_i$ because the resulting averages do not represent anybody in particular. Therefore, the marginal effects for binary variables are usually evaluated for the change from zero to one.
 
 ## Implementation
 
@@ -711,7 +713,7 @@ employment.age    = employment.age[,new.order]
 
 library(stringr)
 rownames(employment.age)  = str_sub(rownames(employment.age), end= -6)
-knitr::kable(employment.age[12:22,], caption = "Men's current and counterfactual (CF) labor share for different age groups", digits = 2, align = "l")
+knitr::kable(employment.age[12:22,], caption = "Men's current and counterfactual labor share for different age groups", digits = 2, align = "l")
 ```
 
 \clearpage
@@ -1886,7 +1888,7 @@ of others than the indicated sources. All passages which are literally or in gen
 out of publications or other sources are marked as such.
 \bigskip
 
-Berlin, 2018-03-16
+Berlin, 2018-03-18
 
 \smallskip
 
