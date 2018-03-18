@@ -108,7 +108,8 @@ Berlin, 2018-03-16 \linebreak
 \newpage
 
 \section{Introduction}
-The proportion of elderly people in Europe continues to rise and is expected to impose major social, fiscal and economic challenges in the future. According to official projections, half of the European population is expected to be 50 years or older by 2050 [@eurostat2012active]. Analyzing the relationship between aging populations, health indicators and labor force participation is essential to come up with suitable policy responses to those demographic changes. Empirical results on the relation between health, well-being and employment are ambiguous. While some studies show that poor health contributes to early retirement [@cai2006health; @karpansalo2004perceived; @monden2005changing], another branch of research suggests the opposite effect: that unemployment has negative effects on well-being and health [@shields2005exploring; @kassenboehmer2008you].
+
+The proportion of elderly people in Europe continues to rise and is expected to impose major social, fiscal and economic challenges in the future. According to official projections, half of the European population is expected to be 50 years or older by 2050 [@eurostat2012active]. Analyzing the relationship between aging populations, health indicators and labor force participation is essential to come up with suitable policy responses to those demographic changes. Empirical results on the relation between health, well-being and employment are ambiguous. While some studies show that poor health contributes to early retirement [@cai2006health; @karpansalo2004perceived; @monden2005changing], another branch of research suggests the opposite effect: Unemployment has also been found to have negative effects on well-being and health [@shields2005exploring; @kassenboehmer2008you].
 
 The Survey of Health, Ageing and Retirement in Europe (SHARE) launched in 2004 is an excellent research base for aging related research designs. This multidisciplinary and cross-national panel database of data on health, socio-economic status and social networks contains data of more than 120,000 individuals aged 50 or older [@borsch2017survey]. Based on the first SHARE data release, @kalwij2005labour analyze the impact of different health indicator on individuals’ participation decisions in 11 European countries. They find that health effects on labor force participation behavior of individuals aged 50-64 differ considerable between countries, age groups and gender.
 
@@ -121,20 +122,17 @@ lays the foundation for two Wald tests that can be used to test the joint signif
 \newpage
 
 \section{Data Cleaning and Manipulation}
-
-The original SHARE data set used by Kalwij and Vermeulen (2005), released in spring 2005, contains data on the life circumstances of eligible members from approximately 18,000 households. The SHARE survey contains a variety of different health, social, and socioeconomic indicators. SHARE contains data from eleven countries: Austria, Belgium, Denmark, France, Germany, Greece, Italy, the Netherlands, Spain, Sweden and Switzerland.
+The SHARE survey is a panel data set covering data from six survey waves carried out between 2004 and 2015. It consists of a variety of different health, social, and socioeconomic indicators from 27 European countries. The analysis conducted by Kalwij and Vermeulen (2005) is based on the first wave of the SHARE data set. Their sample contains observations from approximately 18,000 households from eleven European countries that participated in the first wave between 2004 and 2005.
 
 \subsection{Theory and Design}
 
-The easySHARE data set, released in spring 2017, is the data set for which we will be focusing on in this paper. It is a panel data set of more than 100,000 individuals covering data from six survey waves carried out between 2004 and 2015. As can be derived from its name, it is designed to be a simplified version of the broader SHARE data set. As a result, the data set includes slightly different observations and does not provide the same level of granularity in variables broader SHARE data set, which we shall show below.
-
-The rest of this section describes our process of data transformation, aggregation, and cleaning , not only to match as closely as possible the initial SHARE data set, but also to convert our data sets into a more accessible state for future analyses.
+The easySHARE data set, released in spring 2017, is the basis of the following analysis. As can be derived from its name, it is designed to be a simplified version of the broader SHARE data set. As a result, the data set includes slightly less observations and does not provide the same level of granularity in variables compared to broader SHARE data set. Our main aspiration regarding the data cleaning process is to make our code readily accessible and comprehensible for other users of the easySHARE data set. The rest of this section describes our process of data transformation, aggregation, and cleaning, not only to match as closely as possible to the initial easySHARE data set, but also to convert our data sets into a more accessible state for future analyses.
 
 \subsection{Implementation}
 
 The `read.and.clean()` function is designed to take the raw easySHARE data set file, which is provided in an `.rda` file format, and convert that into a list of data frames. The function additionally accepts a wave number as an argument. Although we are only concerned with the initial wave for our study, this additional parameter may allows us to conduct supplementary panel studies. The function only runs specifically with the raw easySHARE data set (`easySHARE_rel6_0_0.rda`), which is the default `dataset` argument. The `dataset` argument may alternatively be specified to point to the directory where that data set is located. Otherwise it is assumed that it is located in the root directory.
 
-We begin by initializing and downloading the packages (if necessary) required for this function. Much of the function utilizes the functions in the `tidyverse` family of functions developed by Hadley Wickham, namely  `dplyr` and `magrittr`. The `dplyr` package is designed for uncomplicated data manipulation, and it works specifically with data frames. The package provides a consistent set of verbs that do a small thing very well, such as aggregation, selection, filtering, or creation of new variables. The `magrittr` package expands upon this further with the pipe operator `%>%`, which enables the chaining of smaller functions to create something more complex.
+We begin by initializing and downloading the packages (if necessary) required for this function. Much of the function utilizes the functions in the `tidyverse` family of functions developed by Hadley Wickham, namely  `dplyr` and `magrittr`. The `dplyr` package is designed for uncomplicated data manipulation, and it works specifically with data frames. The package provides a consistent set of verbs that perform small task very well, such as aggregation, selection, filtering, or creation of new variables. The `magrittr` package expands upon this further with the pipe operator `%>%`, which enables the chaining of smaller functions to create something more complex.
 
 ```{r eval=FALSE, echo=TRUE}
 [16]    neededPackages = c("dplyr", "magrittr", "infuser", "countrycode")
@@ -168,7 +166,7 @@ We continue with basic filtering to select only variables that are pertinent to 
 
 We use the `countrycode` package to change the country codes into human-friendly country names. Then we make minor transformations to the variables. There are minor differences between the data set that Kalwij and Vermeulen (2005) use and the easySHARE data set, which means we must make certain assumptions in our data cleaning process. For example, certain questions in the survey are an aggregated total of a series of questions, such as the types of chronic diseases the subjects suffer from. Whereas the original authors have access to the specific diseases, we are only provided a count of the total number. Therefore we replace certain variables with the closest relative we have available. In other cases, multiple variables are provided in our data set but it is ambiguous which one the original authors use. An interesting example is employment status: our data set contains one variable for type of employment (full-time, part-time, or not working) and one for labor hours (the number of hours worked by the survey respondent). However, some respondents gave answers that ran counter (for example, saying they worked full-time but only working 20 hours a week). The differences in answers can be attributed to varying interpretations of survey responses.
 
-A simplified example of the final script is shown below.
+A simplified example of the final script is shown below (line 91 - 126).
 
 ```{r eval=FALSE}
 [91]    df.out       = df %>%
@@ -190,9 +188,9 @@ A simplified example of the final script is shown below.
 [126]           set_rownames(NULL)                          # reset row numbering
 ```
 
-Our last step involves splitting the data sets, standardizing any numeric variables, converting the data frames into a model matrix, then storing the resultant data frames into a list that is the final object returned by the function.
+Our last step involves splitting the data sets, standardizing all numeric variables, converting the data frames into a model matrix and storing the resultant data frames into a list that is the final object returned by the function.
 
-The data frames are split into separate country and gender splits, since we will create separate regressions for each of these splits. Then we apply a custom-built standardization function, which finds and standardizes all numeric variables and ignores all other variables. Finally, we use a custom-built function that takes advantage of the base `model.matrix()` function to convert all split data frames into a model matrix. This useful function converts all logical vectors into dummies to replicate the process used in the paper. A corollary benefit is that the resultant data frames can be directly used in R's in-built regression functions.
+The data frames are split into separate country and gender splits since we will create separate regressions for each of these splits. Then we apply the custom-built `standardize.df()` function, which finds and standardizes all numeric variables and ignores all other variables. Finally, we use a custom-built function that takes advantage of the base `model.matrix()` function to convert all split data frames into a model matrix. This useful function `dummify()` converts all logical vectors into dummies to replicate the process used in the paper. A corollary benefit is that the resultant data frames can be directly used in R's in-built regression functions.
 
 ```{r eval=FALSE}
 [146]    standardize.df = function(df) {
@@ -249,9 +247,10 @@ Since we are working with a cross-national survey, it is useful to to present an
 
 ## Implementation
 
-An efficient way of separating the easySHARE data set into country, gender, and age is explained in the following. In order to minimize hard-coding and possibly related errors, we use the `expand.grid` function to expand a grid between named variables in the data set. This allows us to calculate the necessary summary statistics for all combinations of country, gender, and age.
+An efficient way of separating the easySHARE data set into country, gender, and age is explained in the following. In order to minimize hard-coding and possibly related errors, we use the `expand.grid()` function to expand a grid between named variables in the data set. This allows us to calculate the necessary summary statistics for all combinations of country, gender, and age.
 
-We create the function `labor()`, which calculates labor participation rates for the corresponding country, gender, and age cell within the grid. The `group.share()` function calculates the average or percentage for an input data frame and a column name by country. The particular share is calculated by finding the sum of occurences and dividing by their total, represented by the length of the vector.
+We create the function `labor()`, which calculates labor participation rates for the corresponding country, gender, and age cell within the grid. The `group.share()` function calculates the average or percentage for an input data frame and a column name by country. As it is applied on a data frame grouped by gender, one possible outcome is the average grip strength for Swedish women included in the survey. The particular share is calculated by finding the sum of occurrences and dividing by their total, represented by the length of the vector.
+
 
 ```{r, eval = FALSE}
 [52]  # Function for calculation group shares per country
@@ -279,7 +278,7 @@ We create the function `labor()`, which calculates labor participation rates for
 [74]  }
 ```
 
-Within the code below, `args.list` contains three sub-lists divided by country (`c`), gender (`g`) and age (`a`). The list is passed as an argument to `labor`, which are simulatenously iterated over the sub-lists using `pmap`. This function has an advantage over a similar functions, since it allows multiple arguments and uses parallelization by default.
+Within the code below, `args.list` (line 81-83) contains three sub-lists divided by country (`c`), gender (`g`) and age (`a`). The list is passed as an argument to `labor`, which are simultaneously iterated over the sub-lists using `pmap`. This function has an advantage over a similar functions, since it allows multiple arguments and uses parallelization by default.
 
 ```{r, eval = FALSE}
 
@@ -305,7 +304,7 @@ Within the code below, `args.list` contains three sub-lists divided by country (
 
 The resulting `output` list can be easily bound into a data frame and arranged using `dplyr`. We then use `tidyr::spread` in order to spread the variable `Var3`, being the three age groups, into separate columns. Using the pipe operator `%>%` keeps our code compact and avoids unnecessary variable assignment and inefficient memory requirements.
 
-In the next code chunk, `vars` is assigned to be a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes in the underlying data frame and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the column names that contain 'labor'. This is forwarded as a name call to the second argument in `group.share`. It is used to subset the target data frame `df` by the extracted variable names containing the string "labor".
+In the next code chunk, `vars` is assigned to be a name vector that specifies whether labor force participation is full time, part time or not prevalent. Fetching it using `grep` from the cleaned data set makes it robust against name changes in the underlying data frame and ensures consistency. Conveniently, `grep` does not necessarily require regular expressions as an input. Instead, it is able to perform matches on simple strings and, in this case, returns the column names that contain 'labor'. This is forwarded as a name call to the second argument in `group.share` (comment: name the first code chunk in this section). It is used to subset the target data frame `df` by the extracted variable names containing the string "labor".
 
 Since this task involves invoking a function upon multiple list elements, `lapply` is the best candidate in order to construct labor participation rates grouped by gender, (optionally) by country and classified into non participation, part time and full time work.
 
@@ -321,23 +320,18 @@ Since this task involves invoking a function upon multiple list elements, `lappl
 
 ## Empirical Results
 
-We can verify the validity of our results by comparing them directly with the findings in the original paper. Before interpreting the data, we advise to note that some country's participants are generally older than other ones. As the evaluation of the probit model shows, we figure age to have a negative impact on health. Hence certain samples may appear less healthy than others due to the fact that they are older on average. 
+We can verify the validity of our results by comparing them directly with the findings in the original paper. Before interpreting the data, we advise to note that some country's participants are generally older than other ones. As the evaluation of the probit model shows, we figure age to have a negative impact on health. Hence certain samples may appear less healthy than others due to the fact that they are older on average. Additionally, depending on the national pension schemes, workers may have a different incentive to extend or restrict working depending on their age [@kalwij2005labour].
 
-As depicted in the table below, the mean value of chronic diseases is 75%. Conversely, 79% out of the 12689 participants have a good self-perceived health. At first sight, one may deduce that the majority considers themselves to be healthy despite the prevalence of a chronic disease. But the use of the arithmetic mean is sensitive towards outliers and the amount of chronic diseases is in fact counted numerically. In combination, these values indicate an uneven distribution. Surprisingly, the share of overweight people is only 42% compared to an EU-average which @eurostat reports reports to be 59.6% among 45 to 64 year old citizens. However, information on obesity grouped by age is not available to us.
+As depicted in the table below, 79% out of the 12689 participants have a good self-perceived health. The number of chronic diseases is 0.75 on average. Interpretation of this arithmetic mean may be misleading as it is sensitive towards outliers and since the number of chronic diseases is distributed quite unevenly between individuals. Surprisingly, the share of overweight people is only 42% compared to an EU-average which @eurostat reports reports to be 59.6% among 45 to 64 year old citizens. 
 
 ```{r, eval = TRUE, results = 'asis', warning = FALSE, comment = FALSE, message = FALSE, echo = FALSE}
 library("knitr")
 knitr::kable(t(round(sum.stats.tot, 2)), caption = "Summary Statistics over all groups")
-
 ```
 
-Having obtained the share of labor force participation grouped by gender, country and age, striking values can be presented. Among the selected countries, France, the Netherlands and Belgium have the fewest laborers among the oldest age group, which is ranging from 60 to 64 years. In the middle age group, ranging from 54-59, the Belgian and Italian population have sparse labor participation rates among men and women. Within the youngest age group including people from 50 to 54 years old, variance among men is generally low. This is not the case female workers, among which Greek, Italian and Spanish participation rates do not exceed 45.5%.
+Having obtained the share of labor force participation grouped by gender, country and age, striking values can be presented. Among the selected countries, France, the Netherlands and Belgium have the fewest labor share among the oldest age group, which is ranging from 60 to 64 years. In the middle age group, ranging from 54-59, the Belgian and Italian population have sparse labor participation rates among men and women. Within the youngest age group including people from 50 to 54 years old, variance among men is generally low. The opposite is true for 50 to 54 year-old female workers: Participation rate in southern countries do not exceed 45.5%, while they reach values close to 85% in northern countries.
 
-Concerning health statistics, Switzerland and the Scandinavian countries stand out positively. Together, they from a group that has an overall low percentage of obese people while achieving high shares of self-reported good health. Among all other countries, the Swiss have the least number of chronic diseases and fewest overweight. Only the Greek have lower share of activities of daily living (ADL). Switzerland and the Nordic countries additionally present the least non-participation rates and the highest full-time working rates. Summary statistics show that those countries, which strive in health topics, are related to high labor force participation rates in all categories.
-
-The overall age distribution is almost even in the younger age brackets (36% and 37%). The participants beween 54 and 59 years old make up 27%. Generally, labor force participation is higher for males than for females. This applies to part-time work, too.
-
-The overall results of the descriptive statistics align well with @kalwij2005labour.
+Concerning health statistics, Switzerland and the Scandinavian countries stand out positively. Together, they from a group that has an overall low percentage of obese people while achieving high shares of self-reported good health. Among all other countries, the Swiss have the lowest mean of chronic diseases and fewest overweight rate. Switzerland and the Nordic countries additionally present the least non-participation rates and the highest full-time working rates. Summary statistics show that those countries, which strive in health topics, are related to high labor force participation rates in all categories. The overall age distribution is almost even in the younger age brackets (36% and 37%). The participants beween 54 and 59 years old make up 27%. Generally, labor force participation is higher for males than for females. This applies to part-time work, too. The overall results of the descriptive statistics align well with @kalwij2005labour.
 
 ```{r, eval = TRUE, results = 'asis', warning = FALSE, comment = FALSE, message = FALSE, echo = FALSE}
 library("knitr")
@@ -348,44 +342,27 @@ knitr::kable(labor.part.f, caption = "Women: Labor Force Participation Rate by a
 
 \newpage
 
-\section{Crosssectional Probit Regression}
+\section{Cross-Sectional Probit Regression}
 
 ## Theory and Design
 
-Probit models allow for the estimation of binary, random response variables [@schild2017]. Probit and Logit models mitigate problems that would occur in case a (linear) regression would be used for a similar task. In this case, the range of the response variable would not be restricted to the interval (0,1). Consequently, as probabilities are commonly defined on this space, non-interpretable probability estimations would be delivered. While literature often refers to use maximum likelihood to estimate coefficients, the `glm` function in `R` uses iterative re-weighted least squares [@stats]. The estimated coefficients are subject to a Wald Test on joint significance.
+Probit models allow for the estimation of binary, random response variables [@schild2017]. One advantage of probit models over linear regression models is that the range of the response variable is restricted to the (0,1) interval. This allows us to interpret estimates derived from probit models as probabilities. Probit models are usually estimated based on Maximum Likelihood. The `glm` function in `R` uses iterative re-weighted least squares to find the maximum likelihood estimates for the probit coefficients [@stats]. @schild2017 defines the probit model formula as
 
-@schild2017 defines the model formula as
-$$
-P(Y = 1 | X = x) = \Phi (x' \beta) \tag{1}
-$$
-The error term is assumed to be independent and identically distributed (@wooldridge2012)
+$$ P(Y = 1 | X = x) = \Phi (x' \beta) $$
 
-Using this model, it is investigated how the probability of labor force participation is influenced by health and age variables.
+The error term is assumed to be independent and identically distributed (@wooldridge2012). Using this model, it is investigated how the probability of labor force participation is affected by health and age variables. Whereas a simple linear regression allows for direct interpretation of the estimated coefficients, this is not the case for probit models where we deal with non-linear effects. Instead of intpreting the model coefficients, we focus on marginal effects. The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a ceteris paribus change of $x_j$ on the conditional probability that the response variable Y is realized as one. In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is dependent on x.
 
-Whereas a simple linear regression allows for direct interpretation of the estimated coefficients, this is not the case for probit models. As we are particularly interested in the effects of certain regressors on the probability of labor force participation, we are especially focussing on the calculation and evaluation of marginal effects.
-The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a ceteris paribus change of $x_j$ on the conditional probability that the response variable Y is realized as one. In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is dependent on x.
+@wooldridge2012 specifies two possible interpretations of the marginal effect. The "Partial Effect at the Average" (PEA) denotes the marginal effect of a regressor on an average person ($\frac{1}{n}\Sigma_{x_i}$). Problematic are discrete $x_i$ because the resulting averages do not represent anybody in particular. Furthermore, in case of a continuous explanatory variable wrapped inside a non-linear function, it remains unclear whether to apply the average over the function or insert the average into named function. We therefore focus on the "Average Partial/Marginal Effect" (APE), which describes the average effect of a regressor on the probability that $Y = 1$ of all individuals. @dergutedietmar defines it as
 
-@wooldridge2012 specifies two possible interpretations of the mariginal effect. The "Partial Effect at the Average" (PEA) denotes the marginal effect of a regressor on an average person ($\frac{1}{n}\Sigma_{x_i}$). Problematic are discrete $x_i$ because the resulting averages do not represent anybody in particular. Furthermore, in case of a continuous explanatory variable wrapped inside a non-linear function, it remains unclear whether to apply the average over the function or insert the average into named function.
-
-According to @dergutedietmar, the Partial Effect at the Average is defined as
-
-$$
-PEA = \Phi(\hat{\beta_0} + \hat{\beta_1} \Sigma_{i = 1}^n x_i)\beta_1 \tag{2}
-$$
-
-The "Average Partial Effect"( or "Average Marginal Effect", APE) describes the effect of a regressor on the probability that $Y = 1$.
-@dergutedietmar defines it as
-
-$$
-APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1 \tag{3}
-$$
+$$ APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1 $$
 
 where $\beta$ is the vector of coefficients and $x_i$ is the vector of observations at index i. $\Phi$ represents the cumulative standard normal distribution function.
 
 ## Implementation
 
-As stated in the 'Read and Clean' section, `df.splits` is obtained using the `split` function. A list is returned, that seperates the cleaned data frame by country and gender.
-This structure is helpful throughout the following sections, as it enables us to build a series of concatenated `lapply` functions. This function invokes a c-loop that iterates over each list element. As `lapply` takes a list as an input and returns a list, too; it preserves the initial structure. First, it is used to create a probit model for each subset within the list. Since we are estimating with an intercept, the age 50 dummy variable is perfectly correlated with the other age dummies. Hence it is excluded due to multicollinearity.
+As stated in the 'Read and Clean' section, `df.splits` is obtained using the `split` function. A list is returned that separates the cleaned data frame by country and gender.
+
+This structure is helpful throughout the following sections because it enables us to build a series of concatenated `lapply` functions. This function invokes a c-loop that iterates over each list element. As `lapply` takes a list as an input and returns a list, too; it preserves the initial structure. First, it is used to create a probit model for each subset within the list. Since we are estimating with an intercept, the age 50 dummy variable is perfectly correlated with the other age dummies. Hence it is excluded to avoid multicollinearity.
 
 ```{r, eval = FALSE}
 [53]  # Probit for each country and gender
@@ -402,8 +379,7 @@ This structure is helpful throughout the following sections, as it enables us to
 [64]  allSummaries = lapply(allModels, summary)
 ```
 
-The loop below is a robust way to apply the Wald Test for the dataset subsetted by country and gender and utilises only health-related variables. A list intended to log is created, which tracks failure of applying the Wald Test on joint significance of the selected variables. `Try` ensures continuation of the loop despite possible errors. In case an error occurs, the class of `testOutput` will be `try-error` and consequently logged into named list at the index `i`. Since it preserves the structure as specified before, results can be easily transformed and named. This setup has proven to be useful for debugging our test as well as finding out that some health variables are empty for certain subgroups, leading to selective failure of the test.
-
+The loop below is a robust way to apply the Wald Test on health-related variables for the dataset subsetted by country and gender. A list intended to log is created, which tracks failure of applying the Wald Test on joint significance of the selected variables. `Try` ensures continuation of the loop despite possible errors. In case an error occurs, the class of `testOutput` will be `try-error` and consequently logged into named list at the index `i`. Since it preserves the structure as specified before, results can be easily transformed and named. This setup has proven to be useful for debugging our test as well as finding out that some health variables are empty for certain subgroups, leading to selective failure of the test.
 
 ```{r, eval = FALSE}
 [70]  # Wald Test for all models
@@ -434,7 +410,7 @@ The loop below is a robust way to apply the Wald Test for the dataset subsetted 
 [95]  colnames(wald.bound) = names(allModels)
 ```
 
-Furthermore, the application of the Wald Test can easily be substitued. We use a different Wald Test to validate our results.
+Furthermore, the application of the Wald Test can easily be substituted. We use a different Wald Test from the `aod` package to validate our results.
 
 ```{r, eval = FALSE}
 [82]    testOutput = try(wald.test(b = coef(ModelElement),
@@ -458,17 +434,13 @@ Marginal effects are calculated using `probitmfx`, which firstly recalculates a 
 
 ## Empirical Results
 
-By means of the presented model, we evaluate how labor force participation behavior of individuals aged 50-64 is influenced by age and demographic as well as health indicators  across 11 European countries. @kalwij2005labour summarize their own results as follows:
+By means of the presented model, we evaluate how labor force participation behavior of individuals aged 50-64 is affected by age and demographic as well as health indicators across 11 European countries. @kalwij2005labour summarize their own results as follows: In general, good health indicators are associated with higher labor force participation rates. Illness-related covariates have a negative effect on labor force participation rates. The influence of health (as captured by the indicators) on labor force participation differs between age groups, gender and across countries.
 
-- The influence of health (as captured by the indicators) on labor force participation differs among individuals and across countries
-- Health improvements are associated with higher labor force participation rates
-- Decreasing health explains decreasing labor force participation of the elderly in Europe
-
-These main results are validated by the analysis. As shown representatively on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases are negatively related to employment. The overall negative influence and the statistical significance of age on the dependent variable is growing with increasing age. Conversely, high education and having second education positively predict labor force participation for the specified group, but statistical significance usually restricted to one of them. Additionally, we find maximum grip strength to be statistically significant in multiple models. Having children or a partner does not appear to make a difference. Especially the negative influence of age is extraordinarily stable across different models.
+These main results are validated by our analysis. Table 4 shows a representative example of the estimation summary for Austrian women. Increasing age, obesity and the prevalence of chronic diseases are negatively related to employment. The overall negative influence and the statistical significance of age on the dependent variable is growing with increasing age. Conversely, high education and having second education positively predict labor force participation for the specified group, but statistical significance usually restricted to one of them. Additionally, we find maximum grip strength to be statistically significant in multiple models. Having children or a partner does not appear to make a difference. Especially the negative influence of age is extraordinarily stable across different models.
 
 ```{r, eval = TRUE, results = 'asis', echo = FALSE, message = FALSE, warning = FALSE}
 library("xtable", quietly = TRUE)
-xtab = xtable(mfx.Models[[1]]$fit, caption = "Marginal effects of health and age related variables on the probability of labor market participation of Austrian women")
+xtab = xtable(mfx.Models[[1]]$fit, caption = "Marginal effects for probability of labor market participation of Austrian women")
 
 print.xtable(xtab, caption.placement = "top", comment = FALSE)
 ```
