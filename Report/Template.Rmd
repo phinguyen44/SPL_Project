@@ -35,8 +35,8 @@ knitr::opts_chunk$set(fig.pos = 'H')
 ```
 
 ```{r, eval = TRUE, echo = FALSE, cache = TRUE, include = FALSE}
- source("Quantlets/SPL_ELP_SummaryStatistics/SPL_ELP_SummaryStatistics.R")
- source("Scripts/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R")
+source("Quantlets/SPL_ELP_SummaryStatistics/SPL_ELP_SummaryStatistics.R")
+source("Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R")
 ```
 
 \pagenumbering{gobble}
@@ -323,6 +323,7 @@ As depicted in the table below, 79% out of the 12689 participants have a good se
 
 ```{r, eval = TRUE, results = 'asis', warning = FALSE, comment = FALSE, message = FALSE, echo = FALSE}
 library("knitr")
+source("Quantlets/SPL_ELP_SummaryStatistics/SPL_ELP_SummaryStatistics.R")
 knitr::kable(t(round(sum.stats.tot, 2)), caption = "Summary Statistics over all groups")
 ```
 
