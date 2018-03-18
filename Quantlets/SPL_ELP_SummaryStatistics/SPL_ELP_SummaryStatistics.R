@@ -191,7 +191,8 @@ DF7 = rbind(labor.supply.f.df, tot.supply.m.df)
 
 listDF = list(DF1=DF1, DF2=DF2, DF3=DF3, DF4=DF4, DF5=DF5, DF6=DF6, DF7=DF7)
 
+# NOTE: Comment this section in if you want to save to CSV.
 # write to CSV's
-for (i in 1:length(listDF)) {
-    write.csv(listDF[[i]], paste0(names(listDF[i]), '.csv'))
-}
+# for (i in 1:length(listDF)) {
+#     write.csv(listDF[[i]], paste0(names(listDF[i]), '.csv'))
+# }
