@@ -532,7 +532,7 @@ In order to set up default values for the hypothesis specification, we make use 
 [52]    W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
 ```
 
-This means `joint.wald.test` will conduct a joint significance test on all model coefficients by default. The Wald test statistic is calculated via simple matrix algebra based on the provided input by the model summary. This formula is equivalent to equation YYY.
+This means `joint.wald.test` will conduct a joint significance test on all model coefficients by default. The Wald test statistic is calculated via simple matrix algebra based on the provided input by the model summary. This formula is equivalent to equation 6.
 
 The proper format of the specification vector `spec` is crucial as it is used to extract the needed estimates from the model coefficient vector and covariance matrix. To select the right covariance elements and degrees of freedom, `spec` must be a vector of integers of length $0< m \leq k$. Specifically, we make sure `spec` is neither logical nor contains any zero in line 27-30. Furthermore, we only allow for integers since we are testing the joint significance of coefficients.
 
@@ -551,7 +551,7 @@ The proper format of the specification vector `spec` is crucial as it is used to
 <!--     joint.wald.test -->
 <!-- ``` -->
 
-The general Wald test is designed in a similar manner, except it allows for the general formulation of linear hypothesis of the form $R \hat{\beta} = r$. The test statistic is given by equation YYY. As in the `joint.wald.test` function, we use local local if-else statements to setup a default settings. If only the model summary is given as an input, the `general.wald.test` conducts a joint significance test at a 95% confidence level.
+The general Wald test is designed in a similar manner, except it allows for the general formulation of linear hypothesis of the form $R \hat{\beta} = r$. The test statistic is given by equation 5. As in the `joint.wald.test` function, we use local local if-else statements to setup a default settings. If only the model summary is given as an input, the `general.wald.test` conducts a joint significance test at a 95% confidence level.
 
 The crucial elements for usage of this function are the correctly specified Jacobian matrix R and restriction vector r, which must be of size $m \times k$ and $m \times 1$ respectively. We additionally need to assure that R is of rank m. These conditions are tested in line 123-131.
 
@@ -574,7 +574,7 @@ The crucial elements for usage of this function are the correctly specified Jaco
 We furthermore check whether the `model.summary` has the right class and whether the significance level lies within the expected interval. Otherwise, the execution of the function will be stopped. In the second step, we make sure the matrix `R` and the restriction vector `r` have matching dimensions.
 
 \subsection{Empirical Results}
-We use our designed Wald test functions to check the null hypothesis that none of the four included health variables has an impact on labor participation for each country and for both men and women. The results for men can be seen in table XXX.
+We use our designed Wald test functions to check the null hypothesis that none of the four included health variables has an impact on labor participation for each country and for both men and women. The results for men can be seen in table 5.
 
 ```{r start_wald, echo = FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
 # SOURCE DATA
@@ -726,7 +726,7 @@ Finally, we calculate the employment rate for each age group in line 128 For thi
 Running the `empl.rate.age` function on a given model object will return a numerical vector containing the employment rate of the specified age groups.
 
 \subsection{Empirical Results}
-Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table XXX display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (ceteris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage points higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obesity in absolute terms, combined with the above average prevalence of chronic disease and obesity among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obesity in absolute terms. As expected, our results are in line with @kalwij2005labour general, though the estimated participation rates differ for some countries, as a result of differing samples.
+Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table 6 display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (ceteris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage points higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obesity in absolute terms, combined with the above average prevalence of chronic disease and obesity among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obesity in absolute terms. As expected, our results are in line with @kalwij2005labour general, though the estimated participation rates differ for some countries, as a result of differing samples.
 
 ```{r cf_code_eval, echo=FALSE, eval=TRUE, warning=FALSE, message=FALSE}
 # SOURCE DATA
