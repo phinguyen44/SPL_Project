@@ -37,8 +37,8 @@ knitr::opts_chunk$set(fig.pos = 'H')
 ```
 
 ```{r, eval = TRUE, echo = FALSE, cache = TRUE, include = FALSE}
- source("Quantlets/SPL_ELP_SummaryStatistics/SPL_ELP_SummaryStatistics.R")
- source("Quantlets/SPL_ELP_ProbitRegression/SPL_ELP_ProbitRegression.R")
+ source("Scripts/SummaryStatistics.R")
+ source("Scripts/ProbitRegression.R")
 ```
 
 
@@ -98,19 +98,6 @@ Berlin, 2018-03-16 \linebreak
 \newpage
 
 \listoffigures
-
-\newpage
-
-
-\begin{Large}
-\textbf{Abbreviations} \linebreak
-\end{Large}
-
-\begin{tabular}{ll}
-\textbf{XX} & XXXXXXXXXX     \\
-
-\end{tabular}
-
 
 \newpage
 
@@ -369,7 +356,7 @@ Probit models allow for the estimation of binary, random response variables [@sc
 
 @schild2017 defines the model formula as
 $$
-P(Y = 1 | X = x) = \Phi (x' \beta)\tag{1}
+P(Y = 1 | X = x) = \Phi (x' \beta) \tag{1}
 $$
 The error term is assumed to be independent and identically distributed (@wooldridge2012)
 
@@ -383,14 +370,14 @@ The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a
 According to @dergutedietmar, the Partial Effect at the Average is defined as
 
 $$
-PEA = \Phi(\hat{\beta_0} + \hat{\beta_1} \Sigma_{i = 1}^n x_i)\beta_1\tag{2}
+PEA = \Phi(\hat{\beta_0} + \hat{\beta_1} \Sigma_{i = 1}^n x_i)\beta_1 \tag{2}
 $$
 
 The "Average Partial Effect"( or "Average Marginal Effect", APE) describes the effect of a regressor on the probability that $Y = 1$.
 @dergutedietmar defines it as
 
 $$
-APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1\tag{3}
+APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1 \tag{3}
 $$
 
 where $\beta$ is the vector of coefficients and $x_i$ is the vector of observations at index i. $\Phi$ represents the cumulative standard normal distribution function.
@@ -479,11 +466,11 @@ By means of the presented model, we evaluate how labor force participation behav
 
 These main results are validated by the analysis. As shown representatively on the example below, which is a summary of the probability of Austrian women participating in the labor market as explained by the probit model, age and the prevalence of chronic diseases are negatively related to employment. The overall negative influence and the statistical significance of age on the dependent variable is growing with increasing age. Conversely, high education and having second education positively predict labor force participation for the specified group, but statistical significance usually restricted to one of them. Additionally, we find maximum grip strength to be statistically significant in multiple models. Having children or a partner does not appear to make a difference. Especially the negative influence of age is extraordinarily stable across different models.
 
-```{r, eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
+```{r, eval = TRUE, results = 'asis', echo = FALSE, message = FALSE, warning = FALSE}
 library("xtable", quietly = TRUE)
 xtab = xtable(mfx.Models[[1]]$fit, caption = "Marginal effects of health and age related variables on the probability of labor market participation of Austrian women")
 
-print.xtable(xtab, caption.placement = "top")
+print.xtable(xtab, caption.placement = "top", comment = FALSE)
 ```
 
 \pagebreak
@@ -545,7 +532,7 @@ In order to set up default values for the hypothesis specification, we make use 
 [52]    W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
 ```
 
-This means `joint.wald.test` will conduct a joint significance test on all model coefficients by default. The Wald test statistic is calculated via simple matrix algebra based on the provided input by the model summary. This formula is equivalent to equation YYY.
+This means `joint.wald.test` will conduct a joint significance test on all model coefficients by default. The Wald test statistic is calculated via simple matrix algebra based on the provided input by the model summary. This formula is equivalent to equation 6.
 
 The proper format of the specification vector `spec` is crucial as it is used to extract the needed estimates from the model coefficient vector and covariance matrix. To select the right covariance elements and degrees of freedom, `spec` must be a vector of integers of length $0< m \leq k$. Specifically, we make sure `spec` is neither logical nor contains any zero in line 27-30. Furthermore, we only allow for integers since we are testing the joint significance of coefficients.
 
@@ -564,7 +551,7 @@ The proper format of the specification vector `spec` is crucial as it is used to
 <!--     joint.wald.test -->
 <!-- ``` -->
 
-The general Wald test is designed in a similar manner, except it allows for the general formulation of linear hypothesis of the form $R \hat{\beta} = r$. The test statistic is given by equation YYY. As in the `joint.wald.test` function, we use local local if-else statements to setup a default settings. If only the model summary is given as an input, the `general.wald.test` conducts a joint significance test at a 95% confidence level.
+The general Wald test is designed in a similar manner, except it allows for the general formulation of linear hypothesis of the form $R \hat{\beta} = r$. The test statistic is given by equation 5. As in the `joint.wald.test` function, we use local local if-else statements to setup a default settings. If only the model summary is given as an input, the `general.wald.test` conducts a joint significance test at a 95% confidence level.
 
 The crucial elements for usage of this function are the correctly specified Jacobian matrix R and restriction vector r, which must be of size $m \times k$ and $m \times 1$ respectively. We additionally need to assure that R is of rank m. These conditions are tested in line 123-131.
 
@@ -587,7 +574,7 @@ The crucial elements for usage of this function are the correctly specified Jaco
 We furthermore check whether the `model.summary` has the right class and whether the significance level lies within the expected interval. Otherwise, the execution of the function will be stopped. In the second step, we make sure the matrix `R` and the restriction vector `r` have matching dimensions.
 
 \subsection{Empirical Results}
-We use our designed Wald test functions to check the null hypothesis that none of the four included health variables has an impact on labor participation for each country and for both men and women. The results for men can be seen in table XXX.
+We use our designed Wald test functions to check the null hypothesis that none of the four included health variables has an impact on labor participation for each country and for both men and women. The results for men can be seen in table 5.
 
 ```{r start_wald, echo = FALSE, eval = TRUE, results = "asis", warning = FALSE, message = FALSE}
 # SOURCE DATA
@@ -676,7 +663,7 @@ The simplest method to is to replace the existing covariates values $X$ with cou
 
 Obtaining the counterfactual probabilities $\hat{y}_{cf}$ requires a two-step procedure. First, the regular probit regression of $y$ on $X$ is tun to obtain the estimated coefficients $\hat{\beta}$. Second, the counterfactual probabilities for each individuals $\Pi_i$ are calculated by predicting y based on $X_{cf}$ and the estimated coefficients.
 
-$$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) = \Phi(xi_{cf}'{\beta})\tag{7} $$
+$$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) = \Phi(xi_{cf}'{\beta}) \tag{7} $$
 
 We can assess counterfactual health-related effects by comparing the actual and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$. We gain closer insights into the non-linear relation between health effects and participation by calculating $\Pi_{ac}$ and $\Pi_{cf}$ for different age groups. This also allows assessing the proportion of decline in participation that is due to decline in health condition according to our model estimates.
 
@@ -739,7 +726,7 @@ Finally, we calculate the employment rate for each age group in line 128 For thi
 Running the `empl.rate.age` function on a given model object will return a numerical vector containing the employment rate of the specified age groups.
 
 \subsection{Empirical Results}
-Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table XXX display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (ceteris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage points higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obesity in absolute terms, combined with the above average prevalence of chronic disease and obesity among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obesity in absolute terms. As expected, our results are in line with @kalwij2005labour general, though the estimated participation rates differ for some countries, as a result of differing samples.
+Running our created counterfactual functions on all the created subsamples allows us to assess the labor participation potential of a healthy population for different countries and both genders. Table 6 display these results on an aggregate level. On average, the predicted participation rate is 4.5 percentage points given the perfectly healthy individuals (ceteris paribus), although there are quite some outliers. For Dutch women, the estimated counterfactual participation rate is 8 percentage points higher, corresponding to a relative increase of 18%. This is due to the high coefficients of chronic disease and obesity in absolute terms, combined with the above average prevalence of chronic disease and obesity among Dutch women. For men, the results are even more pronounced. In Spain, for example, the counterfactual participation rate is almost 12 percentage points higher, driven by high coefficients of chronic disease, medical conditions and obesity in absolute terms. As expected, our results are in line with @kalwij2005labour general, though the estimated participation rates differ for some countries, as a result of differing samples.
 
 ```{r cf_code_eval, echo=FALSE, eval=TRUE, warning=FALSE, message=FALSE}
 # SOURCE DATA
