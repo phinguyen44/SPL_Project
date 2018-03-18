@@ -19,8 +19,6 @@ nocite: |
   @dplyr, @magrittr, @infuser, @countrycode, @tidyr, @purrr, @formattable, @webshot, @htmltools, @aod, @devtools, @margins, @mfx, @ggplot2, @gridExtra, @matrix
 ---
 
-
-
 ```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
 
 # NOTE: Please change the WD in order to run the file.
@@ -40,7 +38,6 @@ knitr::opts_chunk$set(fig.pos = 'H')
  source("Scripts/SummaryStatistics.R")
  source("Scripts/ProbitRegression.R")
 ```
-
 
 \pagenumbering{gobble}
 
@@ -348,13 +345,13 @@ knitr::kable(labor.part.f, caption = "Women: Labor Force Participation Rate by a
 
 Probit models allow for the estimation of binary, random response variables [@schild2017]. One advantage of probit models over linear regression models is that the range of the response variable is restricted to the (0,1) interval. This allows us to interpret estimates derived from probit models as probabilities. Probit models are usually estimated based on Maximum Likelihood. The `glm` function in `R` uses iterative re-weighted least squares to find the maximum likelihood estimates for the probit coefficients [@stats]. @schild2017 defines the probit model formula as
 
-$$ P(Y = 1 | X = x) = \Phi (x' \beta) $$
+$$ P(Y = 1 | X = x) = \Phi (x' \beta) \tag{1} $$
 
-The error term is assumed to be independent and identically distributed (@wooldridge2012). Using this model, it is investigated how the probability of labor force participation is affected by health and age variables. Whereas a simple linear regression allows for direct interpretation of the estimated coefficients, this is not the case for probit models where we deal with non-linear effects. Instead of intpreting the model coefficients, we focus on marginal effects. The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a ceteris paribus change of $x_j$ on the conditional probability that the response variable Y is realized as one. In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is dependent on x.
+The error term is assumed to be independent and identically distributed (@wooldridge2012). Using this model, it is investigated how the probability of labor force participation is affected by health and age variables. Whereas a simple linear regression allows for direct interpretation of the estimated coefficients, this is not the case for probit models where we deal with non-linear effects. Instead of interpreting the model coefficients, we focus on marginal effects. The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a ceteris paribus change of $x_j$ on the conditional probability that the response variable Y is realized as one. In case of a probit model, the marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is dependent on x.
 
 @wooldridge2012 specifies two possible interpretations of the marginal effect. The "Partial Effect at the Average" (PEA) denotes the marginal effect of a regressor on an average person ($\frac{1}{n}\Sigma_{x_i}$). Problematic are discrete $x_i$ because the resulting averages do not represent anybody in particular. Furthermore, in case of a continuous explanatory variable wrapped inside a non-linear function, it remains unclear whether to apply the average over the function or insert the average into named function. We therefore focus on the "Average Partial/Marginal Effect" (APE), which describes the average effect of a regressor on the probability that $Y = 1$ of all individuals. @dergutedietmar defines it as
 
-$$ APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1 $$
+$$ APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1 \tag{2} $$
 
 where $\beta$ is the vector of coefficients and $x_i$ is the vector of observations at index i. $\Phi$ represents the cumulative standard normal distribution function.
 
@@ -458,20 +455,18 @@ In the context of probit regression, the Wald test can be used to test multiple 
 Depending on the estimation method and distributional assumptions, the Wald statistic can be formulated in different ways. The general form of the Wald statistic after MLE for testing hypothesis regarding our $k \times 1$ parameter vector $\theta$ is given by
 $$
 W = c(\hat{\theta})'[\nabla_{\theta}c(\hat{\theta})\hat{V}\nabla_{\theta}c(\hat{\theta})]^{-1}c(\hat{\theta})
-\tag{4}
+\tag{3}
 $$
 
 
 where $c(\hat{\theta})$ is a $m \times 1$ vector of linear or nonlinear restrictions, $\nabla_{\theta}c(\hat{\theta})$ is the $m \times k$ Jacobian of $c(\hat{\theta})$ evaluated
 at $\hat{\theta}$ and $\hat{V}$ is the estimated asymptotic covariance matrix [@wooldridge2010econometric, 463]. Under H0, the Wald test statistic is asymptotically $\chi2_m$ distributed, with m being the number of specified restrictions. In order to assure the test statistic W has the assumed limiting distribution, we need to impose some restrictions: Under H0, $\theta$ must lie within parameter space and R must be of rank m [@wooldridge2010econometric, 362].
 We limit our attention to testing a set of general linear restrictions since the Wald test is not invariant to the re-formulation of non-linear hypothesis. We thus formulate our null hypothesis in accordance with the common linear restriction structure of H0: $R \hat{\beta} = r$ against the alternative H1:  $R \hat{\beta} \neq r$ to facilitate the derivation of our test statistics, where R is a $m \times k$ matrix of rank m (equivalent to the Jacobian), whereas the restriction function r is a $m \times 1$ vector. Given the conditions mentioned above, the Wald statistic can then be rewritten as
-$$    W = (R \hat{\beta} - r)'[R \hat{V}R']^{-1}(R \hat{\beta} - r)
-\tag{5}
-$$
+
+$$    W = (R \hat{\beta} - r)'[R \hat{V}R']^{-1}(R \hat{\beta} - r) \tag{4} $$
 which facilitates our calculations [@greene2012econometric, 527-529; @wooldridge2010econometric, 362]. When we are interested in the joint significance of a subset of $s$ coefficients, the Wald test statistic $W \stackrel{a}{\sim}\chi2_s$ can be simplified further [@wooldridge2010econometric, 362]:
- $$   W = \hat{\beta}_s'[R\hat{V}R']^{-1}\hat{\beta}_s = \hat{\beta}_s'[\hat{V}_s]^{-1}\hat{\beta}_s
- \tag{6}
- $$
+
+$$   W = \hat{\beta}_s'[R\hat{V}R']^{-1}\hat{\beta}_s = \hat{\beta}_s'[\hat{V}_s]^{-1}\hat{\beta}_s \tag{5} $$
 
 \subsection{Implementation}
 In order to test the linear hypothesis regarding the model specifications, we design two Wald test versions. The function `joint.wald.test` can be used to test the joint significance of a subset of model coefficients, whereas `general.wald.test` allows for us to check any linear hypothesis. The two tests are designed in a way that they align well with the `glm` estimation output. The only required input is the model summary from `glm` estimation, whereas the significance level and test specifications are optional.
@@ -504,7 +499,7 @@ In order to set up default values for the hypothesis specification, we make use 
 [52]    W = t(beta[spec]) %*% solve(Var_beta_est[spec,spec]) %*% beta[spec]
 ```
 
-This means `joint.wald.test` will conduct a joint significance test on all model coefficients by default. The Wald test statistic is calculated via simple matrix algebra based on the provided input by the model summary. This formula is equivalent to equation 6.
+This means `joint.wald.test` will conduct a joint significance test on all model coefficients by default. The Wald test statistic is calculated via simple matrix algebra based on the provided input by the model summary. This formula is equivalent to equation 5.
 
 The proper format of the specification vector `spec` is crucial as it is used to extract the needed estimates from the model coefficient vector and covariance matrix. To select the right covariance elements and degrees of freedom, `spec` must be a vector of integers of length $0< m \leq k$. Specifically, we make sure `spec` is neither logical nor contains any zero in line 27-30. Furthermore, we only allow for integers since we are testing the joint significance of coefficients.
 
@@ -523,7 +518,7 @@ The proper format of the specification vector `spec` is crucial as it is used to
 <!--     joint.wald.test -->
 <!-- ``` -->
 
-The general Wald test is designed in a similar manner, except it allows for the general formulation of linear hypothesis of the form $R \hat{\beta} = r$. The test statistic is given by equation 5. As in the `joint.wald.test` function, we use local local if-else statements to setup a default settings. If only the model summary is given as an input, the `general.wald.test` conducts a joint significance test at a 95% confidence level.
+The general Wald test is designed in a similar manner, except it allows for the general formulation of linear hypothesis of the form $R \hat{\beta} = r$. The test statistic is given by equation 4. As in the `joint.wald.test` function, we use local local if-else statements to setup a default settings. If only the model summary is given as an input, the `general.wald.test` conducts a joint significance test at a 95% confidence level.
 
 The crucial elements for usage of this function are the correctly specified Jacobian matrix R and restriction vector r, which must be of size $m \times k$ and $m \times 1$ respectively. We additionally need to assure that R is of rank m. These conditions are tested in line 123-131.
 
@@ -635,7 +630,7 @@ The simplest method to is to replace the existing covariates values $X$ with cou
 
 Obtaining the counterfactual probabilities $\hat{y}_{cf}$ requires a two-step procedure. First, the regular probit regression of $y$ on $X$ is tun to obtain the estimated coefficients $\hat{\beta}$. Second, the counterfactual probabilities for each individuals $\Pi_i$ are calculated by predicting y based on $X_{cf}$ and the estimated coefficients.
 
-$$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) = \Phi(xi_{cf}'{\beta}) \tag{7} $$
+$$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) = \Phi(xi_{cf}'{\beta}) \tag{6} $$
 
 We can assess counterfactual health-related effects by comparing the actual and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$. We gain closer insights into the non-linear relation between health effects and participation by calculating $\Pi_{ac}$ and $\Pi_{cf}$ for different age groups. This also allows assessing the proportion of decline in participation that is due to decline in health condition according to our model estimates.
 
@@ -713,7 +708,7 @@ knitr::kable(employment[1:11,], caption = "Women's current and counterfactual la
             digits = 2, align = "c")
 ```
 
-It must be stressed that the counterfactual estimates presented by @kalwij2005labour should be interpreted with caution. First of all, the transformation of the status quo populations with perfectly health individuals is artificial and represents a state that could not realistically be reached with any policy. Second, some of the high counterfactual rates are driven by relatively high model coefficients that are not statistically significant, indicating non-robust results. Third, the aggregate country estimates do not properly display the variation of health effects among different age groups. In order to address this, we also analyze the results of the counterfactual exercise with help of our `empl.rate.age` function. The output of this for men is displayed in table XXX. As expected, both the current and counterfactual labor shares decrease at higher age. The difference between current and counterfactual shares is also increasing in age, though some exceptions (Austria, Italy and Greece) exist. Again, our results are in line with those obtained by @kalwij2005labour.
+It must be stressed that the counterfactual estimates presented by @kalwij2005labour should be interpreted with caution. First of all, the transformation of the status quo populations with perfectly health individuals is artificial and represents a state that could not realistically be reached with any policy. Second, some of the high counterfactual rates are driven by relatively high model coefficients that are not statistically significant, indicating non-robust results. Third, the aggregate country estimates do not properly display the variation of health effects among different age groups. In order to address this, we also analyze the results of the counterfactual exercise with help of our `empl.rate.age` function. The output of this for men is displayed in table 7. As expected, both the current and counterfactual labor shares decrease at higher age. The difference between current and counterfactual shares is also increasing in age, though some exceptions (Austria, Italy and Greece) exist. Again, our results are in line with those obtained by @kalwij2005labour.
 
 ```{r echo = FALSE, eval = TRUE, warning = FALSE, message = FALSE}
 # SOURCE DATA
