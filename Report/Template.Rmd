@@ -369,7 +369,7 @@ Probit models allow for the estimation of binary, random response variables [@sc
 
 @schild2017 defines the model formula as
 $$
-P(Y = 1 | X = x) = \Phi (x' \beta)
+P(Y = 1 | X = x) = \Phi (x' \beta)\tag{1}
 $$
 The error term is assumed to be independent and identically distributed (@wooldridge2012)
 
@@ -383,14 +383,14 @@ The marginal effect of $x_j$ on $P(Y = 1 | X = x)$ is defined as the effect of a
 According to @dergutedietmar, the Partial Effect at the Average is defined as
 
 $$
-PEA = \Phi(\hat{\beta_0} + \hat{\beta_1} \Sigma_{i = 1}^n x_i)\beta_1
+PEA = \Phi(\hat{\beta_0} + \hat{\beta_1} \Sigma_{i = 1}^n x_i)\beta_1\tag{2}
 $$
 
 The "Average Partial Effect"( or "Average Marginal Effect", APE) describes the effect of a regressor on the probability that $Y = 1$.
 @dergutedietmar defines it as
 
 $$
-APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1
+APE = \frac{1}{n} \Sigma_{i = 1}^n \Phi(\hat{\beta_0} + x_i \hat{\beta_1}) \beta_1\tag{3}
 $$
 
 where $\beta$ is the vector of coefficients and $x_i$ is the vector of observations at index i. $\Phi$ represents the cumulative standard normal distribution function.
@@ -499,7 +499,7 @@ In the context of probit regression, the Wald test can be used to test multiple 
 Depending on the estimation method and distributional assumptions, the Wald statistic can be formulated in different ways. The general form of the Wald statistic after MLE for testing hypothesis regarding our $k \times 1$ parameter vector $\theta$ is given by
 $$
 W = c(\hat{\theta})'[\nabla_{\theta}c(\hat{\theta})\hat{V}\nabla_{\theta}c(\hat{\theta})]^{-1}c(\hat{\theta})
-\tag{***}
+\tag{4}
 $$
 
 
@@ -507,11 +507,11 @@ where $c(\hat{\theta})$ is a $m \times 1$ vector of linear or nonlinear restrict
 at $\hat{\theta}$ and $\hat{V}$ is the estimated asymptotic covariance matrix [@wooldridge2010econometric, 463]. Under H0, the Wald test statistic is asymptotically $\chi2_m$ distributed, with m being the number of specified restrictions. In order to assure the test statistic W has the assumed limiting distribution, we need to impose some restrictions: Under H0, $\theta$ must lie within parameter space and R must be of rank m [@wooldridge2010econometric, 362].
 We limit our attention to testing a set of general linear restrictions since the Wald test is not invariant to the re-formulation of non-linear hypothesis. We thus formulate our null hypothesis in accordance with the common linear restriction structure of H0: $R \hat{\beta} = r$ against the alternative H1:  $R \hat{\beta} \neq r$ to facilitate the derivation of our test statistics, where R is a $m \times k$ matrix of rank m (equivalent to the Jacobian), whereas the restriction function r is a $m \times 1$ vector. Given the conditions mentioned above, the Wald statistic can then be rewritten as
 $$    W = (R \hat{\beta} - r)'[R \hat{V}R']^{-1}(R \hat{\beta} - r)
-\tag{***}
+\tag{5}
 $$
 which facilitates our calculations [@greene2012econometric, 527-529; @wooldridge2010econometric, 362]. When we are interested in the joint significance of a subset of $s$ coefficients, the Wald test statistic $W \stackrel{a}{\sim}\chi2_s$ can be simplified further [@wooldridge2010econometric, 362]:
  $$   W = \hat{\beta}_s'[R\hat{V}R']^{-1}\hat{\beta}_s = \hat{\beta}_s'[\hat{V}_s]^{-1}\hat{\beta}_s
- \tag{***}
+ \tag{6}
  $$
 
 \subsection{Implementation}
@@ -676,7 +676,7 @@ The simplest method to is to replace the existing covariates values $X$ with cou
 
 Obtaining the counterfactual probabilities $\hat{y}_{cf}$ requires a two-step procedure. First, the regular probit regression of $y$ on $X$ is tun to obtain the estimated coefficients $\hat{\beta}$. Second, the counterfactual probabilities for each individuals $\Pi_i$ are calculated by predicting y based on $X_{cf}$ and the estimated coefficients.
 
-$$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) = \Phi(xi_{cf}'{\beta}\tag{***}) $$
+$$ \Pi_{icf} = Pr(Yi=1|Xi=xi_{cf}) = \Phi(xi_{cf}'{\beta})\tag{7} $$
 
 We can assess counterfactual health-related effects by comparing the actual and counterfactual employment rates $\Pi_{ac}$ and $\Pi_{cf}$. We gain closer insights into the non-linear relation between health effects and participation by calculating $\Pi_{ac}$ and $\Pi_{cf}$ for different age groups. This also allows assessing the proportion of decline in participation that is due to decline in health condition according to our model estimates.
 
