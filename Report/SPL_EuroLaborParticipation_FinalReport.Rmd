@@ -20,8 +20,11 @@ nocite: |
 ---
 
 ```{r setup, eval = TRUE, echo = FALSE, include = TRUE}
-
-# NOTE: Please change the WD in order to run the file.
+###########################
+# IMPORTANT NOTE:
+# In order to create the final report, clone the repository from github:
+# https://github.com/phister/SPL_Project
+# and then change the working directory below to where you cloned the repo.
 
 wd = paste0(Sys.getenv("HOME"), "/Documents/Projects/SPL_Project")
 knitr::opts_knit$set(root.dir = wd)
