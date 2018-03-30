@@ -8,8 +8,8 @@
 # data frame in the datasets lists found in `easySHARE_clean.RData`
 # 
 # health.gridmap(xvar, facetting): generate a tile grid map by a variable in
-# dataset, facetted by either gender or age. if numeric than average is
-# calculated. if logical than % is calculated. both xvar and facetting should be
+# dataset, facetted by either gender or age. if numeric then average is
+# calculated. if logical then % is calculated. both xvar and facetting should be
 # character vectors. returns a grid object, which can be printed to device with # grid.draw() or saved with ggsave()
 # 
 # health.distribution(xvar, gen, countries, remove.outliers): show distribution
@@ -122,7 +122,7 @@ health.gridmap = function(xvar, facetting) {
     # IF GENDER SELECTED:
     if (facetting == 'gender') {
         
-        # if logical than calculate percentage
+        # if logical then calculate percentage
         if (is.logical(df.out[[xvar]])) {
             
             var.type = '% with'
@@ -146,7 +146,7 @@ health.gridmap = function(xvar, facetting) {
                 dplyr::select(iso3c, X, Y, `xvar`)
         }
         
-        # if numeric than calculate average
+        # if numeric then calculate average
         if (is.numeric(df.out[[xvar]])) {
             
             var.type = 'Avg.'
@@ -198,7 +198,7 @@ health.gridmap = function(xvar, facetting) {
     # IF AGE SELECTED:
     if (facetting == 'age') {
         
-        # if logical than calculate percentage
+        # if logical then calculate percentage
         if (is.logical(df.out[[xvar]])) {
             
             var.type = '% with'
@@ -232,7 +232,7 @@ health.gridmap = function(xvar, facetting) {
             names(df60)[4] = xvar
         }
         
-        # if numeric than calculate average
+        # if numeric then calculate average
         if (is.numeric(df.out[[xvar]])) {
             
             var.type = 'Avg.'
